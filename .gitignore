@@ -1,1 +1,19 @@
 specs/
+temp/
+
+
+# .NET / Visual Studio
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build outputs
+TestResults/
+coverage/
+*.db
+*.db-shm
+*.db-wal
