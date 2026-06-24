@@ -1,6 +1,7 @@
 using backend.DTOs.Auth;
 using backend.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace backend.Controllers;
 
@@ -37,5 +38,37 @@ public class AuthController : ControllerBase
             _logger.LogError(ex, "Unexpected error during registration");
             return StatusCode(500, new { message = "An unexpected error occurred" });
         }
+    }
+
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    {
+        try
+        {
+            var response = await _authService.LoginAsync(request);
+            return Ok(response);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            _logger.LogWarning("Login failed: {Message}", ex.Message);
+            return Unauthorized(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error during login");
+            return StatusCode(500, new { message = "An unexpected error occurred" });
+        }
+    }
+
+    [HttpPost("refresh")]
+    [AllowAnonymous]
+    public async Task<ActionResult<AuthResponse>> Refresh(
+        RefreshTokenRequest request)
+    {
+        var response =
+            await _authService.RefreshAsync(
+                request.RefreshToken);
+
+        return Ok(response);
     }
 }
