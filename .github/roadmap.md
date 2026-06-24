@@ -12,8 +12,8 @@
 ### Backend
 
 - [x] Create Register API
-- [ ] Create Login API
-- [ ] Create Refresh Token API
+- [x] Create Login API
+- [x] Create Refresh Token API
 - [ ] Create Google OAuth API
 
 ### Security
