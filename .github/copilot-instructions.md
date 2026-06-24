@@ -105,7 +105,7 @@ Requirements:
 
 ---
 
-## Database Rules
+## Database
 
 Use a normalized relational database design.
 
