@@ -1,80 +1,73 @@
 # Trail Explorer - Copilot Instructions
 
-## Project Context
+## Project Overview
 
 You are a senior full-stack software engineer.
 
-Project:
+Project Name:
 
 Trail Explorer
 
-Purpose:
+Project Type:
 
-A gamified hiking trail tracking application focused on Christchurch and Canterbury trails.
+Gamified hiking trail tracking application.
 
-Users can:
+Primary Goal:
 
-* Register and login
-* Login using Google OAuth
-* Browse hiking trails
-* Search and filter trails
-* Record completed trails
-* Earn XP
-* Unlock badges
-* Maintain streaks
-* View leaderboards
-* Track hiking progress
+Allow users to discover hiking trails, record trail completions, earn achievements, gain experience points, and track progress through a gamified experience.
 
 ---
 
-## Technology Stack
+# Technology Stack
 
-### Backend
+## Backend
 
 * ASP.NET Core Web API (.NET 10)
 * Entity Framework Core
 * SQLite
-* JWT Authentication
-* Google OAuth
-* BCrypt.Net
-* FluentValidation
-* SignalR
-* Serilog
-* IMemoryCache
-* Scalar API
 
-### Frontend
+## Frontend
 
 * React
 * TypeScript
+* React Router
 * Zustand
 * Tailwind CSS
 * Shadcn UI
-* React Router
 
-### Testing
+## Authentication
+
+* JWT Authentication
+* Refresh Tokens
+* Google OAuth
+* BCrypt Password Hashing
+
+## Testing
 
 * xUnit
 * Moq
 * Vitest
 * React Testing Library
 
-### DevOps
+## Infrastructure
 
+* SignalR
+* Serilog
+* IMemoryCache
 * Docker
 * Docker Compose
 
 ---
 
-## Architecture Rules
+# Architecture Rules
 
-Use a Service Layer architecture.
+Use Service Layer Architecture.
 
 Controllers must remain thin.
 
 Business logic belongs in Services.
 
-Database access should use Entity Framework Core.
+Use Entity Framework Core directly.
 
 Repository Pattern is NOT required.
 
@@ -82,225 +75,150 @@ Use Dependency Injection throughout the application.
 
 Use async/await for all I/O operations.
 
-Separate responsibilities clearly.
-
 Follow SOLID principles.
 
----
+Keep code production-ready.
 
-## External Integrations
-
-### DOC Public API
-
-Trail data is synchronized from the New Zealand Department of Conservation API.
-
-Requirements:
-
-* Use HttpClient
-* Create dedicated API client classes
-* Use DTOs for external models
-* Use BackgroundService for scheduled synchronization
-* Use Upsert logic when synchronizing trails
-* Implement fallback seed data if synchronization fails
+Do not generate placeholder implementations.
 
 ---
 
-## Database
+# Development Workflow
 
-Use a normalized relational database design.
+Before implementing any task:
 
-Do NOT create tables for:
+1. Read roadmap.md
+2. Determine the first incomplete task
+3. Identify the task category
+4. Load the required skill files
+5. Explain the implementation plan
+6. Wait for approval before modifying files
 
-* XP
-* Level
-* Streak
-* Leaderboard
+Never implement multiple roadmap tasks in a single execution.
 
-These values must be calculated dynamically from existing data.
-
-Primary keys should use Guid.
-
-Use foreign keys and navigation properties appropriately.
+Implement only the current task.
 
 ---
 
-## Authentication & Security Requirements
+# Skill Selection Rules
 
-Support:
+Determine the task category from roadmap.md.
 
-* Email and Password Authentication
-* Google OAuth Authentication
+## Database Tasks
 
-Implement:
+Examples:
 
-* JWT Authentication
-* Refresh Tokens
-* Role-Based Authorization (RBAC)
-* BCrypt Password Hashing
-* FluentValidation
-* Rate Limiting
+* Create Entity
+* Configure Table
+* Configure Relationships
 
-Roles:
+Load:
 
-* User
-* Moderator
-* Admin
-
-Security should be applied by default.
+.github/skills/database/skill.md
 
 ---
 
-## Advanced Features
+## Backend Tasks
 
-The project includes the following advanced features:
+Examples:
 
-### State Management
-
-Use Zustand for global application state.
-
-### Theme Switching
-
-Support:
-
-* Light Mode
-* Dark Mode
-
-Persist theme preference locally.
-
-### Real-Time Features
-
-Use SignalR for:
-
-* Real-time leaderboard updates
-* Real-time ranking changes
-
-### Logging
-
-Use Serilog.
-
-Log:
-
-* User Registration
-* User Login
-* Trail Completion
-* Badge Unlock
-* DOC Synchronization Jobs
-* Application Errors
-
-### Caching
-
-Use IMemoryCache for:
-
-* Trail Lists
-* Trail Details
-* Leaderboard Data
-
-### Docker
-
-Provide:
-
-* Backend Dockerfile
-* Frontend Dockerfile
-* docker-compose.yml
-
-Application should be runnable using Docker Compose.
-
----
-
-## Coding Standards
-
-### C#
-
-* Use nullable reference types
-* Use DTOs
-* Use FluentValidation
-* Use PascalCase naming
-* Use XML comments for public APIs
-* Prefer constructor injection
-* Keep methods small and focused
-
-### TypeScript
-
-* Use functional components
-* Use hooks
-* Use strict typing
-* Use Zustand stores
-* Use camelCase naming
-* Create reusable UI components
-
----
-
-## Testing Rules
-
-All business logic requires automated tests.
-
-Backend:
-
-* xUnit
-* Moq
-
-Frontend:
-
-* Vitest
-* React Testing Library
-
-Required test coverage:
-
+* API Endpoints
+* Services
+* DTOs
+* Validation
 * Authentication
 * Authorization
-* Trail Search
-* Trail Filtering
-* Trail Check-In
-* XP Calculation
-* Level Calculation
-* Badge Unlock Logic
-* Leaderboard Ranking
+* Caching
+* Logging
+
+Load:
+
+.github/skills/backend/skill.md
 
 ---
 
-## API Design Rules
+## Frontend Tasks
 
-Follow RESTful conventions.
+Examples:
 
-Use DTOs for requests and responses.
+* Pages
+* Components
+* Zustand Stores
+* Routing
+* Theme Switching
+* API Integration
 
-Validate all incoming requests.
+Load:
 
-Return appropriate HTTP status codes.
-
-Support:
-
-* Searching
-* Filtering
-* Pagination
-
-Implement caching where beneficial.
+.github/skills/frontend/skill.md
 
 ---
 
-## AI Behaviour
+## Gamification Tasks
 
-Generate production-ready code.
+Examples:
 
-Never generate placeholder TODO code.
+* XP
+* Levels
+* Streaks
+* Badges
+* Leaderboards
+* Dashboard Statistics
 
-Explain assumptions before generating code.
+Load:
 
-When implementing a feature generate:
+.github/skills/gamification/skill.md
 
-1. Entity
-2. DTOs
-3. Service Interface
-4. Service Implementation
-5. Controller
-6. Validation
-7. Unit Tests
+---
 
-When applicable also generate:
+## Testing Tasks
 
-8. SignalR Integration
-9. Caching Logic
-10. Logging
-11. Docker Configuration
+Examples:
 
-Always align generated code with the Trail Explorer architecture and database design.
+* Unit Tests
+* Integration Tests
+* Validation Tests
+* UI Tests
+
+Load:
+
+.github/skills/testing/skill.md
+
+---
+
+# Priority Rules
+
+When multiple files contain rules:
+
+1. roadmap.md
+   Defines what to build.
+
+2. skill.md files
+   Define how to build it.
+
+3. copilot-instructions.md
+   Defines project-wide architecture rules.
+
+If rules conflict:
+
+Skill files take precedence for implementation details.
+
+---
+
+# Important Restrictions
+
+Do not create future entities.
+
+Do not create future relationships.
+
+Do not infer requirements from future epics.
+
+Do not generate files outside the current task scope.
+
+Do not modify roadmap.md automatically.
+
+Only suggest roadmap updates after successful implementation.
+
+Always keep the project buildable.
+
+Prefer small incremental changes and small commits.

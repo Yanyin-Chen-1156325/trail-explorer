@@ -1,31 +1,63 @@
 # Next Task Workflow
 
-Read the following files:
+Read the following files in order:
 
-- roadmap.md
-- schema.md
-- .github/copilot-instructions.md
+1. .github/copilot-instructions.md
+2. .github/roadmap.md
 
-Read any relevant skill files before making changes.
+Determine the first incomplete roadmap task.
 
-Workflow:
+Identify the task category.
 
-1. Find the first incomplete task in roadmap.md.
-2. Determine which files are relevant.
-3. Implement ONLY that task.
-4. Do not start the next roadmap task.
-5. Follow schema.md as the source of truth.
-6. Follow all architecture and coding rules.
-7. Keep the project buildable.
-8. Do not generate future entities or relationships.
+Load the required skill files according to the Skill Selection Rules defined in copilot-instructions.md.
 
-Before making changes:
+Do not modify any files yet.
 
-- Explain what will be created.
-- Explain why it is required.
+Perform analysis only.
 
-After implementation:
+Output the following:
 
-- List files created.
-- List files modified.
-- Suggest a commit message.
+## Current Task
+
+The first incomplete roadmap task.
+
+## Task Category
+
+Examples:
+
+* Database
+* Backend
+* Frontend
+* Gamification
+* Testing
+* Security
+* Caching
+* SignalR
+
+## Relevant Skills
+
+List the skill files that will be used.
+
+## Files To Create
+
+List any new files that should be created.
+
+## Files To Modify
+
+List any existing files that should be modified.
+
+## Implementation Plan
+
+Provide a short implementation plan.
+
+## Risks Or Dependencies
+
+Identify any missing dependencies or blockers.
+
+Do not generate code.
+
+Do not create files.
+
+Do not modify files.
+
+Wait for approval before implementation.

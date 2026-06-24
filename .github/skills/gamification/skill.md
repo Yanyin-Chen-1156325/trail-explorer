@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Use this skill whenever implementing gamification features for Trail Explorer.
+Use this skill whenever implementing gamification features.
 
 This skill defines the business rules for:
 
@@ -13,26 +13,31 @@ This skill defines the business rules for:
 * Leaderboards
 * Dashboard Statistics
 
-Always follow these rules unless explicitly instructed otherwise.
+This skill is NOT responsible for:
+
+* Database Design
+* Entity Definitions
+* API Endpoints
+* Controllers
+* Authentication
+* Frontend Components
+
+Those concerns belong to other skills.
 
 ---
 
-## Core Principle
+# Core Principle
 
 Gamification values are derived from user activity.
 
-Do NOT create database tables for:
+Never create database tables for:
 
 * XP
 * Level
 * Streak
 * Leaderboard
 
-These values must be calculated dynamically from:
-
-* CheckIns
-* Trails
-* UserBadges
+These values must always be calculated dynamically.
 
 ---
 
@@ -44,46 +49,49 @@ XP is awarded when a user completes a trail.
 
 Base XP:
 
+```text id="9w1mq0"
 DistanceKm × 10
+```
 
 Difficulty Multiplier:
 
-Easy = 1.0
-
+```text id="8bhd9z"
+Easy         = 1.0
 Intermediate = 1.2
-
-Advanced = 1.5
-
-Expert = 2.0
+Advanced     = 1.5
+Expert       = 2.0
+```
 
 Final Formula:
 
+```text id="1gg7fw"
 XP = (DistanceKm × 10) × DifficultyMultiplier
+```
 
 ## Examples
 
+```text id="8o1x0m"
 5km Easy
-
 = 50 XP
 
 10km Intermediate
-
 = 120 XP
 
 12km Advanced
-
 = 180 XP
 
 20km Expert
-
 = 400 XP
+```
 
 ## Requirements
 
 Generate:
 
-* XpCalculatorService
-* Unit Tests
+```text id="igpv1f"
+IXpCalculatorService
+XpCalculatorService
+```
 
 XP should never be stored in the database.
 
@@ -93,93 +101,72 @@ XP should never be stored in the database.
 
 Levels are calculated from Total XP.
 
-Level should never be stored in the database.
+Levels should never be stored.
 
 ## Level Thresholds
 
-Level 1 = 0 XP
-
-Level 2 = 500 XP
-
-Level 3 = 1,000 XP
-
-Level 4 = 2,000 XP
-
-Level 5 = 3,500 XP
-
-Level 6 = 5,000 XP
-
-Level 7 = 7,500 XP
-
-Level 8 = 10,000 XP
-
-Level 9 = 15,000 XP
-
-Level 10 = 20,000 XP
+```text id="64ev4x"
+Level 1  = 0 XP
+Level 2  = 500 XP
+Level 3  = 1000 XP
+Level 4  = 2000 XP
+Level 5  = 3500 XP
+Level 6  = 5000 XP
+Level 7  = 7500 XP
+Level 8  = 10000 XP
+Level 9  = 15000 XP
+Level 10 = 20000 XP
+```
 
 ## Requirements
 
 Generate:
 
-* LevelCalculatorService
-* Unit Tests
+```text id="l80hgh"
+ILevelCalculatorService
+LevelCalculatorService
+```
 
 ---
 
 # Weekly Streak System
 
-A streak is maintained when a user completes at least one trail check-in during a calendar week.
+A streak is maintained when a user completes at least one trail during a calendar week.
 
 ## Rules
 
-A week counts if:
+A week counts when:
 
-* At least one check-in exists during the week
+```text id="i0f5wq"
+At least one check-in exists during the week.
+```
 
-Multiple check-ins within the same week:
+Multiple check-ins in the same week:
 
-* Count as a single successful week
+```text id="r9r1db"
+Count as one successful week.
+```
 
 Missing a week:
 
-* Resets the streak
-
-## Examples
-
-Week 1 ✓
-
-Week 2 ✓
-
-Week 3 ✓
-
-Week 4 ✓
-
-Current Streak = 4
-
----
-
-Week 1 ✓
-
-Week 2 ✓
-
-Week 3 ✗
-
-Week 4 ✓
-
-Current Streak = 1
+```text id="p7if4j"
+Resets the streak.
+```
 
 ## Requirements
 
 Generate:
 
-* StreakCalculatorService
-* Unit Tests
+```text id="av1mqz"
+IStreakCalculatorService
+StreakCalculatorService
+```
 
-Streak should never be stored in the database.
+Streak should never be stored.
 
 ---
 
-# Badge System
+# Achievement System
 
 Badges are defined in the Badge table.
 
@@ -187,184 +174,212 @@ Unlocked badges are stored in UserBadge.
 
 Generate:
 
-* BadgeEngine
-* BadgeEvaluationService
-* BadgeUnlockService
-* Unit Tests
+```text id="7qayzu"
+IBadgeEvaluationService
+BadgeEvaluationService
+
+IBadgeUnlockService
+BadgeUnlockService
+```
 
 ---
 
-## Completion Badges
+# Completion Badges
 
-### First Trail
-
-Requirement:
-
-Complete 1 trail
-
-### Trail Explorer
+## First Trail
 
 Requirement:
 
-Complete 10 trails
+```text id="f8a9oc"
+1 completed trail
+```
 
-### Trail Master
-
-Requirement:
-
-Complete 25 trails
-
-### Trail Legend
+## Trail Explorer
 
 Requirement:
 
-Complete 50 trails
+```text id="hn53mz"
+10 completed trails
+```
 
-### Trail Champion
+## Trail Master
 
 Requirement:
 
-Complete 100 trails
+```text id="pk2kdh"
+25 completed trails
+```
+
+## Trail Legend
+
+Requirement:
+
+```text id="h5zhxk"
+50 completed trails
+```
+
+## Trail Champion
+
+Requirement:
+
+```text id="jktkhv"
+100 completed trails
+```
 
 ---
 
-## Distance Badges
+# Distance Badges
 
-### 50km Explorer
+## 50km Explorer
 
-Requirement:
+```text id="hvkr3e"
+50km total distance
+```
 
-Complete 50km total distance
+## 100km Explorer
 
-### 100km Explorer
+```text id="lgv15d"
+100km total distance
+```
 
-Requirement:
+## 250km Explorer
 
-Complete 100km total distance
+```text id="h1z0jm"
+250km total distance
+```
 
-### 250km Explorer
+## 500km Explorer
 
-Requirement:
+```text id="mhk0kn"
+500km total distance
+```
 
-Complete 250km total distance
+## 1000km Explorer
 
-### 500km Explorer
-
-Requirement:
-
-Complete 500km total distance
-
-### 1000km Explorer
-
-Requirement:
-
-Complete 1000km total distance
-
----
-
-## Region Badges
-
-### Port Hills Explorer
-
-Requirement:
-
-Complete trails in Port Hills
-
-### Banks Peninsula Explorer
-
-Requirement:
-
-Complete trails in Banks Peninsula
-
-### Canterbury Explorer
-
-Requirement:
-
-Complete trails across Canterbury regions
+```text id="w83vn9"
+1000km total distance
+```
 
 ---
 
-## Difficulty Badges
+# Region Badges
 
-### Advanced Explorer
-
-Requirement:
-
-Complete first Advanced trail
-
-### Expert Explorer
+## Port Hills Explorer
 
 Requirement:
 
-Complete first Expert trail
+```text id="q5nmxt"
+Complete trails in Port Hills.
+```
 
-### Expert Specialist
-
-Requirement:
-
-Complete 5 Expert trails
-
-### Expert Master
+## Banks Peninsula Explorer
 
 Requirement:
 
-Complete 10 Expert trails
+```text id="gctcgt"
+Complete trails in Banks Peninsula.
+```
+
+## Canterbury Explorer
+
+Requirement:
+
+```text id="8o1ex6"
+Complete trails across Canterbury regions.
+```
 
 ---
 
-## Weekly Streak Badges
+# Difficulty Badges
 
-### 2 Week Streak
-
-Requirement:
-
-Maintain a 2-week streak
-
-### 4 Week Streak
+## Advanced Explorer
 
 Requirement:
 
-Maintain a 4-week streak
+```text id="lgolfe"
+First Advanced trail.
+```
 
-### 8 Week Streak
-
-Requirement:
-
-Maintain an 8-week streak
-
-### 12 Week Streak
+## Expert Explorer
 
 Requirement:
 
-Maintain a 12-week streak
+```text id="upcxv3"
+First Expert trail.
+```
 
-### 24 Week Streak
+## Expert Specialist
 
 Requirement:
 
-Maintain a 24-week streak
+```text id="vrczqg"
+5 Expert trails.
+```
+
+## Expert Master
+
+Requirement:
+
+```text id="k6u4qn"
+10 Expert trails.
+```
 
 ---
 
-# Leaderboard System
+# Streak Badges
+
+## 2 Week Streak
+
+```text id="xx77n9"
+2 consecutive weeks
+```
+
+## 4 Week Streak
+
+```text id="f2eh8q"
+4 consecutive weeks
+```
+
+## 8 Week Streak
+
+```text id="eb3b3d"
+8 consecutive weeks
+```
+
+## 12 Week Streak
+
+```text id="l1wb8y"
+12 consecutive weeks
+```
+
+## 24 Week Streak
+
+```text id="4vjlwm"
+24 consecutive weeks
+```
+
+---
+
+# Leaderboard Rules
 
 Leaderboards are calculated dynamically.
 
-Do NOT create a Leaderboard table.
+Never create a Leaderboard table.
 
 Generate:
 
-* LeaderboardService
-* Ranking DTOs
-* Unit Tests
+```text id="kp63yb"
+ILeaderboardService
+LeaderboardService
+```
 
-## Ranking Rules
+Ranking Order:
 
-Sort users by:
-
-1. Total XP (Descending)
-2. Trails Completed (Descending)
-3. Total Distance (Descending)
+```text id="d8zb0d"
+1. Total XP Descending
+2. Completed Trails Descending
+3. Total Distance Descending
+```
 
 ---
 
@@ -376,92 +391,58 @@ Generate calculations for:
 * Current Level
 * Completed Trails
 * Total Distance
-* Current Weekly Streak
+* Weekly Streak
 * Unlocked Badges
 * Leaderboard Rank
 
-All values should be calculated dynamically.
+All values must be calculated dynamically.
 
 ---
 
 # Gamification Event Flow
 
-Whenever a CheckIn is created:
+When a CheckIn is created:
 
+```text id="m3n0i2"
 1. Save CheckIn
 2. Recalculate XP
 3. Recalculate Level
 4. Recalculate Weekly Streak
 5. Evaluate Badge Unlocks
 6. Refresh Leaderboard Rankings
-7. Broadcast SignalR Updates
+```
+
+This defines business flow only.
+
+Implementation details belong to Backend Skill.
 
 ---
 
-# SignalR Integration
+# Task Resolution Rules
 
-Broadcast events when gamification changes occur.
+Determine the current task from roadmap.md.
 
-Examples:
+Generate only the services required by the current task.
 
-* XPUpdated
-* BadgeUnlocked
-* RankChanged
+Do not implement future roadmap tasks.
 
-Use SignalR for real-time leaderboard updates.
-
----
-
-# Testing Requirements
-
-All gamification logic must be covered by automated tests.
-
-Required coverage:
-
-## XP
-
-* Easy Trail XP
-* Intermediate Trail XP
-* Advanced Trail XP
-* Expert Trail XP
-
-## Levels
-
-* Level Thresholds
-* Boundary Conditions
-
-## Streaks
-
-* Consecutive Weeks
-* Missing Week
-* Multiple CheckIns Same Week
-
-## Badges
-
-* Completion Badges
-* Distance Badges
-* Region Badges
-* Difficulty Badges
-* Streak Badges
-
-## Leaderboards
-
-* Ranking Order
-* Tie Scenarios
+Do not generate unrelated services.
 
 ---
 
 # Output Expectations
 
-When implementing a gamification feature generate:
+Before generating code:
 
-1. Service Interface
-2. Service Implementation
-3. DTOs
-4. Unit Tests
+* Explain business rules
+* Explain assumptions
 
-Explain business rules before generating code.
+Generated code should be:
+
+* Production-ready
+* Testable
+* Maintainable
 
 Keep all rule values centralized.
 
-Never hardcode rule values across multiple services.
+Never duplicate rule values across multiple services.

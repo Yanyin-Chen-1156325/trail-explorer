@@ -2,22 +2,33 @@
 
 ## Purpose
 
-Use this skill whenever implementing frontend functionality for Trail Explorer.
+Use this skill whenever implementing frontend functionality.
 
-This skill focuses on:
+This skill is responsible for:
 
-* React pages
-* Components
-* State management
-* API integration
-* User experience
-* Responsive design
+* React Pages
+* React Components
+* Zustand Stores
+* API Integration
+* Routing
+* Theme Switching
+* Responsive Design
+* User Experience
 
-Always follow the rules defined in `copilot-instructions.md`.
+This skill is NOT responsible for:
+
+* Entity Definitions
+* Database Design
+* Business Rules
+* XP Calculations
+* Level Calculations
+* Badge Logic
+
+Those concerns belong to Database Skill and Gamification Skill.
 
 ---
 
-## Technology Requirements
+# Technology Stack
 
 Use:
 
@@ -28,94 +39,126 @@ Use:
 * Tailwind CSS
 * Shadcn UI
 
-Do not introduce alternative frameworks unless explicitly requested.
+Do not introduce additional frameworks unless explicitly requested.
 
 ---
 
-## Folder Structure
+# Folder Structure
 
-Use a feature-based folder structure.
+Frontend code should use a feature-based structure.
 
 Example:
 
+```text id="o8iy4d"
 src/
 
 features/
 
-* auth/
-* trails/
-* checkins/
-* dashboard/
-* badges/
-* leaderboard/
+  auth/
+  trails/
+  checkins/
+  dashboard/
+  badges/
+  leaderboard/
 
 shared/
 
-* components/
-* layouts/
-* hooks/
-* lib/
-* types/
+  components/
+  layouts/
+  hooks/
+  lib/
+  types/
+```
 
-Each feature should contain:
+Each feature may contain:
 
-* pages
-* components
-* services
-* hooks
-* types
+```text id="um0l3z"
+pages/
+components/
+services/
+hooks/
+types/
+```
 
 Keep related files together.
 
 ---
 
-## Component Rules
+# Component Rules
 
 Use functional components only.
 
-Use hooks instead of class components.
+Use React Hooks.
+
+Do not use class components.
 
 Components should:
 
 * Have a single responsibility
-* Be reusable
-* Remain small and focused
+* Remain reusable
+* Remain focused
 
 Prefer composition over large components.
 
+Avoid deeply nested component trees.
+
 ---
 
-## State Management Rules
+# TypeScript Rules
+
+Use strict typing.
+
+Create dedicated interfaces and types.
+
+Avoid:
+
+```typescript
+any
+```
+
+Avoid unsafe type assertions.
+
+Prefer explicit types.
+
+All API responses should be strongly typed.
+
+---
+
+# State Management Rules
 
 Use Zustand for global state.
 
 Examples:
 
-* Authentication
-* User Profile
-* Theme Preferences
+```text id="xtqlww"
+Authentication
+Theme
+User Profile
+```
 
 Do not use Redux.
 
-Do not place global state inside React Context unless specifically required.
+Do not use Context API for global application state unless explicitly required.
+
+Store logic should remain simple and focused.
 
 ---
 
-## API Integration Rules
+# API Integration Rules
 
 Create dedicated API service files.
 
-Example:
+Examples:
 
+```text id="7k1wlu"
 authApi.ts
-
 trailApi.ts
-
 checkInApi.ts
-
 dashboardApi.ts
+leaderboardApi.ts
+```
 
-Do not place fetch logic directly inside components.
+Do not place fetch logic directly inside pages or components.
 
 Use typed request and response models.
 
@@ -125,56 +168,119 @@ Handle:
 * Error
 * Success
 
-states appropriately.
+states consistently.
 
 ---
 
-## Routing Rules
+# Routing Rules
 
 Use React Router.
 
-Protect authenticated routes.
+Separate:
+
+## Public Routes
 
 Examples:
 
-Public Routes
+```text id="zkl7dd"
+/
+/login
+/register
+```
 
-* Login
-* Register
+## Protected Routes
 
-Protected Routes
+Examples:
 
-* Dashboard
-* Trails
-* CheckIns
-* Badges
-* Leaderboard
+```text id="s1if4o"
+/dashboard
+/trails
+/checkins
+/badges
+/leaderboard
+```
 
-Generate ProtectedRoute components when required.
+Generate ProtectedRoute components when authentication is required.
 
 ---
 
-## UI Component Rules
+# Authentication UI Rules
+
+Generate:
+
+* Login Page
+* Register Page
+* Google Login Button
+
+Store authentication state using Zustand.
+
+Support:
+
+* Login
+* Logout
+* Token Refresh
+* Authentication Persistence
+
+Handle expired sessions gracefully.
+
+---
+
+# Shadcn UI Rules
 
 Use Shadcn UI as the primary component library.
 
-Use Tailwind CSS for styling.
-
-Create reusable components where appropriate.
-
 Examples:
 
-* TrailCard
-* BadgeCard
-* StatCard
-* LeaderboardTable
-* XpProgressBar
+```text id="pdjlwm"
+Button
+Card
+Dialog
+DropdownMenu
+Sheet
+Tabs
+Toast
+```
 
-Avoid duplicating UI patterns.
+Avoid creating custom components when an appropriate Shadcn component already exists.
 
 ---
 
-## Theme Switching
+# Tailwind Rules
+
+Use Tailwind utilities for styling.
+
+Avoid inline styles.
+
+Prefer utility classes.
+
+Keep styling consistent throughout the application.
+
+---
+
+# Responsive Design Rules
+
+Support:
+
+* Mobile
+* Tablet
+* Desktop
+
+Pages should remain usable on small screens.
+
+Use responsive Tailwind utilities.
+
+Examples:
+
+```text id="k5q4t0"
+sm:
+md:
+lg:
+xl:
+```
+
+---
+
+# Theme Rules
 
 Support:
 
@@ -189,187 +295,161 @@ Requirements:
 
 Generate:
 
-* Theme Store
-* Theme Toggle Component
+```text id="i8r6e6"
+themeStore.ts
+ThemeToggle.tsx
+```
 
 ---
 
-## Responsive Design Rules
-
-Support:
-
-* Mobile
-* Tablet
-* Desktop
-
-Use responsive Tailwind utilities.
-
-Pages should remain usable on small screens.
-
-Leaderboard and Dashboard must be mobile-friendly.
-
----
-
-## User Experience Rules
+# User Experience Rules
 
 Always provide:
 
-### Loading State
+## Loading States
 
 Examples:
 
 * Skeletons
 * Loading Indicators
 
-### Error State
+## Error States
 
 Examples:
 
 * Error Messages
 * Retry Actions
 
-### Empty State
+## Empty States
 
 Examples:
 
 * No Trails Found
-* No CheckIns Yet
+* No Check-Ins Yet
 * No Badges Unlocked
 
-### Success Feedback
+## Success Feedback
 
 Examples:
 
 * Toast Notifications
 * Success Messages
 
+Never leave users without feedback.
+
 ---
 
-## Authentication UI Rules
+# Feature-Specific Components
+
+## Trail Discovery
+
+Examples:
+
+```text id="jvlyl0"
+TrailCard
+TrailSearchBar
+DifficultyFilter
+TrailList
+```
+
+## Check-In System
+
+Examples:
+
+```text id="65fqce"
+CheckInForm
+CheckInHistory
+CheckInCard
+```
+
+## Dashboard
+
+Examples:
+
+```text id="6v1t34"
+StatisticsCard
+ProgressWidget
+DashboardSummary
+```
+
+## Achievement System
+
+Examples:
+
+```text id="8v8v9o"
+BadgeCard
+BadgeWall
+BadgeUnlockModal
+```
+
+## Leaderboard
+
+Examples:
+
+```text id="0dz1ga"
+LeaderboardTable
+LeaderboardRow
+RankBadge
+```
+
+---
+
+# SignalR Rules
+
+When implementing real-time functionality:
 
 Generate:
 
-* Login Page
-* Register Page
-* Google Login Button
+```text id="26qjhk"
+signalrClient.ts
+```
 
 Support:
 
-* JWT Authentication
-* Google OAuth
-
-Store authentication state in Zustand.
-
-Handle:
-
-* Login
-* Logout
-* Token Expiration
-
----
-
-## Dashboard Rules
-
-Display:
-
-* Current Level
-* Total XP
-* Weekly Streak
-* Completed Trails
-* Total Distance
-* Unlocked Badges
-* Leaderboard Rank
-
-Dashboard data should come from backend APIs.
-
-Avoid duplicating calculation logic in the frontend.
-
----
-
-## Leaderboard Rules
-
-Display:
-
-* Rank
-* User
-* XP
-* Completed Trails
-* Distance
-
-Support real-time updates via SignalR.
-
-Update UI without page refresh.
-
----
-
-## SignalR Rules
-
-Generate:
-
-* SignalR Client
 * Connection Management
 * Reconnection Handling
+* Event Subscriptions
 
 Use SignalR for:
 
 * Leaderboard Updates
-* Badge Unlock Notifications
 * XP Updates
+* Badge Notifications
 
 ---
 
-## TypeScript Rules
+# Testing Rules
 
-Use strict typing.
+Frontend tests belong to Testing Skill.
 
-Avoid:
-
-* any
-* unknown workarounds
-
-Create dedicated types and interfaces.
-
-Prefer type safety throughout the application.
+Do not generate tests unless the roadmap task is a Testing task.
 
 ---
 
-## Testing Rules
+# Task Resolution Rules
 
-Use:
+Determine the current task from roadmap.md.
 
-* Vitest
-* React Testing Library
+Generate only files required by that task.
 
-Generate tests for:
+Do not implement future roadmap tasks.
 
-* Components
-* Hooks
-* Zustand Stores
-* User Interactions
-
-Focus on behavior rather than implementation details.
+Do not generate unrelated pages, components, stores, or services.
 
 ---
 
-## Output Expectations
+# Output Expectations
 
-When implementing a frontend feature generate:
+Before generating code:
 
-1. Page Component
-2. Child Components
-3. Zustand Store (if required)
-4. API Service
-5. Types
-6. Unit Tests
+* Explain assumptions
+* Explain design decisions
 
-When applicable also generate:
+Generated code should be:
 
-7. Theme Integration
-8. SignalR Integration
-9. Loading / Error / Empty States
-
-Generate production-ready React code.
+* Production-ready
+* Readable
+* Reusable
+* Maintainable
 
 Never generate placeholder TODO implementations.
-
-Keep UI consistent with the Trail Explorer design system.

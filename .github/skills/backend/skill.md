@@ -2,60 +2,72 @@
 
 ## Purpose
 
-Use this skill whenever implementing backend functionality for Trail Explorer.
+Use this skill whenever implementing backend functionality.
 
-This skill focuses on:
+This skill is responsible for:
 
-* API development
-* Domain logic
-* Database access
+* API Endpoints
+* DTOs
+* Services
 * Validation
 * Authentication
-* Integration services
+* Authorization
+* Dependency Injection
+* Caching
+* Logging
+* External Integrations
 
-Always follow the rules defined in `copilot-instructions.md`.
+This skill is NOT responsible for:
 
----
+* Entity definitions
+* Enum definitions
+* Entity relationships
+* DbContext configuration
+* EF Core migrations
 
-## Backend Feature Checklist
-
-When implementing a backend feature generate:
-
-1. Entity (if required)
-2. DTOs
-3. Service Interface
-4. Service Implementation
-5. Controller
-6. Validation
-7. Dependency Injection Registration
-8. Unit Tests
-
-Generate all required files unless explicitly instructed otherwise.
+Those concerns belong to Database Skill.
 
 ---
 
-## Entity Rules
+# Project Structure
 
-Entities should:
+Backend files should be placed in:
 
-* Use Guid primary keys
-* Use navigation properties
-* Use nullable reference types
-* Contain only domain data
+backend/
 
-Do not place business logic inside entities.
-
-Example:
-
-* User
-* Trail
-* CheckIn
-* Badge
-* RefreshToken
+├── Controllers/
+├── DTOs/
+├── Services/
+├── Validators/
+├── Authentication/
+├── Integrations/
+└── Extensions/
 
 ---
 
-## DTO Rules
+# Architecture Rules
+
+Use Service Layer Architecture.
+
+Controllers must remain thin.
+
+Business logic belongs in Services.
+
+Use Dependency Injection.
+
+Use async/await for all I/O operations.
+
+Follow SOLID principles.
+
+Keep methods small and focused.
+
+Repository Pattern is NOT required.
+
+Services may access DbContext directly.
+
+---
+
+# DTO Rules
 
 Use DTOs for all API requests and responses.
 
@@ -66,123 +78,139 @@ Generate:
 * Request DTOs
 * Response DTOs
 
-Separate create/update requests from response models.
+Examples:
+
+```text id="zq56dq"
+RegisterRequest
+LoginRequest
+TrailResponse
+CheckInResponse
+```
+
+Separate Create and Update DTOs when appropriate.
 
 ---
 
-## Service Rules
+# Service Rules
 
 Business logic belongs in Services.
 
 Services should:
 
-* Be focused on a single responsibility
+* Have a single responsibility
 * Be testable
-* Use dependency injection
+* Be dependency injected
 
 Examples:
 
-* AuthenticationService
-* TrailService
-* CheckInService
-* DashboardService
+```text id="onh1dr"
+AuthenticationService
+TrailService
+CheckInService
+DashboardService
+LeaderboardService
+```
 
-Avoid placing business logic in Controllers.
+Services may:
+
+* Use DbContext
+* Use External APIs
+* Use Cache
+* Use SignalR
+
+Controllers should never contain business logic.
 
 ---
 
-## Controller Rules
+# Controller Rules
 
-Controllers should remain thin.
-
-Controllers may:
+Controllers should:
 
 * Receive requests
-* Validate input
 * Call services
-* Return HTTP responses
+* Return responses
 
 Controllers should not:
 
-* Query DbContext directly
+* Access DbContext directly
 * Perform calculations
-* Contain business rules
+* Implement business rules
+
+Always use RESTful conventions.
+
+Examples:
+
+```text id="v62f63"
+GET    /api/trails
+GET    /api/trails/{id}
+
+POST   /api/auth/register
+POST   /api/auth/login
+
+POST   /api/checkins
+
+PUT    /api/checkins/{id}
+
+DELETE /api/checkins/{id}
+```
+
+Return appropriate HTTP status codes.
+
+Use ProblemDetails when appropriate.
 
 ---
 
-## Validation Rules
+# Validation Rules
 
 Use FluentValidation.
 
 Generate validators for:
 
+* Request DTOs
+* Authentication requests
 * Create requests
 * Update requests
-* Authentication requests
 
 Validate:
 
 * Required fields
 * Length limits
-* Email formats
+* Email format
 * Business constraints
-
----
-
-## Database Rules
-
-Use Entity Framework Core.
-
-Use:
-
-* DbContext
-* LINQ
-* Async queries
-
-Repository Pattern is NOT required.
-
-Prefer direct use of DbContext inside Services.
-
-Always use:
-
-* AsNoTracking() for read-only queries
-* CancellationToken when appropriate
-
----
-
-## API Design Rules
-
-Follow REST conventions.
 
 Examples:
 
-GET
+```text id="0s8jot"
+RegisterRequestValidator
+LoginRequestValidator
+CreateCheckInValidator
+```
 
-/api/trails
+Validation belongs in Validators.
 
-/api/trails/{id}
-
-POST
-
-/api/checkins
-
-/api/auth/login
-
-PUT
-
-/api/checkins/{id}
-
-DELETE
-
-/api/checkins/{id}
-
-Use appropriate HTTP status codes.
-
-Return ProblemDetails for errors when appropriate.
+Do not place validation inside Controllers.
 
 ---
 
-## Authentication Rules
+# Dependency Injection Rules
+
+Register all services using DI.
+
+Examples:
+
+```csharp id="vfsk1t"
+builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+
+builder.Services.AddScoped<ITrailService, TrailService>();
+
+builder.Services.AddScoped<ICheckInService, CheckInService>();
+```
+
+Keep registrations organized.
+
+---
+
+# Authentication Rules
 
 Support:
 
@@ -194,7 +222,6 @@ Generate:
 * Register Endpoint
 * Login Endpoint
 * Refresh Token Endpoint
-* Logout Endpoint
 * Google OAuth Endpoint
 
 Use:
@@ -207,96 +234,133 @@ Never store plain text passwords.
 
 ---
 
-## Authorization Rules
+# JWT Rules
+
+Generate:
+
+```text id="mfdb99"
+JwtOptions
+JwtTokenGenerator
+IJwtTokenGenerator
+```
+
+JWT should contain:
+
+* User Id
+* Email
+* Role
+
+Use configuration values from appsettings.
+
+Token generation belongs in Authentication services.
+
+---
+
+# Authorization Rules
 
 Use Role-Based Authorization.
 
 Roles:
 
-* User
-* Moderator
-* Admin
+```text id="dbrl8f"
+User
+Moderator
+Admin
+```
 
 Protect endpoints using Authorize attributes.
 
-Example:
+Examples:
 
-* Admin-only operations
-* Moderator trail management
+```csharp id="09dl6t"
+[Authorize]
 
----
+[Authorize(Roles = "Admin")]
 
-## DOC API Integration Rules
+[Authorize(Roles = "Moderator")]
+```
 
-When working with DOC synchronization:
-
-Generate:
-
-* API Client
-* DTO Models
-* Mapping Logic
-* Synchronization Service
-
-Requirements:
-
-* Use HttpClientFactory
-* Handle API failures gracefully
-* Implement retry logic when appropriate
-* Use Upsert synchronization
+Authorization rules belong in Controllers and Services.
 
 ---
 
-## Logging Rules
+# Logging Rules
 
-Use structured logging.
+Use ILogger.
 
-Log:
+Log important events:
 
 * User Registration
 * User Login
 * Trail Completion
 * Badge Unlock
-* Synchronization Jobs
-* Errors
+* DOC Synchronisation
+* Application Errors
 
-Use ILogger abstraction.
+Use structured logging.
 
 Do not use Console.WriteLine.
 
 ---
 
-## Caching Rules
+# Caching Rules
 
-Use IMemoryCache when beneficial.
+Use IMemoryCache.
 
 Cache:
 
-* Trail Lists
+* Trail List
 * Trail Details
-* Leaderboards
+* Leaderboard
 
-Invalidate cache when relevant data changes.
+Cache logic belongs in Services.
+
+Invalidate cache when data changes.
 
 ---
 
-## SignalR Rules
+# DOC Integration Rules
 
-When implementing real-time features:
+When implementing DOC synchronisation:
+
+Generate:
+
+* DTO Models
+* API Client
+* Mapping Logic
+* Synchronisation Service
+
+Use:
+
+* HttpClientFactory
+* Dependency Injection
+
+Handle failures gracefully.
+
+Implement Upsert behaviour.
+
+---
+
+# SignalR Rules
+
+When implementing real-time functionality:
 
 Generate:
 
 * Hub
-* Hub Interface (if needed)
 * Broadcast Logic
 
 Use SignalR for:
 
 * Leaderboard Updates
-* Ranking Changes
+* XP Updates
+* Badge Unlock Notifications
+
+SignalR logic belongs in Services.
 
 ---
 
-## Error Handling Rules
+# Error Handling Rules
 
 Handle expected failures gracefully.
 
@@ -304,44 +368,38 @@ Examples:
 
 * Not Found
 * Validation Failure
-* Unauthorized Access
+* Unauthorized
+* Forbidden
 * External API Failure
 
-Avoid exposing internal exception details.
+Do not expose internal exception details.
 
 ---
 
-## Testing Rules
+# Task Resolution Rules
 
-Generate xUnit tests.
+Determine the current task from roadmap.md.
 
-Use:
+Only generate files required by that task.
 
-* Moq
-* FluentAssertions
+Do not implement future roadmap tasks.
 
-Test:
-
-* Business Rules
-* Validation Rules
-* Service Logic
-* Error Handling
-
-Do not test EF Core internals.
-
-Mock external dependencies.
+Do not generate unrelated files.
 
 ---
 
-## Output Expectations
+# Output Expectations
 
-Generated backend code should be:
+Before generating code:
+
+* Explain assumptions
+* Explain design decisions
+
+Generated code should be:
 
 * Production-ready
-* Readable
 * Testable
+* Readable
 * Maintainable
-
-Always explain major design decisions before generating code.
 
 Never generate placeholder TODO implementations.

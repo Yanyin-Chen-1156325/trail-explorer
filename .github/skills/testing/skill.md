@@ -2,24 +2,29 @@
 
 ## Purpose
 
-Use this skill whenever generating automated tests for Trail Explorer.
+Use this skill whenever implementing automated tests.
 
-The goal is to verify:
+This skill is responsible for:
+
+* Unit Tests
+* Integration Tests
+* Validation Tests
+* UI Tests
+
+This skill is NOT responsible for:
 
 * Business Rules
-* Validation Rules
-* Security Rules
-* API Behavior
-* User Interactions
-* Gamification Logic
+* Database Design
+* API Design
+* Frontend Design
 
-Always prioritize meaningful tests over simple code coverage.
+Those concerns belong to other skills.
 
 ---
 
-## Testing Stack
+# Testing Stack
 
-### Backend
+## Backend
 
 Use:
 
@@ -27,14 +32,14 @@ Use:
 * Moq
 * FluentAssertions
 
-### Frontend
+## Frontend
 
 Use:
 
 * Vitest
 * React Testing Library
 
-Do not introduce alternative testing frameworks unless explicitly requested.
+Do not introduce alternative testing frameworks.
 
 ---
 
@@ -42,13 +47,18 @@ Do not introduce alternative testing frameworks unless explicitly requested.
 
 Focus on:
 
-* Business behavior
-* Edge cases
+* Business behaviour
 * User outcomes
+* Edge cases
+* Error handling
 
-Avoid testing implementation details.
+Avoid:
 
-Do not test framework internals.
+* Testing framework internals
+* Testing implementation details
+* Coverage-only tests
+
+Prefer meaningful tests over high coverage numbers.
 
 ---
 
@@ -58,87 +68,58 @@ Generate tests for:
 
 * Services
 * Validators
-* Business Rules
+* Authorization Rules
+* Authentication Logic
+* External Integrations
 
 Avoid testing:
 
 * EF Core internals
-* ASP.NET Core framework behavior
+* ASP.NET Core framework behaviour
+* Third-party library behaviour
 
 Mock external dependencies.
 
 Use Moq for:
 
-* Repositories
-* External APIs
 * Services
+* APIs
 * SignalR
+* Caching
+* Logging
 
 ---
 
-# Authentication Tests
-
-Generate tests for:
-
-## Registration
+# Service Tests
 
 Verify:
 
-* Valid registration succeeds
-* Duplicate email fails
-* Invalid input fails
+* Success scenarios
+* Failure scenarios
+* Edge cases
 
-## Login
+Use:
 
-Verify:
+```csharp id="6gn2l6"
+Arrange
+Act
+Assert
+```
 
-* Correct credentials succeed
-* Invalid password fails
-* Unknown email fails
+structure.
 
-## JWT
+Example:
 
-Verify:
-
-* Token generation
-* Expiration handling
-* Claims creation
-
-## OAuth
-
-Verify:
-
-* New Google user registration
-* Existing user login
-* Provider validation
+```text id="7i6cxt"
+AuthenticationServiceTests
+TrailServiceTests
+CheckInServiceTests
+LeaderboardServiceTests
+```
 
 ---
 
-# Authorization Tests
-
-Verify:
-
-* User access rules
-* Moderator access rules
-* Admin access rules
-
-Examples:
-
-User:
-
-* Cannot access admin endpoints
-
-Moderator:
-
-* Can manage trails
-
-Admin:
-
-* Can perform administrative actions
-
----
-
-# Validation Tests
+# Validator Tests
 
 Generate tests for all FluentValidation validators.
 
@@ -151,41 +132,77 @@ Verify:
 
 Examples:
 
-* Email validation
-* Password validation
-* CheckIn validation
+```text id="87g6mg"
+RegisterRequestValidatorTests
+LoginRequestValidatorTests
+CreateCheckInValidatorTests
+```
 
 ---
 
-# DOC API Integration Tests
+# Authentication Tests
 
 Verify:
 
-* Successful synchronization
-* Mapping correctness
-* API failure handling
-* Retry behavior
-* Upsert behavior
+## Registration
 
-Mock all external API calls.
+* Valid registration succeeds
+* Duplicate email fails
+* Invalid request fails
 
-Do not call live services.
+## Login
+
+* Valid credentials succeed
+* Invalid password fails
+* Unknown email fails
+
+## JWT
+
+* Token generation succeeds
+* Claims are generated correctly
+* Expiration is configured correctly
+
+## Google OAuth
+
+* New user registration
+* Existing user login
+* Provider validation
 
 ---
 
-# Caching Tests
+# Authorization Tests
 
-Verify:
+Verify role-based access.
 
-* Cache hit behavior
-* Cache miss behavior
-* Cache invalidation
+Roles:
+
+```text id="e3hh3z"
+User
+Moderator
+Admin
+```
 
 Examples:
 
-* Trail List Cache
-* Trail Detail Cache
-* Leaderboard Cache
+* User cannot access admin endpoints
+* Moderator can access moderator features
+* Admin can access all features
+
+---
+
+# Integration Tests
+
+Generate integration tests only when explicitly required by the roadmap.
+
+Examples:
+
+* DOC API integration
+* Authentication flow
+* SignalR integration
+
+Mock external services whenever possible.
+
+Do not call live services.
 
 ---
 
@@ -194,147 +211,25 @@ Examples:
 Verify:
 
 * Important events are logged
-* Errors are logged appropriately
+* Errors are logged
 
-Do not test Serilog internals.
+Mock ILogger.
 
-Mock ILogger dependencies.
-
----
-
-# Gamification Tests
-
-Gamification is a critical project area.
-
-Generate comprehensive tests.
+Do not test logging framework internals.
 
 ---
 
-## XP Calculation Tests
+# Caching Tests
 
 Verify:
 
-Easy Trail
+* Cache hit
+* Cache miss
+* Cache invalidation
 
-Distance = 5km
+Do not test IMemoryCache internals.
 
-Expected XP = 50
-
-Intermediate Trail
-
-Distance = 10km
-
-Expected XP = 120
-
-Advanced Trail
-
-Distance = 12km
-
-Expected XP = 180
-
-Expert Trail
-
-Distance = 20km
-
-Expected XP = 400
-
-Verify edge cases.
-
----
-
-## Level Calculation Tests
-
-Verify:
-
-* Level thresholds
-* Boundary values
-* Exact XP transitions
-
-Examples:
-
-499 XP
-
-Level 1
-
-500 XP
-
-Level 2
-
----
-
-## Weekly Streak Tests
-
-Verify:
-
-* Consecutive weeks
-* Missing week
-* Multiple check-ins in same week
-
-Examples:
-
-Week 1 ✓
-
-Week 2 ✓
-
-Week 3 ✓
-
-Current Streak = 3
-
-Missing Week:
-
-Week 3 ✗
-
-Streak resets
-
----
-
-## Badge Tests
-
-Verify:
-
-### Completion Badges
-
-* First Trail
-* 10 Trails
-* 25 Trails
-* 50 Trails
-
-### Distance Badges
-
-* 50km
-* 100km
-* 250km
-
-### Region Badges
-
-* Port Hills Explorer
-* Canterbury Explorer
-
-### Difficulty Badges
-
-* First Advanced Trail
-* First Expert Trail
-
-### Streak Badges
-
-* 2 Week Streak
-* 4 Week Streak
-
-Verify badges are only awarded once.
-
----
-
-## Leaderboard Tests
-
-Verify ranking order.
-
-Sort by:
-
-1. XP
-2. Completed Trails
-3. Distance
-
-Verify tie-breaking behavior.
+Test application behaviour only.
 
 ---
 
@@ -342,13 +237,11 @@ Verify tie-breaking behavior.
 
 Verify:
 
-* Connection establishment
-* Message broadcasting
-* Leaderboard updates
-* XP updates
-* Badge unlock notifications
+* Events are broadcast
+* Correct payloads are sent
+* Connection handling logic works
 
-Mock SignalR dependencies where possible.
+Mock SignalR dependencies.
 
 ---
 
@@ -356,13 +249,14 @@ Mock SignalR dependencies where possible.
 
 Generate tests for:
 
+* Pages
 * Components
-* Stores
-* User interactions
+* Zustand Stores
+* User Interactions
 
 Avoid snapshot-heavy testing.
 
-Prefer behavior-based tests.
+Prefer behaviour-based tests.
 
 ---
 
@@ -370,10 +264,10 @@ Prefer behavior-based tests.
 
 Verify:
 
-* Login form
-* Register form
+* Login form submission
+* Register form submission
 * Validation messages
-* Authentication state updates
+* Authentication state changes
 
 ---
 
@@ -382,8 +276,8 @@ Verify:
 Verify:
 
 * Trail list rendering
-* Search functionality
-* Filter functionality
+* Search behaviour
+* Filter behaviour
 * Loading states
 * Empty states
 
@@ -405,9 +299,9 @@ Verify display of:
 
 * XP
 * Level
-* Weekly Streak
-* Badges
+* Streak
 * Statistics
+* Badges
 
 ---
 
@@ -416,17 +310,17 @@ Verify display of:
 Verify:
 
 * Ranking display
+* Sorting
 * Real-time updates
-* Sorting behavior
 
 ---
 
-# Theme Switching Tests
+# Theme Tests
 
 Verify:
 
-* Light Mode
-* Dark Mode
+* Light mode
+* Dark mode
 * Theme persistence
 
 ---
@@ -441,22 +335,39 @@ Verify:
 
 Examples:
 
-* Authentication Store
-* Theme Store
+```text id="ppsmv7"
+authStore
+themeStore
+```
+
+---
+
+# Task Resolution Rules
+
+Determine the current task from roadmap.md.
+
+Generate tests only for the current roadmap task.
+
+Do not generate tests for future features.
+
+Do not generate unrelated test files.
 
 ---
 
 # Output Expectations
 
-When generating tests:
+Use:
 
-* Use Arrange / Act / Assert structure
-* Use descriptive test names
-* Test both success and failure scenarios
-* Include edge cases
+* Arrange / Act / Assert
+* Descriptive test names
+* Success scenarios
+* Failure scenarios
+* Edge cases
 
-Generate production-quality tests.
+Generated tests should be:
 
-Avoid meaningless coverage-only tests.
+* Production-ready
+* Readable
+* Maintainable
 
-Focus on validating business behavior.
+Focus on behaviour rather than implementation details.
