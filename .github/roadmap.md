@@ -1,6 +1,6 @@
 # Trail Explorer Development Roadmap
 
-## Epic 1 - Authentication
+## Epic 1 - Authentication & User Management
 
 ### Database
 
@@ -14,20 +14,43 @@
 - [x] Create Register API
 - [x] Create Login API
 - [x] Create Refresh Token API
+- [ ] Create Logout API
 - [ ] Create Google OAuth API
+- [ ] Create Get Users API
+- [ ] Create Update User Role API
 
 ### Security
 
 - [x] Generate JWT token
 - [x] Configure JWT authentication
 - [x] Implement BCrypt password hashing
-- [-] Configure Role-Based Authorization
+- [ ] Create UserRole enum
+- [ ] Configure Authorization Policies
+- [ ] Add Role claim to JWT
+- [ ] Protect Admin APIs
+
+### Frontend
+
+- [ ] Create Auth API client
+- [ ] Create Auth Store (Zustand)
+- [ ] Create Register page
+- [ ] Create Login page
+- [ ] Create Google Login button
+- [ ] Configure Protected Routes
+- [ ] Add Logout functionality
+- [ ] Create User Management Page
+- [ ] Display User List
+- [ ] Change User Role
 
 ### Testing
 
-- [ ] Register API tests
-- [ ] Login API tests
-- [ ] OAuth API tests
+- [ ] Register tests
+- [ ] Login tests
+- [ ] Refresh Token tests
+- [ ] Logout tests
+- [ ] OAuth tests
+- [ ] Get Users tests
+- [ ] Update User Role tests
 
 ---
 
@@ -53,6 +76,7 @@
 
 ### Frontend
 
+- [ ] Create Trail API client
 - [ ] Create Explore page
 - [ ] Create Trail Card component
 - [ ] Create Trail Detail page
@@ -110,6 +134,14 @@
 - [ ] Create Update Check-In API
 - [ ] Create Delete Check-In API
 - [ ] Create User Check-In History API
+- [ ] Create Get All Check-Ins API
+- [ ] Create Hide Check-In API
+- [ ] Create Restore Check-In API
+
+### Security
+
+ - [ ] Authorize Check-In Ownership
+ - [ ] Protect Moderator APIs
 
 ### Logging
 
@@ -121,6 +153,10 @@
 - [ ] Create Check-In History page
 - [ ] Create Edit Check-In UI
 - [ ] Create Delete Check-In UI
+- [ ] Create Moderation Page
+- [ ] Display All Check-Ins
+- [ ] Hide Check-In
+- [ ] Restore Check-In
 
 ### Testing
 
@@ -137,6 +173,7 @@
 - [ ] Implement XP Formula
 - [ ] Create LevelCalculatorService
 - [ ] Implement Level Rules
+- [ ] Create User Progress DTO
 
 ### Frontend
 
@@ -157,6 +194,7 @@
 
 - [ ] Create Badge entity
 - [ ] Create UserBadge entity
+- [ ] Seed default badges
 - [ ] Configure UserBadge composite key
 - [ ] Add User → UserBadges relationship
 
@@ -213,9 +251,6 @@
 ### Backend
 
 - [ ] Create Leaderboard API
-
-### SignalR
-
 - [ ] Create Leaderboard Hub
 - [ ] Broadcast XP Updates
 - [ ] Broadcast Ranking Updates
@@ -224,10 +259,12 @@
 ### Caching
 
 - [ ] Cache Leaderboard
+- [ ] Invalidate Leaderboard Cache on XP Updates
 
 ### Frontend
 
 - [ ] Create Leaderboard page
+- [ ] Create SignalR Client Service
 - [ ] Connect SignalR client
 - [ ] Handle real-time updates
 - [ ] Display badge notifications
@@ -281,8 +318,10 @@
 ### Documentation
 
 - [ ] Complete README
-- [ ] Complete Architecture Documentation
-- [ ] Complete Design Decisions Documentation
+- [ ] Complete project-planning.md
+- [ ] Complete architecture.md
+- [ ] Complete database-design.md
+- [ ] Complete design-decisions.md
 
 ### AI Collaboration Evidence
 

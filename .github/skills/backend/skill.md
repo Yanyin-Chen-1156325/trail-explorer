@@ -257,30 +257,121 @@ Token generation belongs in Authentication services.
 ---
 
 # Authorization Rules
+# Authorization Rules
 
 Use Role-Based Authorization.
 
 Roles:
 
-```text id="dbrl8f"
+```text
 User
 Moderator
 Admin
 ```
 
+## User Permissions
+
+Standard application user.
+
+Permissions:
+
+* Browse trails
+* Search trails
+* View trail details
+* Create check-ins
+* Update own check-ins
+* Delete own check-ins
+* Upload trail photos
+* Earn XP
+* Unlock badges
+* View dashboard
+* View leaderboard
+
+## Moderator Permissions
+
+Community moderator.
+
+Permissions:
+
+* View all users
+* View all check-ins
+* View reported content (future feature)
+* Hide inappropriate check-ins
+* Restore hidden check-ins
+* View moderation logs
+
+Moderators cannot:
+
+* Change user roles
+* Access system administration features
+* Trigger DOC synchronisation
+
+## Admin Permissions
+
+System administrator.
+
+Permissions:
+
+* View all users
+* Update user roles
+* Promote or demote moderators
+* Access user management page
+* Trigger DOC synchronisation
+* View system statistics
+* Access moderation logs
+* Manage all system settings
+
 Protect endpoints using Authorize attributes.
 
 Examples:
 
-```csharp id="09dl6t"
+```csharp
 [Authorize]
 
-[Authorize(Roles = "Admin")]
+[Authorize(Roles = "Moderator,Admin")]
 
-[Authorize(Roles = "Moderator")]
+[Authorize(Roles = "Admin")]
+```
+
+Generate Admin APIs when required:
+
+```text
+GET    /api/users
+PUT    /api/users/{id}/role
+POST   /api/admin/trails/sync
+```
+
+Generate Moderator APIs when required:
+
+```text
+GET    /api/checkins
+PUT    /api/checkins/{id}/hide
+PUT    /api/checkins/{id}/restore
 ```
 
 Authorization rules belong in Controllers and Services.
+
+Check-In update and delete operations must validate ownership.
+
+Example:
+
+```csharp
+if (checkIn.UserId != currentUserId)
+{
+    return Forbid();
+}
+```
+
+| Feature          | User | Moderator | Admin |
+| ---------------- | ---- | --------- | ----- |
+| Browse Trails    | ✅    | ✅         | ✅     |
+| Check-In         | ✅    | ✅         | ✅     |
+| XP / Badge       | ✅    | ✅         | ✅     |
+| View Users       | ❌    | ✅         | ✅     |
+| Hide Check-In    | ❌    | ✅         | ✅     |
+| Restore Check-In | ❌    | ✅         | ✅     |
+| Change User Role | ❌    | ❌         | ✅     |
+| Trigger DOC Sync | ❌    | ❌         | ✅     |
 
 ---
 
