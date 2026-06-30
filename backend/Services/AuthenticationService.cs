@@ -16,6 +16,8 @@ public interface IAuthenticationService
 
     Task<AuthResponse> RefreshAsync(string refreshToken);
 
+    Task LogoutAsync(string refreshToken);
+
 }
 
 public class AuthenticationService : IAuthenticationService
@@ -155,7 +157,7 @@ public class AuthenticationService : IAuthenticationService
             throw new UnauthorizedAccessException("User inactive");
         }
 
-        token.IsRevoked = true;
+        await RevokeRefreshTokenAsync(token);
 
         var newRefreshToken = new RefreshToken
         {
@@ -185,5 +187,28 @@ public class AuthenticationService : IAuthenticationService
             RefreshToken = newRefreshToken.Token,
             ExpiresAt = _tokenGenerator.GetAccessTokenExpiration()
         };
+    }
+
+    public async Task LogoutAsync(string refreshToken)
+    {
+        var token = await _context.RefreshTokens
+            .FirstOrDefaultAsync(x => x.Token == refreshToken);
+
+        if (token is null)
+        {
+            throw new UnauthorizedAccessException("Invalid refresh token");
+        }
+
+        await RevokeRefreshTokenAsync(token);
+    }
+
+    private async Task RevokeRefreshTokenAsync(RefreshToken token)
+    {
+        if (!token.IsRevoked)
+        {
+            token.IsRevoked = true;
+            token.RevokedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+        }
     }
 }
