@@ -12,9 +12,7 @@ public class AuthController : ControllerBase
     private readonly IAuthenticationService _authService;
     private readonly ILogger<AuthController> _logger;
 
-    public AuthController(
-        IAuthenticationService authService,
-        ILogger<AuthController> logger)
+    public AuthController(IAuthenticationService authService, ILogger<AuthController> logger)
     {
         _authService = authService;
         _logger = logger;
@@ -62,8 +60,7 @@ public class AuthController : ControllerBase
 
     [HttpPost("refresh")]
     [AllowAnonymous]
-    public async Task<ActionResult<AuthResponse>> Refresh(
-        RefreshTokenRequest request)
+    public async Task<ActionResult<AuthResponse>> Refresh(RefreshTokenRequest request)
     {
         var response =
             await _authService.RefreshAsync(
