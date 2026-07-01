@@ -42,7 +42,12 @@
 - [ ] Display User List
 - [ ] Change User Role
 
-### Testing
+### Unit Testing
+
+- [x] Backend
+- [ ] Frontend
+
+### Integration Testing
 
 - [ ] Register tests
 - [ ] Login tests

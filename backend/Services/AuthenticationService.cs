@@ -13,6 +13,7 @@ public class AuthenticationService : IAuthenticationService
 {
     private readonly ApplicationDbContext _context;
     private readonly IJwtTokenGenerator _tokenGenerator;
+    private readonly IGoogleTokenValidator _googleTokenValidator;
     private readonly ILogger<AuthenticationService> _logger;
     private readonly JwtOptions _jwtOptions;
     private readonly GoogleOAuthOptions _googleOAuthOptions;
@@ -20,12 +21,14 @@ public class AuthenticationService : IAuthenticationService
     public AuthenticationService(
         ApplicationDbContext context,
         IJwtTokenGenerator tokenGenerator,
+        IGoogleTokenValidator googleTokenValidator,
         ILogger<AuthenticationService> logger,
         IOptions<JwtOptions> jwtOptions,
         IOptions<GoogleOAuthOptions> googleOAuthOptions)
     {
         _context = context;
         _tokenGenerator = tokenGenerator;
+        _googleTokenValidator = googleTokenValidator;
         _logger = logger;
         _jwtOptions = jwtOptions.Value;
         _googleOAuthOptions = googleOAuthOptions.Value;
@@ -102,12 +105,7 @@ public class AuthenticationService : IAuthenticationService
 
         try
         {
-            payload = await GoogleJsonWebSignature.ValidateAsync(
-                request.IdToken,
-                new GoogleJsonWebSignature.ValidationSettings
-                {
-                    Audience = [ _googleOAuthOptions.ClientId ]
-                });
+            payload = await _googleTokenValidator.ValidateAsync(request.IdToken, _googleOAuthOptions.ClientId);
         }
         catch (InvalidJwtException ex)
         {
