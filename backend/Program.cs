@@ -27,6 +27,7 @@ builder.Services.Configure<GoogleOAuthOptions>(builder.Configuration.GetSection(
 builder.Services.AddSingleton(jwtOptions);
 builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 // Add Validation
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();

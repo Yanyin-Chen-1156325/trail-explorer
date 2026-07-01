@@ -1,0 +1,56 @@
+using backend.DTOs.User;
+using backend.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace backend.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+[Authorize(Roles = "Admin")]
+public class UsersController : ControllerBase
+{
+    private readonly IUserService _userService;
+    private readonly ILogger<UsersController> _logger;
+
+    public UsersController(IUserService userService, ILogger<UsersController> logger)
+    {
+        _userService = userService;
+        _logger = logger;
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetUsers()
+    {
+        try
+        {
+            var users = await _userService.GetUsersAsync();
+            return Ok(users);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error while retrieving users");
+            return StatusCode(500, new { message = "An unexpected error occurred" });
+        }
+    }
+
+    [HttpPut("{id:guid}/role")]
+    public async Task<IActionResult> UpdateUserRole([FromRoute] Guid id, [FromBody] UpdateUserRoleRequest request)
+    {
+        try
+        {
+            var user = await _userService.UpdateUserRoleAsync(id, request);
+            return Ok(user);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            _logger.LogWarning("Update user role failed: {Message}", ex.Message);
+            return NotFound(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error while updating user role");
+            return StatusCode(500, new { message = "An unexpected error occurred" });
+        }
+    }
+}
