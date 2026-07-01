@@ -15,7 +15,7 @@
 - [x] Create Login API
 - [x] Create Refresh Token API
 - [x] Create Logout API
-- [ ] Create Google OAuth API
+- [x] Create Google OAuth API
 - [ ] Create Get Users API
 - [ ] Create Update User Role API
 

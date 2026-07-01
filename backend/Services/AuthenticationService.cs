@@ -3,6 +3,7 @@ using backend.Data;
 using backend.DTOs.Auth;
 using backend.Entities;
 using backend.Enums;
+using Google.Apis.Auth;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -14,17 +15,20 @@ public class AuthenticationService : IAuthenticationService
     private readonly IJwtTokenGenerator _tokenGenerator;
     private readonly ILogger<AuthenticationService> _logger;
     private readonly JwtOptions _jwtOptions;
+    private readonly GoogleOAuthOptions _googleOAuthOptions;
 
     public AuthenticationService(
         ApplicationDbContext context,
         IJwtTokenGenerator tokenGenerator,
         ILogger<AuthenticationService> logger,
-        IOptions<JwtOptions> jwtOptions)
+        IOptions<JwtOptions> jwtOptions,
+        IOptions<GoogleOAuthOptions> googleOAuthOptions)
     {
         _context = context;
         _tokenGenerator = tokenGenerator;
         _logger = logger;
         _jwtOptions = jwtOptions.Value;
+        _googleOAuthOptions = googleOAuthOptions.Value;
     }
 
     public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
@@ -83,6 +87,91 @@ public class AuthenticationService : IAuthenticationService
         }
 
         _logger.LogInformation("User logged in successfully: {UserId}", user.Id);
+
+        return await CreateAuthResponseAsync(user);
+    }
+
+    public async Task<AuthResponse> GoogleOAuthAsync(GoogleOAuthRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(_googleOAuthOptions.ClientId))
+        {
+            throw new InvalidOperationException("Google OAuth client ID is not configured");
+        }
+
+        GoogleJsonWebSignature.Payload payload;
+
+        try
+        {
+            payload = await GoogleJsonWebSignature.ValidateAsync(
+                request.IdToken,
+                new GoogleJsonWebSignature.ValidationSettings
+                {
+                    Audience = [ _googleOAuthOptions.ClientId ]
+                });
+        }
+        catch (InvalidJwtException ex)
+        {
+            throw new UnauthorizedAccessException("Invalid Google ID token", ex);
+        }
+
+        if (string.IsNullOrWhiteSpace(payload.Email))
+        {
+            throw new UnauthorizedAccessException("Google account did not provide an email address");
+        }
+
+        if (!payload.EmailVerified)
+        {
+            throw new UnauthorizedAccessException("Google account email is not verified");
+        }
+
+        var existingUser = await _context.Users
+            .FirstOrDefaultAsync(u => u.ProviderUserId == payload.Subject || u.Email == payload.Email);
+
+        if (existingUser is not null)
+        {
+            if (existingUser.AuthProvider == AuthProvider.Local)
+            {
+                throw new InvalidOperationException("Email already registered with local login");
+            }
+
+            if (existingUser.Status != UserStatus.Active)
+            {
+                throw new UnauthorizedAccessException("User inactive");
+            }
+
+            existingUser.ProviderUserId = payload.Subject;
+            existingUser.DisplayName = string.IsNullOrWhiteSpace(payload.Name)
+                ? existingUser.DisplayName
+                : payload.Name;
+            existingUser.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Google OAuth user signed in successfully: {UserId}", existingUser.Id);
+
+            return await CreateAuthResponseAsync(existingUser);
+        }
+
+        var user = new User
+        {
+            Id = Guid.NewGuid(),
+            Email = payload.Email,
+            DisplayName = string.IsNullOrWhiteSpace(payload.Name)
+                ? payload.Email.Split('@', 2)[0]
+                : payload.Name,
+            PasswordHash = null,
+            Role = UserRole.User,
+            Status = UserStatus.Active,
+            AuthProvider = AuthProvider.Google,
+            ProviderUserId = payload.Subject,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        _context.Users.Add(user);
+        await _context.SaveChangesAsync();
+
+        _logger.LogInformation("Google OAuth user created successfully: {UserId}", user.Id);
 
         return await CreateAuthResponseAsync(user);
     }

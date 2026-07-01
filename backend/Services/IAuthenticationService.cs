@@ -8,6 +8,8 @@ public interface IAuthenticationService
 
     Task<AuthResponse> LoginAsync(LoginRequest request);
 
+    Task<AuthResponse> GoogleOAuthAsync(GoogleOAuthRequest request);
+
     Task<AuthResponse> RefreshAsync(string refreshToken);
 
     Task LogoutAsync(string refreshToken);

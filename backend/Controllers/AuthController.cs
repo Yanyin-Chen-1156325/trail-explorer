@@ -58,6 +58,37 @@ public class AuthController : ControllerBase
         }
     }
 
+    [HttpPost("google")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GoogleOAuth([FromBody] GoogleOAuthRequest request)
+    {
+        try
+        {
+            var response = await _authService.GoogleOAuthAsync(request);
+            return Ok(response);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            _logger.LogWarning("Google OAuth failed: {Message}", ex.Message);
+            return Unauthorized(new { message = ex.Message });
+        }
+        catch (InvalidOperationException ex) when (ex.Message.Contains("already registered", StringComparison.OrdinalIgnoreCase))
+        {
+            _logger.LogWarning("Google OAuth conflict: {Message}", ex.Message);
+            return Conflict(new { message = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogWarning("Google OAuth failed: {Message}", ex.Message);
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error during Google OAuth");
+            return StatusCode(500, new { message = "An unexpected error occurred" });
+        }
+    }
+
     [HttpPost("refresh")]
     [AllowAnonymous]
     public async Task<ActionResult<AuthResponse>> Refresh(RefreshTokenRequest request)
