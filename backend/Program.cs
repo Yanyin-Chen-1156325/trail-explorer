@@ -1,5 +1,6 @@
 using backend.Authentication;
 using backend.Data;
+using backend.Enums;
 using backend.Services;
 using backend.Validators;
 using FluentValidation;
@@ -52,7 +53,14 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(AuthorizationPolicies.AdminOnly, policy =>
+        policy.RequireRole(UserRole.Admin.ToString()));
+
+    options.AddPolicy(AuthorizationPolicies.ModeratorOrAdmin, policy =>
+        policy.RequireRole(UserRole.Moderator.ToString(), UserRole.Admin.ToString()));
+});
 
 // Add Controllers
 builder.Services.AddControllers();

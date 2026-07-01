@@ -16,18 +16,18 @@
 - [x] Create Refresh Token API
 - [x] Create Logout API
 - [x] Create Google OAuth API
-- [ ] Create Get Users API
-- [ ] Create Update User Role API
+- [x] Create Get Users API
+- [x] Create Update User Role API
 
 ### Security
 
 - [x] Generate JWT token
 - [x] Configure JWT authentication
 - [x] Implement BCrypt password hashing
-- [ ] Create UserRole enum
-- [ ] Configure Authorization Policies
-- [ ] Add Role claim to JWT
-- [ ] Protect Admin APIs
+- [x] Create UserRole enum
+- [x] Configure Authorization Policies
+- [x] Add Role claim to JWT
+- [x] Protect Admin APIs
 
 ### Frontend
 
@@ -140,8 +140,8 @@
 
 ### Security
 
- - [ ] Authorize Check-In Ownership
- - [ ] Protect Moderator APIs
+- [ ] Authorize Check-In Ownership
+- [ ] Protect Moderator APIs
 
 ### Logging
 
