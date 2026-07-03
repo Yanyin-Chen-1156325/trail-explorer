@@ -280,6 +280,241 @@ xl:
 
 ---
 
+# UI Design System
+
+## Design Inspiration
+
+Trail Explorer uses a combination of:
+
+- AllTrails
+- Strava
+- Duolingo
+
+Design Goals:
+
+- Modern SaaS appearance
+- Outdoor adventure feeling
+- Strong gamification
+- Professional portfolio quality
+- Mobile-first experience
+
+Users should feel:
+
+- Motivated
+- Rewarded
+- Progress-oriented
+- Competitive
+
+---
+
+## Theme Strategy
+
+Default Theme:
+
+- Dark Mode
+
+Optional Theme:
+
+- Light Mode
+
+Dark Mode is the primary user experience.
+
+Avoid white backgrounds as the primary application theme.
+
+---
+
+## Color Palette
+
+Background
+
+#0F172A
+
+Surface
+
+#1E293B
+
+Primary
+
+#10B981
+
+Secondary
+
+#22C55E
+
+XP
+
+#F59E0B
+
+Badge
+
+#8B5CF6
+
+Danger
+
+#EF4444
+
+Text Primary
+
+#F8FAFC
+
+Text Secondary
+
+#94A3B8
+
+---
+
+## Layout Guidelines
+
+Desktop Layout
+
+- Fixed left sidebar navigation
+- Top application header
+- Main content area
+
+Tablet Layout
+
+- Collapsible sidebar
+- Responsive grid layouts
+
+Mobile Layout
+
+- Bottom navigation
+- Drawer menu for secondary actions
+
+All layouts must be responsive.
+
+---
+
+## Navigation Style
+
+Inspired by AllTrails and Strava.
+
+Desktop:
+
+- Sidebar navigation
+
+Mobile:
+
+- Bottom navigation
+
+Primary Navigation Items:
+
+- Dashboard
+- Trails
+- Check-ins
+- Badges
+- Leaderboard
+- Profile
+
+---
+
+## Dashboard Design Rules
+
+Dashboard should be the primary application landing page.
+
+Dashboard must display:
+
+- Current Level
+- XP Progress
+- Weekly Streak
+- Statistics Cards
+- Recent Badges
+- Recent Check-ins
+- Leaderboard Preview
+
+Gamification information should be visible above the fold.
+
+---
+
+## Gamification Visual Rules
+
+XP should always be visually emphasized.
+
+Display:
+
+- XP Progress Bar
+- Current Level
+- Badge Collection
+- Weekly Streak
+- Ranking Position
+
+Use visual rewards to reinforce user progress.
+
+Badge unlocks should feel rewarding.
+
+---
+
+## Card Design Rules
+
+Use Shadcn Card components.
+
+Cards should include:
+
+- rounded-xl
+- subtle border
+- hover transition
+- soft shadow
+
+Avoid flat enterprise-style cards.
+
+---
+
+## Responsive Design Requirements
+
+Mobile First Design.
+
+Support:
+
+- Mobile
+- Tablet
+- Desktop
+
+Recommended Breakpoints:
+
+sm: 640px
+
+md: 768px
+
+lg: 1024px
+
+xl: 1280px
+
+Pages must remain fully usable on smaller screens.
+
+---
+
+## Accessibility Requirements
+
+All pages must:
+
+- Support keyboard navigation
+- Maintain sufficient color contrast
+- Provide loading states
+- Provide empty states
+- Provide error states
+- Be responsive on all supported devices
+
+---
+
+## Portfolio Quality Requirement
+
+The application should resemble a production-ready SaaS product.
+
+Avoid:
+
+- Default Bootstrap appearance
+- Generic CRUD layouts
+- Plain tables as the primary experience
+
+Prefer:
+
+- Rich dashboard experiences
+- Visual progress indicators
+- Gamification-focused interfaces
+- Consistent design language
+
+---
+
 # Theme Rules
 
 Support:
