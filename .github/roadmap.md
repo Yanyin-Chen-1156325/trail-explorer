@@ -33,8 +33,8 @@
 
 - [x] Create Auth API client
 - [x] Create Auth Store (Zustand)
-- [ ] Create Register page
-- [ ] Create Login page
+- [x] Create Register page
+- [x] Create Login page
 - [ ] Create Google Login button
 - [ ] Configure Protected Routes
 - [ ] Add Logout functionality
