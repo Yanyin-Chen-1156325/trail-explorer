@@ -3,6 +3,7 @@ import { Mountain, RouteIcon, Trophy } from "lucide-react";
 
 import {
   LoginPage,
+  LogoutButton,
   ProtectedRoute,
   PublicOnlyRoute,
   RegisterPage,
@@ -16,16 +17,20 @@ function ProtectedHomePage() {
     <main className="min-h-screen bg-[#0F172A] px-4 py-6 text-[#F8FAFC] sm:px-6 lg:px-8">
       <div className="mx-auto flex min-h-[calc(100vh-3rem)] w-full max-w-5xl items-center">
         <section className="w-full rounded-lg border border-white/10 bg-[#1E293B] p-6 shadow-2xl shadow-black/25 sm:p-8 lg:p-10">
-          <div className="flex items-center gap-3">
-            <div className="flex size-11 items-center justify-center rounded-lg bg-[#10B981]/15 text-[#10B981]">
-              <Mountain aria-hidden="true" className="size-6" />
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex size-11 items-center justify-center rounded-lg bg-[#10B981]/15 text-[#10B981]">
+                <Mountain aria-hidden="true" className="size-6" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-[#F8FAFC]">
+                  Trail Explorer
+                </p>
+                <p className="text-sm text-[#94A3B8]">Protected route active</p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm font-semibold text-[#F8FAFC]">
-                Trail Explorer
-              </p>
-              <p className="text-sm text-[#94A3B8]">Protected route active</p>
-            </div>
+
+            <LogoutButton />
           </div>
 
           <div className="mt-10 max-w-2xl space-y-4">
