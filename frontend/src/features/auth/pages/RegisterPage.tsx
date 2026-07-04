@@ -11,6 +11,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 
+import { GoogleLoginButton } from "../components/GoogleLoginButton";
 import { useAuthStore } from "../store/authStore";
 
 interface RegisterFormValues {
@@ -221,6 +222,16 @@ function RegisterPage() {
                   <p className="text-sm leading-6 text-[#94A3B8]">
                     Use the same requirements enforced by the backend register API.
                   </p>
+                </div>
+
+                <GoogleLoginButton />
+
+                <div className="flex items-center gap-3">
+                  <div className="h-px flex-1 bg-white/10" />
+                  <span className="text-xs font-medium uppercase text-[#94A3B8]">
+                    or use email
+                  </span>
+                  <div className="h-px flex-1 bg-white/10" />
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-2">

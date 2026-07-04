@@ -12,6 +12,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 
+import { GoogleLoginButton } from "../components/GoogleLoginButton";
 import { useAuthStore } from "../store/authStore";
 
 interface LoginFormValues {
@@ -131,6 +132,16 @@ function LoginPage() {
                   <p className="text-sm leading-6 text-[#94A3B8]">
                     Sign in to continue tracking hikes, XP, and achievements.
                   </p>
+                </div>
+
+                <GoogleLoginButton />
+
+                <div className="flex items-center gap-3">
+                  <div className="h-px flex-1 bg-white/10" />
+                  <span className="text-xs font-medium uppercase text-[#94A3B8]">
+                    or use email
+                  </span>
+                  <div className="h-px flex-1 bg-white/10" />
                 </div>
 
                 <div className="space-y-4">
