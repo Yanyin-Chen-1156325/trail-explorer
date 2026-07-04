@@ -31,8 +31,8 @@
 
 ### Frontend
 
-- [ ] Create Auth API client
-- [ ] Create Auth Store (Zustand)
+- [x] Create Auth API client
+- [x] Create Auth Store (Zustand)
 - [ ] Create Register page
 - [ ] Create Login page
 - [ ] Create Google Login button
