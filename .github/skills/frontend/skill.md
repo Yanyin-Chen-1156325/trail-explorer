@@ -307,6 +307,203 @@ Users should feel:
 
 ---
 
+## Homepage / Landing Page Design Rules
+
+The homepage should introduce Trail Explorer as a gamified hiking product, not as a generic CRUD application.
+
+The homepage should follow the visual direction shown in the approved design mockup:
+
+- Dark outdoor adventure hero section
+- Mountain or trail-inspired background imagery
+- Strong green accent colors
+- Gamification summary card above the fold
+- Featured trail cards
+- XP progress and badge previews
+- Clear calls to action for exploration and authentication
+
+Homepage Goals:
+
+- Explain the product quickly
+- Encourage users to explore trails
+- Show gamification value immediately
+- Make the app feel polished and portfolio-ready
+- Work well on mobile, tablet, and desktop
+
+Homepage Structure:
+
+1. Hero Section
+
+Required content:
+
+- Product logo or app name
+- Primary headline
+- Short description
+- Primary call-to-action button
+- Secondary call-to-action button
+- Gamification summary card
+
+Recommended headline:
+
+```text
+Explore Christchurch Trails.
+Level Up Your Hiking Journey.
+```
+
+Recommended description:
+
+```text
+Discover stunning trails, track your adventures, earn achievements, and become a trail legend.
+```
+
+Recommended buttons:
+
+```text
+Start Exploring
+View Leaderboard
+```
+
+Hero gamification card should display:
+
+- Current level
+- Total XP
+- Trails completed
+- Weekly streak
+- XP progress bar
+
+2. Feature Cards Section
+
+Display three feature cards:
+
+- Discover Trails
+- Check In
+- Earn Rewards
+
+Each card should include:
+
+- Icon
+- Title
+- Short description
+- Hover transition
+
+3. Featured Trails Section
+
+Display a small preview of hiking trails.
+
+Trail cards should include:
+
+- Trail image or image placeholder
+- Trail name
+- Region or city
+- Difficulty badge
+- Distance
+- Elevation or duration if available
+
+Example trail cards:
+
+```text
+Rapaki Track
+Port Hills
+Intermediate
+7.2 km
+
+Godley Head Track
+Banks Peninsula
+Advanced
+8.0 km
+
+Bottle Lake Forest
+Christchurch
+Easy
+10.0 km
+```
+
+4. Progress Preview Section
+
+Show a visual gamification preview.
+
+Display:
+
+- Total XP
+- Current level
+- XP progress bar
+- Recent badges
+- Weekly streak
+- Leaderboard rank
+
+This section should visually reinforce that user progress is central to the product.
+
+5. Final Call-To-Action Section
+
+Display a strong closing message.
+
+Recommended copy:
+
+```text
+Ready to start your next adventure?
+Join Trail Explorer and turn every hike into progress.
+```
+
+Recommended buttons:
+
+```text
+Create Account
+Log In
+```
+
+Homepage Visual Requirements:
+
+- Use dark mode as the default visual style
+- Avoid plain white backgrounds as the primary page background
+- Use emerald and green accents for primary actions
+- Use amber or gold accents for XP
+- Use purple accents for badges
+- Use rounded cards and soft shadows
+- Use large readable typography
+- Use responsive grids
+- Keep important gamification information visible above the fold
+
+Homepage Responsive Rules:
+
+Mobile:
+
+- Stack hero content vertically
+- Place CTA buttons full-width or near full-width
+- Show featured trail cards in a single column
+- Keep the gamification card visible early
+
+Tablet:
+
+- Use two-column sections where space allows
+- Use two-column card grids
+
+Desktop:
+
+- Use a wide hero layout
+- Place hero text on the left
+- Place gamification summary card on the right
+- Use three-column feature and trail card grids
+
+Homepage File Guidance:
+
+Recommended files:
+
+```text
+src/features/home/pages/HomePage.tsx
+src/features/home/components/HeroSection.tsx
+src/features/home/components/FeatureCard.tsx
+src/features/home/components/FeaturedTrailCard.tsx
+src/features/home/components/ProgressPreview.tsx
+src/features/home/components/HomeCtaSection.tsx
+```
+
+Mock data is allowed for the homepage before the related backend APIs are implemented.
+
+When backend APIs become available, replace mock data with typed API services.
+
+Do not implement future roadmap business logic inside homepage components.
+
+---
+
 ## Theme Strategy
 
 Default Theme:

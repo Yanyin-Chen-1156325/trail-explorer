@@ -35,9 +35,10 @@
 - [x] Create Auth Store (Zustand)
 - [x] Create Register page
 - [x] Create Login page
-- [ ] Create Google Login button
-- [ ] Configure Protected Routes
-- [ ] Add Logout functionality
+- [x] Create Google Login button
+- [x] Configure Protected Routes
+- [x] Add Logout functionality
+- [ ] Create HomePage
 - [ ] Create User Management Page
 - [ ] Display User List
 - [ ] Change User Role
