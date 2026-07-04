@@ -10,5 +10,7 @@ export type {
 export { AuthApiError, createAuthApi } from "./services/authApi";
 export { GoogleLoginButton } from "./components/GoogleLoginButton";
 export { LoginPage } from "./pages/LoginPage";
+export { ProtectedRoute } from "./components/ProtectedRoute";
+export { PublicOnlyRoute } from "./components/PublicOnlyRoute";
 export { RegisterPage } from "./pages/RegisterPage";
 export { useAuthStore } from "./store/authStore";
