@@ -15,6 +15,10 @@ export interface UserResponse {
   updatedAt: string;
 }
 
+export interface UpdateUserRoleRequest {
+  role: UserRole;
+}
+
 export type RawEnumValue<TValue extends string> = TValue | number;
 
 export interface RawUserResponse {

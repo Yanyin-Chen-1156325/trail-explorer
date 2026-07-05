@@ -41,7 +41,7 @@
 - [x] Create HomePage
 - [x] Create User Management Page
 - [x] Display User List
-- [ ] Change User Role
+- [x] Change User Role
 
 ### Unit Testing
 

@@ -2,6 +2,7 @@ import type {
   AuthProvider,
   RawEnumValue,
   RawUserResponse,
+  UpdateUserRoleRequest,
   UserResponse,
   UserRole,
   UserStatus,
@@ -19,6 +20,11 @@ export class UserApiError extends Error {
 
 export interface UserApi {
   getUsers(accessToken: string): Promise<UserResponse[]>;
+  updateUserRole(
+    accessToken: string,
+    userId: string,
+    request: UpdateUserRoleRequest,
+  ): Promise<UserResponse>;
 }
 
 const trimTrailingSlash = (value: string) => value.replace(/\/+$/, "");
@@ -26,6 +32,11 @@ const trimTrailingSlash = (value: string) => value.replace(/\/+$/, "");
 const userRoleLabels: UserRole[] = ["User", "Admin", "Moderator"];
 const userStatusLabels: UserStatus[] = ["Active", "Disabled", "Deleted"];
 const authProviderLabels: AuthProvider[] = ["Local", "Google"];
+const userRoleValues: Record<UserRole, number> = {
+  User: 0,
+  Admin: 1,
+  Moderator: 2,
+};
 
 function normalizeEnum<TValue extends string>(
   value: RawEnumValue<TValue>,
@@ -64,12 +75,16 @@ async function requestJson<TResponse>(
   baseUrl: string,
   path: string,
   accessToken: string,
+  init?: RequestInit,
 ): Promise<TResponse> {
   const response = await fetch(`${baseUrl}${path}`, {
     method: "GET",
     headers: {
+      "Content-Type": "application/json",
       Authorization: `Bearer ${accessToken}`,
+      ...init?.headers,
     },
+    ...init,
   });
 
   if (!response.ok) {
@@ -91,6 +106,19 @@ export function createUserApi(baseUrl: string = "/api/users"): UserApi {
       );
 
       return users.map(normalizeUser);
+    },
+    async updateUserRole(accessToken, userId, request) {
+      const user = await requestJson<RawUserResponse>(
+        normalizedBaseUrl,
+        `/${userId}/role`,
+        accessToken,
+        {
+          method: "PUT",
+          body: JSON.stringify({ role: userRoleValues[request.role] }),
+        },
+      );
+
+      return normalizeUser(user);
     },
   };
 }

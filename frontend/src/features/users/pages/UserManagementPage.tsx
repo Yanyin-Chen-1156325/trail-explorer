@@ -4,6 +4,7 @@ import {
   AlertTriangle,
   ArrowLeft,
   Calendar,
+  CheckCircle2,
   LoaderCircle,
   Mail,
   RefreshCw,
@@ -16,9 +17,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useAuthStore } from "@/features/auth";
 
 import { createUserApi, UserApiError } from "../services/userApi";
-import type { UserResponse } from "../types/user";
+import type { UserResponse, UserRole } from "../types/user";
 
 const userApi = createUserApi();
+const userRoles: UserRole[] = ["User", "Moderator", "Admin"];
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("en-NZ", {
@@ -54,6 +56,8 @@ function UserManagementPage() {
   const [users, setUsers] = useState<UserResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [updatingUserId, setUpdatingUserId] = useState<string | null>(null);
 
   const activeUsers = useMemo(
     () => users.filter((user) => user.status === "Active").length,
@@ -75,6 +79,7 @@ function UserManagementPage() {
 
     setIsLoading(true);
     setError(null);
+    setSuccessMessage(null);
 
     try {
       const nextUsers = await userApi.getUsers(token);
@@ -94,6 +99,50 @@ function UserManagementPage() {
       setIsLoading(false);
     }
   }, []);
+
+  const changeUserRole = useCallback(
+    async (user: UserResponse, role: UserRole) => {
+      if (role === user.role) {
+        return;
+      }
+
+      if (!accessToken) {
+        setError("A valid session is required to update user roles.");
+        return;
+      }
+
+      setUpdatingUserId(user.id);
+      setError(null);
+      setSuccessMessage(null);
+
+      try {
+        const updatedUser = await userApi.updateUserRole(accessToken, user.id, {
+          role,
+        });
+
+        setUsers((currentUsers) =>
+          currentUsers.map((currentUser) =>
+            currentUser.id === updatedUser.id ? updatedUser : currentUser,
+          ),
+        );
+        setSuccessMessage(`${updatedUser.displayName} is now ${updatedUser.role}.`);
+      } catch (requestError) {
+        if (
+          requestError instanceof UserApiError &&
+          (requestError.status === 401 || requestError.status === 403)
+        ) {
+          setError("You need an admin account to change user roles.");
+        } else if (requestError instanceof Error) {
+          setError(requestError.message);
+        } else {
+          setError("User role could not be updated.");
+        }
+      } finally {
+        setUpdatingUserId(null);
+      }
+    },
+    [accessToken],
+  );
 
   useEffect(() => {
     const timerId = window.setTimeout(() => {
@@ -210,6 +259,22 @@ function UserManagementPage() {
                 </div>
               ) : null}
 
+              {!isLoading && successMessage ? (
+                <div className="px-5 pt-5">
+                  <div className="rounded-xl border border-[#10B981]/30 bg-[#10B981]/10 p-4">
+                    <div className="flex gap-3">
+                      <CheckCircle2
+                        aria-hidden="true"
+                        className="mt-0.5 size-5 shrink-0 text-[#A7F3D0]"
+                      />
+                      <p className="text-sm font-medium text-[#A7F3D0]">
+                        {successMessage}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+
               {!isLoading && error ? (
                 <div className="p-5">
                   <div className="rounded-xl border border-[#EF4444]/30 bg-[#EF4444]/10 p-5">
@@ -258,6 +323,7 @@ function UserManagementPage() {
                           <th className="px-5 py-4 font-semibold">Status</th>
                           <th className="px-5 py-4 font-semibold">Provider</th>
                           <th className="px-5 py-4 font-semibold">Created</th>
+                          <th className="px-5 py-4 font-semibold">Change Role</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-white/10">
@@ -292,6 +358,29 @@ function UserManagementPage() {
                             </td>
                             <td className="px-5 py-4 text-[#D7DEE8]">
                               {formatDate(user.createdAt)}
+                            </td>
+                            <td className="px-5 py-4">
+                              <label className="sr-only" htmlFor={`role-${user.id}`}>
+                                Change role for {user.displayName}
+                              </label>
+                              <select
+                                className="h-9 rounded-lg border border-white/10 bg-[#0F172A] px-3 text-sm font-semibold text-[#F8FAFC] outline-none transition focus:border-[#10B981] focus:ring-2 focus:ring-[#10B981]/25 disabled:cursor-not-allowed disabled:opacity-60"
+                                disabled={updatingUserId === user.id}
+                                id={`role-${user.id}`}
+                                value={user.role}
+                                onChange={(event) =>
+                                  void changeUserRole(
+                                    user,
+                                    event.target.value as UserRole,
+                                  )
+                                }
+                              >
+                                {userRoles.map((role) => (
+                                  <option key={role} value={role}>
+                                    {role}
+                                  </option>
+                                ))}
+                              </select>
                             </td>
                           </tr>
                         ))}
@@ -344,6 +433,26 @@ function UserManagementPage() {
                             </span>
                             <span>{formatDate(user.createdAt)}</span>
                           </div>
+                          <label className="grid gap-2">
+                            <span className="text-[#94A3B8]">Change Role</span>
+                            <select
+                              className="h-10 rounded-lg border border-white/10 bg-[#071511] px-3 text-sm font-semibold text-[#F8FAFC] outline-none transition focus:border-[#10B981] focus:ring-2 focus:ring-[#10B981]/25 disabled:cursor-not-allowed disabled:opacity-60"
+                              disabled={updatingUserId === user.id}
+                              value={user.role}
+                              onChange={(event) =>
+                                void changeUserRole(
+                                  user,
+                                  event.target.value as UserRole,
+                                )
+                              }
+                            >
+                              {userRoles.map((role) => (
+                                <option key={role} value={role}>
+                                  {role}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
                         </div>
                       </div>
                     ))}
