@@ -1,5 +1,6 @@
 using backend.DTOs.Auth;
 using backend.Services;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 
@@ -11,16 +12,37 @@ public class AuthController : ControllerBase
 {
     private readonly IAuthenticationService _authService;
     private readonly ILogger<AuthController> _logger;
+    private readonly IValidator<RegisterRequest> _registerValidator;
+    private readonly IValidator<LoginRequest> _loginValidator;
+    private readonly IValidator<RefreshTokenRequest> _refreshTokenValidator;
+    private readonly IValidator<GoogleOAuthRequest> _googleOAuthValidator;
 
-    public AuthController(IAuthenticationService authService, ILogger<AuthController> logger)
+    public AuthController(
+        IAuthenticationService authService,
+        ILogger<AuthController> logger,
+        IValidator<RegisterRequest> registerValidator,
+        IValidator<LoginRequest> loginValidator,
+        IValidator<RefreshTokenRequest> refreshTokenValidator,
+        IValidator<GoogleOAuthRequest> googleOAuthValidator)
     {
         _authService = authService;
         _logger = logger;
+        _registerValidator = registerValidator;
+        _loginValidator = loginValidator;
+        _refreshTokenValidator = refreshTokenValidator;
+        _googleOAuthValidator = googleOAuthValidator;
     }
 
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
+        var validationResult = await _registerValidator.ValidateAsync(request);
+
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(CreateValidationErrorResponse(validationResult));
+        }
+
         try
         {
             var response = await _authService.RegisterAsync(request);
@@ -41,6 +63,13 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
+        var validationResult = await _loginValidator.ValidateAsync(request);
+
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(CreateValidationErrorResponse(validationResult));
+        }
+
         try
         {
             var response = await _authService.LoginAsync(request);
@@ -62,6 +91,13 @@ public class AuthController : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> GoogleOAuth([FromBody] GoogleOAuthRequest request)
     {
+        var validationResult = await _googleOAuthValidator.ValidateAsync(request);
+
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(CreateValidationErrorResponse(validationResult));
+        }
+
         try
         {
             var response = await _authService.GoogleOAuthAsync(request);
@@ -91,19 +127,46 @@ public class AuthController : ControllerBase
 
     [HttpPost("refresh")]
     [AllowAnonymous]
-    public async Task<ActionResult<AuthResponse>> Refresh(RefreshTokenRequest request)
+    public async Task<IActionResult> Refresh(RefreshTokenRequest request)
     {
-        var response =
-            await _authService.RefreshAsync(
-                request.RefreshToken);
+        var validationResult = await _refreshTokenValidator.ValidateAsync(request);
 
-        return Ok(response);
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(CreateValidationErrorResponse(validationResult));
+        }
+
+        try
+        {
+            var response =
+                await _authService.RefreshAsync(
+                    request.RefreshToken);
+
+            return Ok(response);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            _logger.LogWarning("Refresh token failed: {Message}", ex.Message);
+            return Unauthorized(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error during token refresh");
+            return StatusCode(500, new { message = "An unexpected error occurred" });
+        }
     }
 
     [HttpPost("logout")]
     [AllowAnonymous]
     public async Task<IActionResult> Logout([FromBody] RefreshTokenRequest request)
     {
+        var validationResult = await _refreshTokenValidator.ValidateAsync(request);
+
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(CreateValidationErrorResponse(validationResult));
+        }
+
         try
         {
             await _authService.LogoutAsync(request.RefreshToken);
@@ -119,5 +182,18 @@ public class AuthController : ControllerBase
             _logger.LogError(ex, "Unexpected error during logout");
             return StatusCode(500, new { message = "An unexpected error occurred" });
         }
+    }
+
+    private static object CreateValidationErrorResponse(FluentValidation.Results.ValidationResult validationResult)
+    {
+        return new
+        {
+            message = "Validation failed",
+            errors = validationResult.Errors.Select(error => new
+            {
+                field = error.PropertyName,
+                message = error.ErrorMessage
+            })
+        };
     }
 }

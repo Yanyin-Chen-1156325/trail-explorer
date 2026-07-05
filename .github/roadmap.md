@@ -46,17 +46,17 @@
 ### Unit Testing
 
 - [x] Backend
-- [ ] Frontend
+- [x] Frontend
 
 ### Integration Testing
 
-- [ ] Register tests
-- [ ] Login tests
-- [ ] Refresh Token tests
-- [ ] Logout tests
-- [ ] OAuth tests
-- [ ] Get Users tests
-- [ ] Update User Role tests
+- [x] Register tests
+- [x] Login tests
+- [x] Refresh Token tests
+- [x] Logout tests
+- [x] OAuth tests
+- [x] Get Users tests
+- [x] Update User Role tests
 
 ---
 

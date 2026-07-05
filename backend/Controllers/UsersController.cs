@@ -1,6 +1,7 @@
 using backend.Authentication;
 using backend.DTOs.User;
 using backend.Services;
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,11 +14,16 @@ public class UsersController : ControllerBase
 {
     private readonly IUserService _userService;
     private readonly ILogger<UsersController> _logger;
+    private readonly IValidator<UpdateUserRoleRequest> _updateUserRoleValidator;
 
-    public UsersController(IUserService userService, ILogger<UsersController> logger)
+    public UsersController(
+        IUserService userService,
+        ILogger<UsersController> logger,
+        IValidator<UpdateUserRoleRequest> updateUserRoleValidator)
     {
         _userService = userService;
         _logger = logger;
+        _updateUserRoleValidator = updateUserRoleValidator;
     }
 
     [HttpGet]
@@ -38,6 +44,21 @@ public class UsersController : ControllerBase
     [HttpPut("{id:guid}/role")]
     public async Task<IActionResult> UpdateUserRole([FromRoute] Guid id, [FromBody] UpdateUserRoleRequest request)
     {
+        var validationResult = await _updateUserRoleValidator.ValidateAsync(request);
+
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(new
+            {
+                message = "Validation failed",
+                errors = validationResult.Errors.Select(error => new
+                {
+                    field = error.PropertyName,
+                    message = error.ErrorMessage
+                })
+            });
+        }
+
         try
         {
             var user = await _userService.UpdateUserRoleAsync(id, request);
