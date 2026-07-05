@@ -1,42 +1,111 @@
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
+  AlertTriangle,
   ArrowLeft,
-  KeyRound,
-  LockKeyhole,
-  ShieldCheck,
+  Calendar,
+  LoaderCircle,
+  Mail,
+  RefreshCw,
   UserCog,
+  Users,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuthStore } from "@/features/auth";
 
-const adminNotes = [
-  {
-    title: "Protected access",
-    description: "Only authenticated sessions can reach this admin workspace.",
-    icon: LockKeyhole,
-  },
-  {
-    title: "Admin policy",
-    description:
-      "The users API is already guarded by the backend AdminOnly policy.",
-    icon: ShieldCheck,
-  },
-  {
-    title: "Role-aware actions",
-    description:
-      "User list and role controls will be added in the next roadmap tasks.",
-    icon: KeyRound,
-  },
-];
+import { createUserApi, UserApiError } from "../services/userApi";
+import type { UserResponse } from "../types/user";
+
+const userApi = createUserApi();
+
+function formatDate(value: string) {
+  return new Intl.DateTimeFormat("en-NZ", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  }).format(new Date(value));
+}
+
+function roleClassName(role: UserResponse["role"]) {
+  if (role === "Admin") {
+    return "border-[#F59E0B]/35 bg-[#F59E0B]/10 text-[#FCD34D]";
+  }
+
+  if (role === "Moderator") {
+    return "border-[#8B5CF6]/35 bg-[#8B5CF6]/10 text-[#C4B5FD]";
+  }
+
+  return "border-[#10B981]/35 bg-[#10B981]/10 text-[#A7F3D0]";
+}
+
+function statusClassName(status: UserResponse["status"]) {
+  if (status === "Disabled" || status === "Deleted") {
+    return "border-[#EF4444]/35 bg-[#EF4444]/10 text-red-200";
+  }
+
+  return "border-[#10B981]/35 bg-[#10B981]/10 text-[#A7F3D0]";
+}
 
 function UserManagementPage() {
   const session = useAuthStore((state) => state.session);
+  const accessToken = session?.accessToken;
+  const [users, setUsers] = useState<UserResponse[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const activeUsers = useMemo(
+    () => users.filter((user) => user.status === "Active").length,
+    [users],
+  );
+
+  const adminUsers = useMemo(
+    () => users.filter((user) => user.role === "Admin").length,
+    [users],
+  );
+
+  const loadUsers = useCallback(async (token: string | undefined) => {
+    if (!token) {
+      setUsers([]);
+      setError("A valid session is required to load users.");
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const nextUsers = await userApi.getUsers(token);
+      setUsers(nextUsers);
+    } catch (requestError) {
+      if (
+        requestError instanceof UserApiError &&
+        (requestError.status === 401 || requestError.status === 403)
+      ) {
+        setError("You need an admin account to view the user list.");
+      } else if (requestError instanceof Error) {
+        setError(requestError.message);
+      } else {
+        setError("Users could not be loaded.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const timerId = window.setTimeout(() => {
+      void loadUsers(accessToken);
+    }, 0);
+
+    return () => window.clearTimeout(timerId);
+  }, [accessToken, loadUsers]);
 
   return (
     <main className="min-h-screen bg-[#0F172A] px-4 py-6 text-[#F8FAFC] sm:px-6 lg:px-8">
-      <div className="mx-auto flex min-h-[calc(100vh-3rem)] w-full max-w-6xl items-center">
+      <div className="mx-auto flex min-h-[calc(100vh-3rem)] w-full max-w-7xl items-center">
         <section className="w-full space-y-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <Button
@@ -68,58 +137,221 @@ function UserManagementPage() {
                       User Management
                     </h1>
                     <p className="text-base leading-7 text-[#94A3B8] sm:text-lg">
-                      Review the signed-in admin context before loading account
-                      records and role controls.
+                      Review registered Trail Explorer accounts and prepare
+                      admin-only role management.
                     </p>
                   </div>
                 </div>
 
-                <div className="rounded-xl border border-white/10 bg-[#0F172A] p-5">
-                  <p className="text-sm font-semibold text-[#94A3B8]">
-                    Current session
-                  </p>
-                  <div className="mt-4 space-y-3">
-                    <div>
-                      <p className="text-xs uppercase tracking-wide text-[#94A3B8]">
-                        Name
-                      </p>
-                      <p className="mt-1 font-semibold">
-                        {session?.user.displayName ?? "Authenticated user"}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs uppercase tracking-wide text-[#94A3B8]">
-                        Email
-                      </p>
-                      <p className="mt-1 break-all font-semibold">
-                        {session?.user.email ?? "Session email unavailable"}
-                      </p>
-                    </div>
+                <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
+                  <div className="rounded-xl border border-white/10 bg-[#0F172A] p-5">
+                    <Users
+                      aria-hidden="true"
+                      className="mb-3 size-5 text-[#10B981]"
+                    />
+                    <p className="text-3xl font-black">{users.length}</p>
+                    <p className="mt-1 text-sm text-[#94A3B8]">Total users</p>
+                  </div>
+                  <div className="rounded-xl border border-white/10 bg-[#0F172A] p-5">
+                    <UserCog
+                      aria-hidden="true"
+                      className="mb-3 size-5 text-[#F59E0B]"
+                    />
+                    <p className="text-3xl font-black">{adminUsers}</p>
+                    <p className="mt-1 text-sm text-[#94A3B8]">Admins</p>
+                  </div>
+                  <div className="rounded-xl border border-white/10 bg-[#0F172A] p-5">
+                    <Users
+                      aria-hidden="true"
+                      className="mb-3 size-5 text-[#A7F3D0]"
+                    />
+                    <p className="text-3xl font-black">{activeUsers}</p>
+                    <p className="mt-1 text-sm text-[#94A3B8]">Active</p>
                   </div>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <div className="grid gap-4 md:grid-cols-3">
-            {adminNotes.map((note) => (
-              <Card
-                className="border-white/10 bg-[#1E293B] text-[#F8FAFC] shadow-lg shadow-black/15"
-                key={note.title}
-              >
-                <CardContent className="p-6">
-                  <note.icon
-                    aria-hidden="true"
-                    className="mb-5 size-7 text-[#10B981]"
-                  />
-                  <h2 className="text-lg font-bold">{note.title}</h2>
-                  <p className="mt-2 text-sm leading-6 text-[#94A3B8]">
-                    {note.description}
+          <Card className="border-white/10 bg-[#1E293B] text-[#F8FAFC] shadow-xl shadow-black/20">
+            <CardContent className="p-0">
+              <div className="flex flex-col gap-4 border-b border-white/10 p-5 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h2 className="text-xl font-black">Users</h2>
+                  <p className="mt-1 text-sm text-[#94A3B8]">
+                    Account records returned by the admin users API.
                   </p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                </div>
+
+                <Button
+                  className="w-fit border-white/15 bg-white/5 text-[#F8FAFC] hover:bg-white/10"
+                  disabled={isLoading}
+                  type="button"
+                  variant="outline"
+                  onClick={() => void loadUsers(accessToken)}
+                >
+                  <RefreshCw
+                    aria-hidden="true"
+                    className={isLoading ? "size-4 animate-spin" : "size-4"}
+                  />
+                  Refresh
+                </Button>
+              </div>
+
+              {isLoading ? (
+                <div className="flex min-h-64 items-center justify-center p-8">
+                  <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-[#0F172A] px-5 py-4 text-sm text-[#94A3B8]">
+                    <LoaderCircle
+                      aria-hidden="true"
+                      className="size-5 animate-spin text-[#10B981]"
+                    />
+                    Loading users
+                  </div>
+                </div>
+              ) : null}
+
+              {!isLoading && error ? (
+                <div className="p-5">
+                  <div className="rounded-xl border border-[#EF4444]/30 bg-[#EF4444]/10 p-5">
+                    <div className="flex gap-3">
+                      <AlertTriangle
+                        aria-hidden="true"
+                        className="mt-0.5 size-5 shrink-0 text-red-200"
+                      />
+                      <div>
+                        <h3 className="font-bold text-red-100">
+                          Unable to load users
+                        </h3>
+                        <p className="mt-1 text-sm leading-6 text-red-100/75">
+                          {error}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+
+              {!isLoading && !error && users.length === 0 ? (
+                <div className="p-5">
+                  <div className="rounded-xl border border-white/10 bg-[#0F172A] p-8 text-center">
+                    <Users
+                      aria-hidden="true"
+                      className="mx-auto mb-4 size-8 text-[#10B981]"
+                    />
+                    <h3 className="text-lg font-bold">No users found</h3>
+                    <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#94A3B8]">
+                      Registered accounts will appear here after the admin API
+                      returns user records.
+                    </p>
+                  </div>
+                </div>
+              ) : null}
+
+              {!isLoading && !error && users.length > 0 ? (
+                <>
+                  <div className="hidden overflow-x-auto md:block">
+                    <table className="w-full min-w-[760px] text-left text-sm">
+                      <thead className="border-b border-white/10 bg-[#0F172A]/70 text-xs uppercase tracking-wide text-[#94A3B8]">
+                        <tr>
+                          <th className="px-5 py-4 font-semibold">User</th>
+                          <th className="px-5 py-4 font-semibold">Role</th>
+                          <th className="px-5 py-4 font-semibold">Status</th>
+                          <th className="px-5 py-4 font-semibold">Provider</th>
+                          <th className="px-5 py-4 font-semibold">Created</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-white/10">
+                        {users.map((user) => (
+                          <tr className="transition hover:bg-white/5" key={user.id}>
+                            <td className="px-5 py-4">
+                              <p className="font-semibold text-[#F8FAFC]">
+                                {user.displayName}
+                              </p>
+                              <p className="mt-1 text-[#94A3B8]">{user.email}</p>
+                            </td>
+                            <td className="px-5 py-4">
+                              <span
+                                className={`inline-flex rounded-full border px-3 py-1 text-xs font-bold ${roleClassName(
+                                  user.role,
+                                )}`}
+                              >
+                                {user.role}
+                              </span>
+                            </td>
+                            <td className="px-5 py-4">
+                              <span
+                                className={`inline-flex rounded-full border px-3 py-1 text-xs font-bold ${statusClassName(
+                                  user.status,
+                                )}`}
+                              >
+                                {user.status}
+                              </span>
+                            </td>
+                            <td className="px-5 py-4 text-[#D7DEE8]">
+                              {user.authProvider}
+                            </td>
+                            <td className="px-5 py-4 text-[#D7DEE8]">
+                              {formatDate(user.createdAt)}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div className="grid gap-3 p-5 md:hidden">
+                    {users.map((user) => (
+                      <div
+                        className="rounded-xl border border-white/10 bg-[#0F172A] p-4"
+                        key={user.id}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <h3 className="font-bold">{user.displayName}</h3>
+                            <p className="mt-1 flex items-center gap-2 break-all text-sm text-[#94A3B8]">
+                              <Mail aria-hidden="true" className="size-4" />
+                              {user.email}
+                            </p>
+                          </div>
+                          <span
+                            className={`shrink-0 rounded-full border px-3 py-1 text-xs font-bold ${roleClassName(
+                              user.role,
+                            )}`}
+                          >
+                            {user.role}
+                          </span>
+                        </div>
+
+                        <div className="mt-4 grid gap-3 text-sm">
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="text-[#94A3B8]">Status</span>
+                            <span
+                              className={`rounded-full border px-3 py-1 text-xs font-bold ${statusClassName(
+                                user.status,
+                              )}`}
+                            >
+                              {user.status}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="text-[#94A3B8]">Provider</span>
+                            <span>{user.authProvider}</span>
+                          </div>
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="flex items-center gap-2 text-[#94A3B8]">
+                              <Calendar aria-hidden="true" className="size-4" />
+                              Created
+                            </span>
+                            <span>{formatDate(user.createdAt)}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : null}
+            </CardContent>
+          </Card>
         </section>
       </div>
     </main>

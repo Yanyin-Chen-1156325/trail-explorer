@@ -39,8 +39,8 @@
 - [x] Configure Protected Routes
 - [x] Add Logout functionality
 - [x] Create HomePage
-- [ ] Create User Management Page
-- [ ] Display User List
+- [x] Create User Management Page
+- [x] Display User List
 - [ ] Change User Role
 
 ### Unit Testing
