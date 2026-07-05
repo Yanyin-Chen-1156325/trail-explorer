@@ -38,7 +38,7 @@
 - [x] Create Google Login button
 - [x] Configure Protected Routes
 - [x] Add Logout functionality
-- [ ] Create HomePage
+- [x] Create HomePage
 - [ ] Create User Management Page
 - [ ] Display User List
 - [ ] Change User Role
