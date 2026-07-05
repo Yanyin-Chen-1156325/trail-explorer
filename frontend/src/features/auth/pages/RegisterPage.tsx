@@ -1,4 +1,5 @@
 import { type FormEvent, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   CheckCircle2,
   Eye,
@@ -10,6 +11,8 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 
 import { GoogleLoginButton } from "../components/GoogleLoginButton";
 import { useAuthStore } from "../store/authStore";
@@ -154,12 +157,12 @@ function RegisterPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#0F172A] text-[#F8FAFC]">
-      <div className="mx-auto grid min-h-screen w-full max-w-7xl gap-8 px-4 py-6 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:px-8 lg:py-10">
-        <section className="flex flex-col justify-between rounded-lg border border-white/10 bg-[#1E293B] p-6 shadow-2xl shadow-black/25 sm:p-8 lg:p-10">
+    <main className="bg-[#F7F8F3] px-4 py-12 text-[#0B1511] dark:bg-[#071511] dark:text-white sm:px-6 lg:px-8">
+      <div className="mx-auto grid w-full max-w-6xl gap-8 lg:grid-cols-[0.92fr_1.08fr]">
+        <section className="flex flex-col justify-between rounded-xl border border-white/10 bg-[#061813] p-6 text-white shadow-2xl shadow-black/20 sm:p-8 lg:p-10">
           <div className="space-y-8">
             <div className="flex items-center gap-3">
-              <div className="flex size-11 items-center justify-center rounded-lg bg-[#10B981]/15 text-[#10B981]">
+              <div className="flex size-11 items-center justify-center rounded-xl bg-[#10B981]/15 text-[#86EFAC]">
                 <Mountain aria-hidden="true" className="size-6" />
               </div>
               <div>
@@ -171,7 +174,7 @@ function RegisterPage() {
             </div>
 
             <div className="max-w-xl space-y-4">
-              <h1 className="text-4xl font-semibold sm:text-5xl">
+              <h1 className="text-4xl font-black sm:text-5xl">
                 Create your account and start building trail progress.
               </h1>
               <p className="text-base leading-7 text-[#94A3B8] sm:text-lg">
@@ -182,34 +185,35 @@ function RegisterPage() {
           </div>
 
           <div className="mt-10 grid gap-3 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
-            <div className="rounded-lg border border-white/10 bg-white/3 p-4">
+            <div className="rounded-lg border border-white/10 bg-white/5 p-4">
               <ShieldCheck aria-hidden="true" className="mb-3 size-5 text-[#10B981]" />
-              <p className="text-sm font-medium text-[#F8FAFC]">Secure auth</p>
+              <p className="text-sm font-medium">Secure auth</p>
               <p className="mt-1 text-sm text-[#94A3B8]">JWT session ready</p>
             </div>
-            <div className="rounded-lg border border-white/10 bg-white/3 p-4">
+            <div className="rounded-lg border border-white/10 bg-white/5 p-4">
               <Trophy aria-hidden="true" className="mb-3 size-5 text-[#F59E0B]" />
-              <p className="text-sm font-medium text-[#F8FAFC]">XP profile</p>
+              <p className="text-sm font-medium">XP profile</p>
               <p className="mt-1 text-sm text-[#94A3B8]">Prepared for rewards</p>
             </div>
-            <div className="rounded-lg border border-white/10 bg-white/3 p-4">
+            <div className="rounded-lg border border-white/10 bg-white/5 p-4">
               <CheckCircle2 aria-hidden="true" className="mb-3 size-5 text-[#8B5CF6]" />
-              <p className="text-sm font-medium text-[#F8FAFC]">Trail history</p>
+              <p className="text-sm font-medium">Trail history</p>
               <p className="mt-1 text-sm text-[#94A3B8]">Progress stays saved</p>
             </div>
           </div>
         </section>
 
         <section className="flex items-center">
-          <div className="w-full rounded-lg border border-white/10 bg-[#1E293B] p-5 shadow-2xl shadow-black/25 sm:p-8 lg:p-10">
+          <Card className="w-full border-black/5 bg-white shadow-xl shadow-black/8 dark:border-white/10 dark:bg-[#10221A]">
+            <CardContent className="p-5 sm:p-8 lg:p-10">
             {session ? (
-              <div className="space-y-5 rounded-lg border border-[#10B981]/30 bg-[#10B981]/10 p-6 text-[#F8FAFC]">
+              <div className="space-y-5 rounded-xl border border-[#10B981]/30 bg-[#10B981]/10 p-6">
                 <CheckCircle2 aria-hidden="true" className="size-10 text-[#10B981]" />
                 <div>
                   <h2 className="text-2xl font-semibold">
                     Welcome, {session.user.displayName}.
                   </h2>
-                  <p className="mt-2 text-sm leading-6 text-[#94A3B8]">
+                  <p className="mt-2 text-sm leading-6 text-[#56655D] dark:text-white/65">
                     Your Trail Explorer account is active for {session.user.email}.
                   </p>
                 </div>
@@ -217,35 +221,34 @@ function RegisterPage() {
             ) : (
               <form className="space-y-6" noValidate onSubmit={handleSubmit}>
                 <div className="space-y-2">
-                  <p className="text-sm font-medium text-[#10B981]">Register</p>
-                  <h2 className="text-3xl font-semibold">Create account</h2>
-                  <p className="text-sm leading-6 text-[#94A3B8]">
-                    Use the same requirements enforced by the backend register API.
+                  <p className="text-sm font-bold text-[#2E7D32] dark:text-[#86EFAC]">
+                    Register
                   </p>
+                  <h2 className="text-3xl font-black">Create account</h2>
                 </div>
 
                 <GoogleLoginButton />
 
                 <div className="flex items-center gap-3">
-                  <div className="h-px flex-1 bg-white/10" />
-                  <span className="text-xs font-medium uppercase text-[#94A3B8]">
+                  <div className="h-px flex-1 bg-black/10 dark:bg-white/10" />
+                  <span className="text-xs font-bold uppercase text-[#56655D] dark:text-white/55">
                     or use email
                   </span>
-                  <div className="h-px flex-1 bg-white/10" />
+                  <div className="h-px flex-1 bg-black/10 dark:bg-white/10" />
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-2">
                   <label className="space-y-2 sm:col-span-2">
-                    <span className="text-sm font-medium text-[#F8FAFC]">
+                    <span className="text-sm font-bold">
                       Display name
                     </span>
-                    <input
+                    <Input
                       aria-describedby={
                         formErrors.displayName ? "display-name-error" : undefined
                       }
                       aria-invalid={Boolean(formErrors.displayName)}
                       autoComplete="name"
-                      className="h-12 w-full rounded-lg border border-white/10 bg-[#0F172A] px-4 text-[#F8FAFC] outline-none transition placeholder:text-[#94A3B8]/70 focus:border-[#10B981] focus:ring-2 focus:ring-[#10B981]/30"
+                      className="h-12 border-black/10 bg-[#F7F8F3] focus-visible:border-[#2E7D32] focus-visible:ring-[#2E7D32]/25 dark:border-white/10 dark:bg-[#071511]"
                       name="displayName"
                       placeholder="Alex Walker"
                       value={formValues.displayName}
@@ -261,12 +264,12 @@ function RegisterPage() {
                   </label>
 
                   <label className="space-y-2 sm:col-span-2">
-                    <span className="text-sm font-medium text-[#F8FAFC]">Email</span>
-                    <input
+                    <span className="text-sm font-bold">Email</span>
+                    <Input
                       aria-describedby={formErrors.email ? "email-error" : undefined}
                       aria-invalid={Boolean(formErrors.email)}
                       autoComplete="email"
-                      className="h-12 w-full rounded-lg border border-white/10 bg-[#0F172A] px-4 text-[#F8FAFC] outline-none transition placeholder:text-[#94A3B8]/70 focus:border-[#10B981] focus:ring-2 focus:ring-[#10B981]/30"
+                      className="h-12 border-black/10 bg-[#F7F8F3] focus-visible:border-[#2E7D32] focus-visible:ring-[#2E7D32]/25 dark:border-white/10 dark:bg-[#071511]"
                       name="email"
                       placeholder="you@example.com"
                       type="email"
@@ -281,17 +284,17 @@ function RegisterPage() {
                   </label>
 
                   <label className="space-y-2">
-                    <span className="text-sm font-medium text-[#F8FAFC]">
+                    <span className="text-sm font-bold">
                       Password
                     </span>
                     <div className="relative">
-                      <input
+                      <Input
                         aria-describedby={
                           formErrors.password ? "password-error" : "password-help"
                         }
                         aria-invalid={Boolean(formErrors.password)}
                         autoComplete="new-password"
-                        className="h-12 w-full rounded-lg border border-white/10 bg-[#0F172A] px-4 pr-12 text-[#F8FAFC] outline-none transition placeholder:text-[#94A3B8]/70 focus:border-[#10B981] focus:ring-2 focus:ring-[#10B981]/30"
+                        className="h-12 border-black/10 bg-[#F7F8F3] pr-12 focus-visible:border-[#2E7D32] focus-visible:ring-[#2E7D32]/25 dark:border-white/10 dark:bg-[#071511]"
                         name="password"
                         placeholder="Create password"
                         type={showPassword ? "text" : "password"}
@@ -302,7 +305,7 @@ function RegisterPage() {
                       />
                       <button
                         aria-label={showPassword ? "Hide password" : "Show password"}
-                        className="absolute right-2 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-lg text-[#94A3B8] transition hover:bg-white/10 hover:text-[#F8FAFC] focus:outline-none focus:ring-2 focus:ring-[#10B981]/40"
+                        className="absolute right-2 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-lg text-[#56655D] transition hover:bg-black/5 focus:outline-none focus:ring-2 focus:ring-[#2E7D32]/40 dark:text-white/60 dark:hover:bg-white/10"
                         type="button"
                         onClick={() => setShowPassword((current) => !current)}
                       >
@@ -321,10 +324,10 @@ function RegisterPage() {
                   </label>
 
                   <label className="space-y-2">
-                    <span className="text-sm font-medium text-[#F8FAFC]">
+                    <span className="text-sm font-bold">
                       Confirm password
                     </span>
-                    <input
+                    <Input
                       aria-describedby={
                         formErrors.confirmPassword
                           ? "confirm-password-error"
@@ -332,7 +335,7 @@ function RegisterPage() {
                       }
                       aria-invalid={Boolean(formErrors.confirmPassword)}
                       autoComplete="new-password"
-                      className="h-12 w-full rounded-lg border border-white/10 bg-[#0F172A] px-4 text-[#F8FAFC] outline-none transition placeholder:text-[#94A3B8]/70 focus:border-[#10B981] focus:ring-2 focus:ring-[#10B981]/30"
+                      className="h-12 border-black/10 bg-[#F7F8F3] focus-visible:border-[#2E7D32] focus-visible:ring-[#2E7D32]/25 dark:border-white/10 dark:bg-[#071511]"
                       name="confirmPassword"
                       placeholder="Repeat password"
                       type={showPassword ? "text" : "password"}
@@ -351,11 +354,11 @@ function RegisterPage() {
 
                 <div
                   id="password-help"
-                  className="grid gap-2 rounded-lg border border-white/10 bg-[#0F172A]/70 p-4 sm:grid-cols-2"
+                  className="grid gap-2 rounded-lg border border-black/10 bg-[#F7F8F3] p-4 sm:grid-cols-2 dark:border-white/10 dark:bg-[#071511]"
                 >
                   {requirementStatus.map((requirement) => (
                     <div
-                      className="flex items-center gap-2 text-sm text-[#94A3B8]"
+                      className="flex items-center gap-2 text-sm text-[#56655D] dark:text-white/65"
                       key={requirement.label}
                     >
                       <CheckCircle2
@@ -378,7 +381,7 @@ function RegisterPage() {
                 ) : null}
 
                 <Button
-                  className="h-12 w-full rounded-lg bg-[#10B981] text-base font-semibold text-[#052E2B] hover:bg-[#22C55E]"
+                  className="h-12 w-full rounded-lg bg-[#43A047] text-base font-bold text-white hover:bg-[#2E7D32]"
                   disabled={isLoading}
                   type="submit"
                 >
@@ -394,9 +397,17 @@ function RegisterPage() {
                     "Create account"
                   )}
                 </Button>
+
+                <p className="text-center text-sm text-[#56655D] dark:text-white/65">
+                  Already have an account?{" "}
+                  <Link className="font-bold text-[#0B6B2B] dark:text-[#86EFAC]" to="/login">
+                    Log in
+                  </Link>
+                </p>
               </form>
             )}
-          </div>
+            </CardContent>
+          </Card>
         </section>
       </div>
     </main>

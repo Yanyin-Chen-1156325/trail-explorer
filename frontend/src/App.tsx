@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Mountain, RouteIcon, Trophy } from "lucide-react";
 
+import { HomePage } from "./features/home/pages/HomePage";
 import {
   LoginPage,
   LogoutButton,
@@ -9,6 +10,7 @@ import {
   RegisterPage,
   useAuthStore,
 } from "./features/auth";
+import { PublicLayout } from "./shared/layouts/PublicLayout";
 
 function ProtectedHomePage() {
   const session = useAuthStore((state) => state.session);
@@ -79,13 +81,16 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route element={<PublicOnlyRoute />}>
-          <Route element={<LoginPage />} path="/login" />
-          <Route element={<RegisterPage />} path="/register" />
+        <Route element={<PublicLayout />}>
+          <Route element={<HomePage />} path="/" />
+          <Route element={<PublicOnlyRoute />}>
+            <Route element={<LoginPage />} path="/login" />
+            <Route element={<RegisterPage />} path="/register" />
+          </Route>
         </Route>
 
         <Route element={<ProtectedRoute />}>
-          <Route element={<ProtectedHomePage />} path="/" />
+          <Route element={<ProtectedHomePage />} path="/dashboard" />
         </Route>
 
         <Route element={<Navigate replace to="/" />} path="*" />

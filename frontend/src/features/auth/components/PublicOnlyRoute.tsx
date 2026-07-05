@@ -17,7 +17,7 @@ function PublicOnlyRoute() {
   }
 
   if (session) {
-    return <Navigate replace to="/" />;
+    return <Navigate replace to="/dashboard" />;
   }
 
   return <Outlet />;
