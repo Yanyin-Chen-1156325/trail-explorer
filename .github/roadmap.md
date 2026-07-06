@@ -70,25 +70,24 @@
 ### Backend
 
 - [x] Research DOC API
-- [ ] Create DocApiClient
-- [ ] Create DOC DTOs
-- [ ] Implement DOC API integration
-- [ ] Create TrailSyncService
-- [ ] Implement Upsert logic
-- [ ] Create Seed Data fallback
+- [x] Create DocApiClient
+- [x] Create DOC DTOs
+- [x] Implement DOC API integration
+- [x] Create TrailSyncService
+- [x] Implement Upsert logic
 
 ### Background Jobs
 
-- [ ] Create Trail Synchronisation BackgroundService
+- [x] Create Trail Synchronisation BackgroundService
 
 ### Logging
 
-- [ ] Log Synchronisation Events
+- [x] Log Synchronisation Events
 
 ### Testing
 
-- [ ] DOC API client tests
-- [ ] Synchronisation service tests
+- [x] DOC API client tests
+- [x] Synchronisation service tests
 
 ---
 

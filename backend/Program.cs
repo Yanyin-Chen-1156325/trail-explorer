@@ -1,11 +1,14 @@
+using backend.BackgroundServices;
 using backend.Authentication;
 using backend.Data;
 using backend.Enums;
+using backend.Integrations.Doc;
 using backend.Services;
 using backend.Validators;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Scalar.AspNetCore;
@@ -25,12 +28,24 @@ var jwtOptions = builder.Configuration.GetSection("Jwt").Get<JwtOptions>()
 
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
 builder.Services.Configure<GoogleOAuthOptions>(builder.Configuration.GetSection("GoogleOAuth"));
+builder.Services.Configure<DocApiOptions>(builder.Configuration.GetSection(DocApiOptions.SectionName));
+builder.Services.Configure<TrailSynchronisationOptions>(
+    builder.Configuration.GetSection(TrailSynchronisationOptions.SectionName));
 builder.Services.AddSingleton(jwtOptions);
 builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 builder.Services.AddScoped<IGoogleTokenValidator, GoogleTokenValidator>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITrailService, TrailService>();
+builder.Services.AddScoped<ITrailSyncService, TrailSyncService>();
+builder.Services.AddScoped<IDocTrailIntegrationService, DocTrailIntegrationService>();
+builder.Services.AddHttpClient<IDocApiClient, DocApiClient>((serviceProvider, client) =>
+{
+    var options = serviceProvider.GetRequiredService<IOptions<DocApiOptions>>().Value;
+    client.BaseAddress = new Uri(options.BaseUrl);
+    client.Timeout = TimeSpan.FromSeconds(options.TimeoutSeconds);
+});
+builder.Services.AddHostedService<TrailSynchronisationBackgroundService>();
 
 // Add Validation
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
