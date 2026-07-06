@@ -1,6 +1,7 @@
 specs/
 temp/
 trail-explorer.db
+backend/appsettings.Development.json
 
 
 # .NET / Visual Studio
