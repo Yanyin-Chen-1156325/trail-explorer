@@ -74,8 +74,9 @@
 
 ### Backend
 
-- [ ] Create Get Trails API
-- [ ] Create Get Trail By Id API
+- [ ] Get Trails Data From DOC
+- [x] Create Get Trails API
+- [x] Create Get Trail By Id API
 - [ ] Implement Search API
 - [ ] Implement Filter API
 - [ ] Implement Pagination

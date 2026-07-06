@@ -30,6 +30,7 @@ builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 builder.Services.AddScoped<IGoogleTokenValidator, GoogleTokenValidator>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ITrailService, TrailService>();
 
 // Add Validation
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
