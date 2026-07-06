@@ -69,8 +69,8 @@
 
 ### Database
 
-- [ ] Create Trail entity
-- [ ] Configure Trail table
+- [x] Create Trail entity
+- [x] Configure Trail table
 
 ### Backend
 
