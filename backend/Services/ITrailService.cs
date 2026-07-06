@@ -4,7 +4,7 @@ namespace backend.Services;
 
 public interface ITrailService
 {
-    Task<IReadOnlyList<TrailResponse>> GetTrailsAsync();
+    Task<PagedTrailResponse> GetTrailsAsync(TrailQueryRequest query);
 
     Task<TrailResponse?> GetTrailByIdAsync(Guid trailId);
 }

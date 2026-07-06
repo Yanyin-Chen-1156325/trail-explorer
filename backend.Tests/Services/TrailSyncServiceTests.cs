@@ -239,6 +239,7 @@ public class TrailSyncServiceTests
         return new TrailSyncService(
             context,
             integrationService,
+            new TrailCacheInvalidator(),
             NullLogger<TrailSyncService>.Instance);
     }
 

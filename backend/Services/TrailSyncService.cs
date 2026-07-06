@@ -12,15 +12,18 @@ public class TrailSyncService : ITrailSyncService
 {
     private readonly ApplicationDbContext _context;
     private readonly IDocTrailIntegrationService _docTrailIntegrationService;
+    private readonly ITrailCacheInvalidator _cacheInvalidator;
     private readonly ILogger<TrailSyncService> _logger;
 
     public TrailSyncService(
         ApplicationDbContext context,
         IDocTrailIntegrationService docTrailIntegrationService,
+        ITrailCacheInvalidator cacheInvalidator,
         ILogger<TrailSyncService> logger)
     {
         _context = context;
         _docTrailIntegrationService = docTrailIntegrationService;
+        _cacheInvalidator = cacheInvalidator;
         _logger = logger;
     }
 
@@ -72,6 +75,12 @@ public class TrailSyncService : ITrailSyncService
             }
 
             await _context.SaveChangesAsync(cancellationToken);
+
+            if (result.Created > 0 || result.Updated > 0)
+            {
+                _cacheInvalidator.InvalidateTrailList();
+                _cacheInvalidator.InvalidateTrailDetails();
+            }
 
             _logger.LogInformation(
                 "DOC trail synchronisation completed. Candidates: {CandidatesFound}, Created: {Created}, Updated: {Updated}, Skipped: {Skipped}.",

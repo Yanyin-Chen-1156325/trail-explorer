@@ -95,21 +95,21 @@
 
 ### Database
 
-- [ ] Create Trail entity
-- [ ] Configure Trail table
+- [x] Create Trail entity
+- [x] Configure Trail table
 
 ### Backend
 
-- [ ] Create Get Trails API
-- [ ] Create Get Trail By Id API
-- [ ] Implement Search API
-- [ ] Implement Filter API
-- [ ] Implement Pagination
+- [x] Create Get Trails API
+- [x] Create Get Trail By Id API
+- [x] Implement Search API
+- [x] Implement Filter API
+- [x] Implement Pagination
 
 ### Caching
 
-- [ ] Cache Trail List
-- [ ] Cache Trail Details
+- [x] Cache Trail List
+- [x] Cache Trail Details
 
 ### Frontend
 

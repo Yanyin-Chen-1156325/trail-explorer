@@ -32,10 +32,12 @@ builder.Services.Configure<DocApiOptions>(builder.Configuration.GetSection(DocAp
 builder.Services.Configure<TrailSynchronisationOptions>(
     builder.Configuration.GetSection(TrailSynchronisationOptions.SectionName));
 builder.Services.AddSingleton(jwtOptions);
+builder.Services.AddMemoryCache();
 builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 builder.Services.AddScoped<IGoogleTokenValidator, GoogleTokenValidator>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddSingleton<ITrailCacheInvalidator, TrailCacheInvalidator>();
 builder.Services.AddScoped<ITrailService, TrailService>();
 builder.Services.AddScoped<ITrailSyncService, TrailSyncService>();
 builder.Services.AddScoped<IDocTrailIntegrationService, DocTrailIntegrationService>();
