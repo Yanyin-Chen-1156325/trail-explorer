@@ -33,7 +33,8 @@ public class OAuthIntegrationTests : IClassFixture<CustomWebApplicationFactory>
 
         var response = await client.PostAsJsonAsync("/api/auth/google", new GoogleOAuthRequest
         {
-            IdToken = "valid-google-token"
+            IdToken = "valid-google-token",
+            CreateAccount = true
         });
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -65,7 +66,8 @@ public class OAuthIntegrationTests : IClassFixture<CustomWebApplicationFactory>
 
         var firstResponse = await client.PostAsJsonAsync("/api/auth/google", new GoogleOAuthRequest
         {
-            IdToken = "existing-google-token"
+            IdToken = "existing-google-token",
+            CreateAccount = true
         });
         var secondResponse = await client.PostAsJsonAsync("/api/auth/google", new GoogleOAuthRequest
         {
@@ -84,6 +86,31 @@ public class OAuthIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         var userCount = await dbContext.Users.CountAsync(x => x.Email == payload.Email);
 
         Assert.Equal(1, userCount);
+    }
+
+    [Fact]
+    public async Task GoogleOAuth_WhenLoginModeAndGoogleUserDoesNotExist_ReturnsNotFound()
+    {
+        var payload = CreateGooglePayload("google.missing@example.com", "Missing Google User", "google-subject-missing");
+        using var factory = CreateFactoryWithGooglePayload("missing-google-token", payload);
+        var client = factory.CreateClient();
+
+        var response = await client.PostAsJsonAsync("/api/auth/google", new GoogleOAuthRequest
+        {
+            IdToken = "missing-google-token",
+            CreateAccount = false
+        });
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+
+        var body = await response.Content.ReadAsStringAsync();
+        Assert.Contains("Google account not found. Please create an account first.", body);
+
+        using var scope = factory.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var userExists = await dbContext.Users.AnyAsync(x => x.Email == payload.Email);
+
+        Assert.False(userExists);
     }
 
     [Fact]
@@ -119,7 +146,8 @@ public class OAuthIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         });
         var googleResponse = await client.PostAsJsonAsync("/api/auth/google", new GoogleOAuthRequest
         {
-            IdToken = "conflict-google-token"
+            IdToken = "conflict-google-token",
+            CreateAccount = true
         });
 
         Assert.Equal(HttpStatusCode.OK, registerResponse.StatusCode);

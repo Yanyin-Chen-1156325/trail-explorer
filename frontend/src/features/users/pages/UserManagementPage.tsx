@@ -14,13 +14,26 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
+import { usersApiBaseUrl } from "@/config/api";
 import { useAuthStore } from "@/features/auth";
 
 import { createUserApi, UserApiError } from "../services/userApi";
-import type { UserResponse, UserRole } from "../types/user";
+import type { UserResponse, UserRole, UserStatus } from "../types/user";
 
-const userApi = createUserApi();
+const userApi = createUserApi(usersApiBaseUrl);
 const userRoles: UserRole[] = ["User", "Moderator", "Admin"];
+const userStatuses: UserStatus[] = ["Active", "Suspended", "Deleted"];
+
+interface PendingRoleChange {
+  role: UserRole;
+  user: UserResponse;
+}
+
+interface PendingStatusChange {
+  status: UserStatus;
+  user: UserResponse;
+}
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("en-NZ", {
@@ -43,7 +56,7 @@ function roleClassName(role: UserResponse["role"]) {
 }
 
 function statusClassName(status: UserResponse["status"]) {
-  if (status === "Disabled" || status === "Deleted") {
+  if (status === "Suspended" || status === "Deleted") {
     return "border-[#EF4444]/35 bg-[#EF4444]/10 text-red-200";
   }
 
@@ -52,12 +65,22 @@ function statusClassName(status: UserResponse["status"]) {
 
 function UserManagementPage() {
   const session = useAuthStore((state) => state.session);
+  const refreshSession = useAuthStore((state) => state.refreshSession);
   const accessToken = session?.accessToken;
+  const currentUserId = session?.user.userId;
+  const currentUserRole = session?.user.role;
+  const canUpdateRoles = currentUserRole === "Admin";
+  const canUpdateStatuses =
+    currentUserRole === "Admin" || currentUserRole === "Moderator";
   const [users, setUsers] = useState<UserResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [updatingUserId, setUpdatingUserId] = useState<string | null>(null);
+  const [pendingRoleChange, setPendingRoleChange] =
+    useState<PendingRoleChange | null>(null);
+  const [pendingStatusChange, setPendingStatusChange] =
+    useState<PendingStatusChange | null>(null);
 
   const activeUsers = useMemo(
     () => users.filter((user) => user.status === "Active").length,
@@ -69,7 +92,7 @@ function UserManagementPage() {
     [users],
   );
 
-  const loadUsers = useCallback(async (token: string | undefined) => {
+  const loadUsers = useCallback(async (token: string | undefined, hasRetried = false) => {
     if (!token) {
       setUsers([]);
       setError("A valid session is required to load users.");
@@ -89,7 +112,21 @@ function UserManagementPage() {
         requestError instanceof UserApiError &&
         (requestError.status === 401 || requestError.status === 403)
       ) {
-        setError("You need an admin account to view the user list.");
+        if (!hasRetried) {
+          try {
+            await refreshSession();
+            const refreshedToken = useAuthStore.getState().session?.accessToken;
+
+            if (refreshedToken) {
+              await loadUsers(refreshedToken, true);
+              return;
+            }
+          } catch {
+            // Fall through to the permission error below.
+          }
+        }
+
+        setError("You need an admin or moderator account to view the user list.");
       } else if (requestError instanceof Error) {
         setError(requestError.message);
       } else {
@@ -98,16 +135,69 @@ function UserManagementPage() {
     } finally {
       setIsLoading(false);
     }
+  }, [refreshSession]);
+
+  const requestRoleChange = useCallback((user: UserResponse, role: UserRole) => {
+    if (role === user.role) {
+      return;
+    }
+
+    setPendingRoleChange({ user, role });
   }, []);
 
-  const changeUserRole = useCallback(
-    async (user: UserResponse, role: UserRole) => {
+  const cancelRoleChange = useCallback(() => {
+    setPendingRoleChange(null);
+  }, []);
+
+  const requestStatusChange = useCallback(
+    (user: UserResponse, status: UserStatus) => {
+      if (status === user.status) {
+        return;
+      }
+
+      setPendingStatusChange({ user, status });
+    },
+    [],
+  );
+
+  const cancelStatusChange = useCallback(() => {
+    setPendingStatusChange(null);
+  }, []);
+
+  const getAvailableStatusOptions = useCallback(
+    (user: UserResponse): UserStatus[] => {
+      if (currentUserRole === "Admin") {
+        return userStatuses;
+      }
+
+      if (
+        currentUserRole === "Moderator" &&
+        user.role === "User" &&
+        user.status === "Active"
+      ) {
+        return ["Active", "Suspended"];
+      }
+
+      return [];
+    },
+    [currentUserRole],
+  );
+
+  const confirmRoleChange = useCallback(async () => {
+      if (!pendingRoleChange) {
+        return;
+      }
+
+      const { user, role } = pendingRoleChange;
+
       if (role === user.role) {
+        setPendingRoleChange(null);
         return;
       }
 
       if (!accessToken) {
         setError("A valid session is required to update user roles.");
+        setPendingRoleChange(null);
         return;
       }
 
@@ -126,6 +216,7 @@ function UserManagementPage() {
           ),
         );
         setSuccessMessage(`${updatedUser.displayName} is now ${updatedUser.role}.`);
+        setPendingRoleChange(null);
       } catch (requestError) {
         if (
           requestError instanceof UserApiError &&
@@ -141,8 +232,60 @@ function UserManagementPage() {
         setUpdatingUserId(null);
       }
     },
-    [accessToken],
+    [accessToken, pendingRoleChange],
   );
+
+  const confirmStatusChange = useCallback(async () => {
+    if (!pendingStatusChange) {
+      return;
+    }
+
+    const { user, status } = pendingStatusChange;
+
+    if (status === user.status) {
+      setPendingStatusChange(null);
+      return;
+    }
+
+    if (!accessToken) {
+      setError("A valid session is required to update user statuses.");
+      setPendingStatusChange(null);
+      return;
+    }
+
+    setUpdatingUserId(user.id);
+    setError(null);
+    setSuccessMessage(null);
+
+    try {
+      const updatedUser = await userApi.updateUserStatus(accessToken, user.id, {
+        status,
+      });
+
+      setUsers((currentUsers) =>
+        currentUsers.map((currentUser) =>
+          currentUser.id === updatedUser.id ? updatedUser : currentUser,
+        ),
+      );
+      setSuccessMessage(
+        `${updatedUser.displayName} is now ${updatedUser.status}.`,
+      );
+      setPendingStatusChange(null);
+    } catch (requestError) {
+      if (
+        requestError instanceof UserApiError &&
+        (requestError.status === 401 || requestError.status === 403)
+      ) {
+        setError("You need an admin or moderator account to change user statuses.");
+      } else if (requestError instanceof Error) {
+        setError(requestError.message);
+      } else {
+        setError("User status could not be updated.");
+      }
+    } finally {
+      setUpdatingUserId(null);
+    }
+  }, [accessToken, pendingStatusChange]);
 
   useEffect(() => {
     const timerId = window.setTimeout(() => {
@@ -323,6 +466,7 @@ function UserManagementPage() {
                           <th className="px-5 py-4 font-semibold">Status</th>
                           <th className="px-5 py-4 font-semibold">Provider</th>
                           <th className="px-5 py-4 font-semibold">Created</th>
+                          <th className="px-5 py-4 font-semibold">Change Status</th>
                           <th className="px-5 py-4 font-semibold">Change Role</th>
                         </tr>
                       </thead>
@@ -360,27 +504,74 @@ function UserManagementPage() {
                               {formatDate(user.createdAt)}
                             </td>
                             <td className="px-5 py-4">
-                              <label className="sr-only" htmlFor={`role-${user.id}`}>
-                                Change role for {user.displayName}
-                              </label>
-                              <select
-                                className="h-9 rounded-lg border border-white/10 bg-[#0F172A] px-3 text-sm font-semibold text-[#F8FAFC] outline-none transition focus:border-[#10B981] focus:ring-2 focus:ring-[#10B981]/25 disabled:cursor-not-allowed disabled:opacity-60"
-                                disabled={updatingUserId === user.id}
-                                id={`role-${user.id}`}
-                                value={user.role}
-                                onChange={(event) =>
-                                  void changeUserRole(
-                                    user,
-                                    event.target.value as UserRole,
-                                  )
-                                }
-                              >
-                                {userRoles.map((role) => (
-                                  <option key={role} value={role}>
-                                    {role}
-                                  </option>
-                                ))}
-                              </select>
+                              {user.id === currentUserId ? (
+                                <span className="text-[#94A3B8]">Current user</span>
+                              ) : getAvailableStatusOptions(user).length > 0 ? (
+                                <>
+                                  <label
+                                    className="sr-only"
+                                    htmlFor={`status-${user.id}`}
+                                  >
+                                    Change status for {user.displayName}
+                                  </label>
+                                  <select
+                                    className="h-9 rounded-lg border border-white/10 bg-[#0F172A] px-3 text-sm font-semibold text-[#F8FAFC] outline-none transition focus:border-[#10B981] focus:ring-2 focus:ring-[#10B981]/25 disabled:cursor-not-allowed disabled:opacity-60"
+                                    disabled={updatingUserId === user.id}
+                                    id={`status-${user.id}`}
+                                    value={user.status}
+                                    onChange={(event) =>
+                                      requestStatusChange(
+                                        user,
+                                        event.target.value as UserStatus,
+                                      )
+                                    }
+                                  >
+                                    {getAvailableStatusOptions(user).map((status) => (
+                                      <option key={status} value={status}>
+                                        {status}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </>
+                              ) : (
+                                <span className="text-[#94A3B8]">
+                                  {canUpdateStatuses ? "No action" : "Admin only"}
+                                </span>
+                              )}
+                            </td>
+                            <td className="px-5 py-4">
+                              {user.id === currentUserId ? (
+                                <span className="text-[#94A3B8]">Current user</span>
+                              ) : canUpdateRoles ? (
+                                <>
+                                  <label
+                                    className="sr-only"
+                                    htmlFor={`role-${user.id}`}
+                                  >
+                                    Change role for {user.displayName}
+                                  </label>
+                                  <select
+                                    className="h-9 rounded-lg border border-white/10 bg-[#0F172A] px-3 text-sm font-semibold text-[#F8FAFC] outline-none transition focus:border-[#10B981] focus:ring-2 focus:ring-[#10B981]/25 disabled:cursor-not-allowed disabled:opacity-60"
+                                    disabled={updatingUserId === user.id}
+                                    id={`role-${user.id}`}
+                                    value={user.role}
+                                    onChange={(event) =>
+                                      requestRoleChange(
+                                        user,
+                                        event.target.value as UserRole,
+                                      )
+                                    }
+                                  >
+                                    {userRoles.map((role) => (
+                                      <option key={role} value={role}>
+                                        {role}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </>
+                              ) : (
+                                <span className="text-[#94A3B8]">Admin only</span>
+                              )}
                             </td>
                           </tr>
                         ))}
@@ -433,26 +624,70 @@ function UserManagementPage() {
                             </span>
                             <span>{formatDate(user.createdAt)}</span>
                           </div>
-                          <label className="grid gap-2">
-                            <span className="text-[#94A3B8]">Change Role</span>
-                            <select
-                              className="h-10 rounded-lg border border-white/10 bg-[#071511] px-3 text-sm font-semibold text-[#F8FAFC] outline-none transition focus:border-[#10B981] focus:ring-2 focus:ring-[#10B981]/25 disabled:cursor-not-allowed disabled:opacity-60"
-                              disabled={updatingUserId === user.id}
-                              value={user.role}
-                              onChange={(event) =>
-                                void changeUserRole(
-                                  user,
-                                  event.target.value as UserRole,
-                                )
-                              }
-                            >
-                              {userRoles.map((role) => (
-                                <option key={role} value={role}>
-                                  {role}
-                                </option>
-                              ))}
-                            </select>
-                          </label>
+                          {user.id === currentUserId ? (
+                            <div className="flex items-center justify-between gap-3">
+                              <span className="text-[#94A3B8]">Change Status</span>
+                              <span>Current user</span>
+                            </div>
+                          ) : getAvailableStatusOptions(user).length > 0 ? (
+                            <label className="grid gap-2">
+                              <span className="text-[#94A3B8]">Change Status</span>
+                              <select
+                                className="h-10 rounded-lg border border-white/10 bg-[#071511] px-3 text-sm font-semibold text-[#F8FAFC] outline-none transition focus:border-[#10B981] focus:ring-2 focus:ring-[#10B981]/25 disabled:cursor-not-allowed disabled:opacity-60"
+                                disabled={updatingUserId === user.id}
+                                value={user.status}
+                                onChange={(event) =>
+                                  requestStatusChange(
+                                    user,
+                                    event.target.value as UserStatus,
+                                  )
+                                }
+                              >
+                                {getAvailableStatusOptions(user).map((status) => (
+                                  <option key={status} value={status}>
+                                    {status}
+                                  </option>
+                                ))}
+                              </select>
+                            </label>
+                          ) : (
+                            <div className="flex items-center justify-between gap-3">
+                              <span className="text-[#94A3B8]">Change Status</span>
+                              <span>{canUpdateStatuses ? "No action" : "Admin only"}</span>
+                            </div>
+                          )}
+                          {user.id === currentUserId ? (
+                            <div className="flex items-center justify-between gap-3">
+                              <span className="text-[#94A3B8]">Change Role</span>
+                              <span>Current user</span>
+                            </div>
+                          ) : canUpdateRoles ? (
+                            <label className="grid gap-2">
+                              <span className="text-[#94A3B8]">Change Role</span>
+                              <select
+                                className="h-10 rounded-lg border border-white/10 bg-[#071511] px-3 text-sm font-semibold text-[#F8FAFC] outline-none transition focus:border-[#10B981] focus:ring-2 focus:ring-[#10B981]/25 disabled:cursor-not-allowed disabled:opacity-60"
+                                disabled={updatingUserId === user.id}
+                                value={user.role}
+                                onChange={(event) =>
+                                  requestRoleChange(
+                                    user,
+                                    event.target.value as UserRole,
+                                  )
+                                }
+                              >
+                                {userRoles.map((role) => (
+                                  <option key={role} value={role}>
+                                    {role}
+                                  </option>
+                                ))}
+                              </select>
+                            </label>
+                          ) : (
+                            <div className="flex items-center justify-between gap-3">
+                              <span className="text-[#94A3B8]">Change Role</span>
+                              <span>Admin only</span>
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -463,6 +698,48 @@ function UserManagementPage() {
           </Card>
         </section>
       </div>
+      <ConfirmationDialog
+        cancelLabel="Keep current role"
+        confirmLabel="Change role"
+        description={
+          pendingRoleChange
+            ? `This will change ${pendingRoleChange.user.displayName} (${pendingRoleChange.user.email}) from ${pendingRoleChange.user.role} to ${pendingRoleChange.role}.`
+            : ""
+        }
+        isOpen={Boolean(pendingRoleChange)}
+        isProcessing={Boolean(
+          pendingRoleChange && updatingUserId === pendingRoleChange.user.id,
+        )}
+        title="Confirm role change"
+        onCancel={cancelRoleChange}
+        onConfirm={() => void confirmRoleChange()}
+        onOpenChange={(isOpen) => {
+          if (!isOpen) {
+            cancelRoleChange();
+          }
+        }}
+      />
+      <ConfirmationDialog
+        cancelLabel="Keep current status"
+        confirmLabel="Change status"
+        description={
+          pendingStatusChange
+            ? `This will change ${pendingStatusChange.user.displayName} (${pendingStatusChange.user.email}) from ${pendingStatusChange.user.status} to ${pendingStatusChange.status}.`
+            : ""
+        }
+        isOpen={Boolean(pendingStatusChange)}
+        isProcessing={Boolean(
+          pendingStatusChange && updatingUserId === pendingStatusChange.user.id,
+        )}
+        title="Confirm status change"
+        onCancel={cancelStatusChange}
+        onConfirm={() => void confirmStatusChange()}
+        onOpenChange={(isOpen) => {
+          if (!isOpen) {
+            cancelStatusChange();
+          }
+        }}
+      />
     </main>
   );
 }

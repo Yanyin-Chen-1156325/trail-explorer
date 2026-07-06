@@ -1,4 +1,4 @@
-import { type FormEvent, useMemo, useState } from "react";
+import { type FormEvent, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   CheckCircle2,
@@ -105,6 +105,10 @@ function RegisterPage() {
     useState<RegisterFormValues>(initialFormValues);
   const [formErrors, setFormErrors] = useState<RegisterFormErrors>({});
   const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    clearError();
+  }, [clearError]);
 
   const requirementStatus = useMemo(
     () =>
@@ -227,7 +231,7 @@ function RegisterPage() {
                   <h2 className="text-3xl font-black">Create account</h2>
                 </div>
 
-                <GoogleLoginButton />
+                <GoogleLoginButton mode="register" />
 
                 <div className="flex items-center gap-3">
                   <div className="h-px flex-1 bg-black/10 dark:bg-white/10" />

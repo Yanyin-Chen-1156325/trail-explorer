@@ -150,6 +150,11 @@ public class AuthenticationService : IAuthenticationService
             return await CreateAuthResponseAsync(existingUser);
         }
 
+        if (!request.CreateAccount)
+        {
+            throw new KeyNotFoundException("Google account not found. Please create an account first.");
+        }
+
         var user = new User
         {
             Id = Guid.NewGuid(),
@@ -200,6 +205,7 @@ public class AuthenticationService : IAuthenticationService
             UserId = user.Id,
             Email = user.Email,
             DisplayName = user.DisplayName,
+            Role = user.Role.ToString(),
             AccessToken = accessToken,
             RefreshToken = refreshTokenString,
             ExpiresAt = _tokenGenerator.GetAccessTokenExpiration()
@@ -258,6 +264,7 @@ public class AuthenticationService : IAuthenticationService
             UserId = token.User.Id,
             Email = token.User.Email,
             DisplayName = token.User.DisplayName,
+            Role = token.User.Role.ToString(),
             AccessToken = accessToken,
             RefreshToken = newRefreshToken.Token,
             ExpiresAt = _tokenGenerator.GetAccessTokenExpiration()

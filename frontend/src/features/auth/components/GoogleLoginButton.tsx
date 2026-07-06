@@ -78,11 +78,14 @@ function loadGoogleIdentityScript(): Promise<void> {
   return googleScriptPromise;
 }
 
-function GoogleLoginButton() {
+interface GoogleLoginButtonProps {
+  mode?: "login" | "register";
+}
+
+function GoogleLoginButton({ mode = "login" }: GoogleLoginButtonProps) {
   const googleOAuth = useAuthStore((state) => state.googleOAuth);
   const clearError = useAuthStore((state) => state.clearError);
   const isLoading = useAuthStore((state) => state.isLoading);
-  const authError = useAuthStore((state) => state.error);
 
   const buttonContainerRef = useRef<HTMLDivElement | null>(null);
   const [localError, setLocalError] = useState<string | null>(null);
@@ -90,7 +93,7 @@ function GoogleLoginButton() {
 
   const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
   const configError = clientId ? null : "Google sign-in is not configured.";
-  const statusMessage = configError || localError || authError;
+  const statusMessage = configError || localError;
 
   useEffect(() => {
     let isActive = true;
@@ -121,7 +124,10 @@ function GoogleLoginButton() {
             try {
               setLocalError(null);
               clearError();
-              await googleOAuth({ idToken: response.credential });
+              await googleOAuth({
+                idToken: response.credential,
+                createAccount: mode === "register",
+              });
             } catch {
               // The auth store exposes the API error for this component.
             }
@@ -158,7 +164,7 @@ function GoogleLoginButton() {
       isActive = false;
       window.google?.accounts.id.cancel();
     };
-  }, [clearError, clientId, googleOAuth]);
+  }, [clearError, clientId, googleOAuth, mode]);
 
   if (configError || localError) {
     return (

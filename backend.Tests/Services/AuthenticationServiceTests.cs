@@ -255,7 +255,8 @@ public class AuthenticationServiceTests
 
         var response = await service.GoogleOAuthAsync(new GoogleOAuthRequest
         {
-            IdToken = "id-token"
+            IdToken = "id-token",
+            CreateAccount = true
         });
 
         Assert.Equal("google.user@example.com", response.Email);
@@ -269,6 +270,38 @@ public class AuthenticationServiceTests
 
         var createdRefreshToken = await database.Context.RefreshTokens.SingleAsync();
         Assert.Equal("google-refresh-token", createdRefreshToken.Token);
+    }
+
+    [Fact]
+    public async Task GoogleOAuthAsync_WhenLoginModeAndGoogleUserDoesNotExist_ThrowsKeyNotFoundException()
+    {
+        using var database = CreateDatabase();
+        var googlePayload = new GoogleJsonWebSignature.Payload
+        {
+            Email = "missing.google@example.com",
+            Name = "Missing Google User",
+            Subject = "missing-google-subject",
+            EmailVerified = true
+        };
+
+        var googleTokenValidator = new Mock<IGoogleTokenValidator>();
+        googleTokenValidator
+            .Setup(x => x.ValidateAsync("id-token", GoogleOAuthOptions.ClientId))
+            .ReturnsAsync(googlePayload);
+
+        var service = CreateService(
+            database.Context,
+            CreateTokenGeneratorMock().Object,
+            googleTokenValidator.Object);
+
+        var exception = await Assert.ThrowsAsync<KeyNotFoundException>(() => service.GoogleOAuthAsync(new GoogleOAuthRequest
+        {
+            IdToken = "id-token",
+            CreateAccount = false
+        }));
+
+        Assert.Equal("Google account not found. Please create an account first.", exception.Message);
+        Assert.False(await database.Context.Users.AnyAsync());
     }
 
     [Fact]

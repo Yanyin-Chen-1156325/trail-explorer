@@ -1,9 +1,12 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
+import { authApiBaseUrl } from "@/config/api";
+
 import { AuthApiError, createAuthApi } from "../services/authApi";
 import type {
   AuthResponse,
+  AuthRole,
   GoogleOAuthRequest,
   LoginRequest,
   RegisterRequest,
@@ -13,6 +16,7 @@ export interface AuthUser {
   userId: string;
   email: string;
   displayName: string;
+  role?: AuthRole;
 }
 
 export interface AuthSession {
@@ -38,7 +42,7 @@ export interface AuthState {
   markHydrated: () => void;
 }
 
-const authApi = createAuthApi();
+const authApi = createAuthApi(authApiBaseUrl);
 const storageKey = "trail-explorer-auth";
 
 function toSession(response: AuthResponse): AuthSession {
@@ -47,6 +51,7 @@ function toSession(response: AuthResponse): AuthSession {
       userId: response.userId,
       email: response.email,
       displayName: response.displayName,
+      role: response.role,
     },
     accessToken: response.accessToken,
     refreshToken: response.refreshToken,

@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { renderWithRouter } from "@/test/renderWithRouter";
 
 import { resetAuthStore } from "../testUtils";
+import { useAuthStore } from "../store/authStore";
 import { RegisterPage } from "./RegisterPage";
 
 describe("RegisterPage", () => {
@@ -88,6 +89,18 @@ describe("RegisterPage", () => {
         email: "alex@example.com",
         password: "Password1",
       });
+    });
+  });
+
+  it("clears stale auth errors when the page opens", async () => {
+    useAuthStore.setState({ error: "Invalid email or password." });
+
+    renderWithRouter(<RegisterPage />);
+
+    await waitFor(() => {
+      expect(
+        screen.queryByText("Invalid email or password."),
+      ).not.toBeInTheDocument();
     });
   });
 });

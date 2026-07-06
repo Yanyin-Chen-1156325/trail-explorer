@@ -113,6 +113,11 @@ public class AuthController : ControllerBase
             _logger.LogWarning("Google OAuth conflict: {Message}", ex.Message);
             return Conflict(new { message = ex.Message });
         }
+        catch (KeyNotFoundException ex)
+        {
+            _logger.LogWarning("Google OAuth account not found: {Message}", ex.Message);
+            return NotFound(new { message = ex.Message });
+        }
         catch (InvalidOperationException ex)
         {
             _logger.LogWarning("Google OAuth failed: {Message}", ex.Message);

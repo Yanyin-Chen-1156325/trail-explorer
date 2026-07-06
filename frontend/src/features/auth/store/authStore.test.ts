@@ -7,6 +7,7 @@ const authResponse = {
   userId: "7b1b74e7-9ad5-4f08-a2ef-086f9a0f4a91",
   email: "alex@example.com",
   displayName: "Alex Walker",
+  role: "User" as const,
   accessToken: "access-token",
   refreshToken: "refresh-token",
   expiresAt: new Date(Date.now() + 60_000).toISOString(),
@@ -36,7 +37,7 @@ describe("authStore", () => {
       password: "Password1",
     });
 
-    expect(fetchMock).toHaveBeenCalledWith("/api/auth/login", {
+    expect(fetchMock).toHaveBeenCalledWith("http://localhost:5146/api/auth/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -74,6 +75,7 @@ describe("authStore", () => {
           userId: authResponse.userId,
           email: authResponse.email,
           displayName: authResponse.displayName,
+          role: authResponse.role,
         },
         accessToken: authResponse.accessToken,
         refreshToken: authResponse.refreshToken,

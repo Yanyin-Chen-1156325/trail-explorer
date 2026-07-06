@@ -64,6 +64,26 @@ public class GetUsersIntegrationTests : IClassFixture<CustomWebApplicationFactor
     }
 
     [Fact]
+    public async Task GetUsers_WithModeratorRole_ReturnsUsers()
+    {
+        var client = _factory.CreateClient();
+        var moderator = await SeedUserAsync("moderator.user@example.com", UserRole.Moderator);
+        var regularUser = await SeedUserAsync("moderator-listed.user@example.com", UserRole.User);
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+            "Bearer",
+            CreateAccessToken(moderator));
+
+        var response = await client.GetAsync("/api/users");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var users = await response.Content.ReadFromJsonAsync<List<UserResponse>>();
+        Assert.NotNull(users);
+        Assert.Contains(users, user => user.Email == moderator.Email && user.Role == UserRole.Moderator);
+        Assert.Contains(users, user => user.Email == regularUser.Email && user.Role == UserRole.User);
+    }
+
+    [Fact]
     public async Task GetUsers_WithAdminRole_DoesNotReturnSensitiveFields()
     {
         var client = _factory.CreateClient();

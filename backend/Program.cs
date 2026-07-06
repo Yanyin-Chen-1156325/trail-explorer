@@ -63,6 +63,17 @@ builder.Services.AddAuthorization(options =>
         policy.RequireRole(UserRole.Moderator.ToString(), UserRole.Admin.ToString()));
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("DevelopmentFrontend", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 // Add Controllers
 builder.Services.AddControllers();
 
@@ -74,6 +85,11 @@ using (var scope = app.Services.CreateScope())
         scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
     dbContext.Database.Migrate();
+
+    if (app.Environment.IsDevelopment())
+    {
+        await DevelopmentDataSeeder.SeedAsync(dbContext);
+    }
 }
 
 // Configure the HTTP request pipeline
@@ -82,6 +98,8 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 
     app.MapScalarApiReference();
+
+    app.UseCors("DevelopmentFrontend");
 }
 
 app.UseHttpsRedirection();

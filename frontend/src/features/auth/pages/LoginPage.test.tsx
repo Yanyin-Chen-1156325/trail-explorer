@@ -58,13 +58,34 @@ describe("LoginPage", () => {
     });
   });
 
-  it("displays the auth store error after a failed login", () => {
+  it("clears stale auth errors when the page opens", async () => {
     useAuthStore.setState({ error: "Invalid email or password." });
 
     renderWithRouter(<LoginPage />);
 
-    expect(screen.getAllByText("Invalid email or password.").length).toBeGreaterThan(
-      0,
-    );
+    await waitFor(() => {
+      expect(
+        screen.queryByText("Invalid email or password."),
+      ).not.toBeInTheDocument();
+    });
+  });
+
+  it("displays the auth store error after a failed login", async () => {
+    const user = userEvent.setup();
+    const login = vi.fn().mockImplementation(() => {
+      useAuthStore.setState({ error: "Invalid email or password." });
+      return Promise.reject(new Error("Invalid email or password."));
+    });
+    resetAuthStore({ login });
+
+    renderWithRouter(<LoginPage />);
+
+    await user.type(screen.getByLabelText("Email"), "alex@example.com");
+    await user.type(screen.getByLabelText("Password"), "Password1");
+    await user.click(screen.getByRole("button", { name: "Sign in" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("Invalid email or password.")).toBeInTheDocument();
+    });
   });
 });

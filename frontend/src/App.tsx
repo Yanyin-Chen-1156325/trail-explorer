@@ -1,27 +1,26 @@
-import { BrowserRouter, Link, Navigate, Route, Routes } from "react-router-dom";
-import { Mountain, RouteIcon, Trophy, UserCog } from "lucide-react";
+import { useEffect, useState } from "react";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { Mountain, RouteIcon, Trophy } from "lucide-react";
 
 import { HomePage } from "./features/home/pages/HomePage";
 import { UserManagementPage } from "./features/users";
 import {
   LoginPage,
-  LogoutButton,
   ProtectedRoute,
   PublicOnlyRoute,
   RegisterPage,
   useAuthStore,
 } from "./features/auth";
 import { PublicLayout } from "./shared/layouts/PublicLayout";
-import { Button } from "./components/ui/button";
 
-function ProtectedHomePage() {
+export function ProtectedHomePage() {
   const session = useAuthStore((state) => state.session);
 
   return (
-    <main className="min-h-screen bg-[#0F172A] px-4 py-6 text-[#F8FAFC] sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-[#0F172A] px-4 py-10 text-[#F8FAFC] sm:px-6 lg:px-8">
       <div className="mx-auto flex min-h-[calc(100vh-3rem)] w-full max-w-5xl items-center">
         <section className="w-full rounded-lg border border-white/10 bg-[#1E293B] p-6 shadow-2xl shadow-black/25 sm:p-8 lg:p-10">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex items-center gap-3">
             <div className="flex items-center gap-3">
               <div className="flex size-11 items-center justify-center rounded-lg bg-[#10B981]/15 text-[#10B981]">
                 <Mountain aria-hidden="true" className="size-6" />
@@ -33,8 +32,6 @@ function ProtectedHomePage() {
                 <p className="text-sm text-[#94A3B8]">Protected route active</p>
               </div>
             </div>
-
-            <LogoutButton />
           </div>
 
           <div className="mt-10 max-w-2xl space-y-4">
@@ -74,21 +71,60 @@ function ProtectedHomePage() {
             </div>
           </div>
 
-          <div className="mt-8">
-            <Button
-              asChild
-              className="h-11 bg-[#10B981] px-5 font-semibold text-[#052E2B] hover:bg-[#22C55E]"
-            >
-              <Link to="/admin/users">
-                <UserCog aria-hidden="true" className="size-4" />
-                Manage Users
-              </Link>
-            </Button>
-          </div>
         </section>
       </div>
     </main>
   );
+}
+
+export function ManageUsersRoute() {
+  const session = useAuthStore((state) => state.session);
+  const refreshSession = useAuthStore((state) => state.refreshSession);
+  const [hasRefreshedRole, setHasRefreshedRole] = useState(false);
+  const canManageUsers =
+    session?.user.role === "Admin" || session?.user.role === "Moderator";
+
+  useEffect(() => {
+    if (!session || canManageUsers || hasRefreshedRole) {
+      return;
+    }
+
+    let isCurrent = true;
+
+    const refreshRole = async () => {
+      try {
+        await refreshSession();
+      } catch {
+        // ProtectedRoute will redirect if the refresh clears the session.
+      } finally {
+        if (isCurrent) {
+          setHasRefreshedRole(true);
+        }
+      }
+    };
+
+    void refreshRole();
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [canManageUsers, hasRefreshedRole, refreshSession, session]);
+
+  if (session && !canManageUsers && !hasRefreshedRole) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-[#0F172A] px-4 text-[#F8FAFC]">
+        <div className="rounded-lg border border-white/10 bg-[#1E293B] px-5 py-4 text-sm text-[#94A3B8]">
+          Checking user permissions
+        </div>
+      </main>
+    );
+  }
+
+  if (!canManageUsers) {
+    return <Navigate replace to="/dashboard" />;
+  }
+
+  return <UserManagementPage />;
 }
 
 function App() {
@@ -101,11 +137,11 @@ function App() {
             <Route element={<LoginPage />} path="/login" />
             <Route element={<RegisterPage />} path="/register" />
           </Route>
-        </Route>
 
-        <Route element={<ProtectedRoute />}>
-          <Route element={<ProtectedHomePage />} path="/dashboard" />
-          <Route element={<UserManagementPage />} path="/admin/users" />
+          <Route element={<ProtectedRoute />}>
+            <Route element={<ProtectedHomePage />} path="/dashboard" />
+            <Route element={<ManageUsersRoute />} path="/admin/users" />
+          </Route>
         </Route>
 
         <Route element={<Navigate replace to="/" />} path="*" />

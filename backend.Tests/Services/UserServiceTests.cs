@@ -65,6 +65,74 @@ public class UserServiceTests
         }));
     }
 
+    [Fact]
+    public async Task UpdateUserStatusAsync_UpdatesStatusAndUpdatedAt()
+    {
+        using var database = CreateDatabase();
+        var user = CreateUser("status@example.com", "Status User", DateTime.UtcNow.AddDays(-1));
+        database.Context.Users.Add(user);
+        await database.Context.SaveChangesAsync();
+
+        var service = new UserService(database.Context);
+        var beforeUpdate = user.UpdatedAt;
+
+        var response = await service.UpdateUserStatusAsync(user.Id, new UpdateUserStatusRequest
+        {
+            Status = UserStatus.Suspended
+        });
+
+        Assert.Equal(UserStatus.Suspended, response.Status);
+        Assert.Equal(UserStatus.Suspended, (await database.Context.Users.SingleAsync()).Status);
+        Assert.True((await database.Context.Users.SingleAsync()).UpdatedAt >= beforeUpdate);
+    }
+
+    [Fact]
+    public async Task UpdateUserStatusAsync_WhenUserDoesNotExist_ThrowsKeyNotFoundException()
+    {
+        using var database = CreateDatabase();
+        var service = new UserService(database.Context);
+
+        await Assert.ThrowsAsync<KeyNotFoundException>(() => service.UpdateUserStatusAsync(Guid.NewGuid(), new UpdateUserStatusRequest
+        {
+            Status = UserStatus.Suspended
+        }));
+    }
+
+    [Fact]
+    public async Task UpdateUserStatusAsync_WithModeratorRoleAndRegularUser_UpdatesStatus()
+    {
+        using var database = CreateDatabase();
+        var user = CreateUser("moderator-status@example.com", "Moderator Status User", DateTime.UtcNow.AddDays(-1));
+        database.Context.Users.Add(user);
+        await database.Context.SaveChangesAsync();
+
+        var service = new UserService(database.Context);
+
+        var response = await service.UpdateUserStatusAsync(user.Id, new UpdateUserStatusRequest
+        {
+            Status = UserStatus.Suspended
+        }, UserRole.Moderator);
+
+        Assert.Equal(UserStatus.Suspended, response.Status);
+    }
+
+    [Fact]
+    public async Task UpdateUserStatusAsync_WithModeratorRoleAndAdminUser_ThrowsUnauthorizedAccessException()
+    {
+        using var database = CreateDatabase();
+        var user = CreateUser("admin-status@example.com", "Admin Status User", DateTime.UtcNow.AddDays(-1));
+        user.Role = UserRole.Admin;
+        database.Context.Users.Add(user);
+        await database.Context.SaveChangesAsync();
+
+        var service = new UserService(database.Context);
+
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => service.UpdateUserStatusAsync(user.Id, new UpdateUserStatusRequest
+        {
+            Status = UserStatus.Suspended
+        }, UserRole.Moderator));
+    }
+
     private static User CreateUser(string email, string displayName, DateTime createdAt)
     {
         return new User

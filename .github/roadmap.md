@@ -18,6 +18,7 @@
 - [x] Create Google OAuth API
 - [x] Create Get Users API
 - [x] Create Update User Role API
+- [x] Create Update User Status API
 
 ### Security
 
@@ -28,6 +29,8 @@
 - [x] Configure Authorization Policies
 - [x] Add Role claim to JWT
 - [x] Protect Admin APIs
+- [x] Prevent suspended users from signing in
+- [x] Prevent admins from changing their own status
 
 ### Frontend
 
@@ -42,6 +45,7 @@
 - [x] Create User Management Page
 - [x] Display User List
 - [x] Change User Role
+- [x] Change User Status
 
 ### Unit Testing
 
@@ -57,6 +61,7 @@
 - [x] OAuth tests
 - [x] Get Users tests
 - [x] Update User Role tests
+- [x] Update User Status tests
 
 ---
 

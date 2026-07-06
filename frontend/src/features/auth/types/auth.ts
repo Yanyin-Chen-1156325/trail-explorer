@@ -1,7 +1,10 @@
+export type AuthRole = "User" | "Admin" | "Moderator";
+
 export interface AuthResponse {
   userId: string;
   email: string;
   displayName: string;
+  role: AuthRole;
   accessToken: string;
   refreshToken: string;
   expiresAt: string;
@@ -20,6 +23,7 @@ export interface LoginRequest {
 
 export interface GoogleOAuthRequest {
   idToken: string;
+  createAccount: boolean;
 }
 
 export interface RefreshTokenRequest {

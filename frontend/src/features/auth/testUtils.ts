@@ -11,6 +11,7 @@ function createTestSession(
       userId: "7b1b74e7-9ad5-4f08-a2ef-086f9a0f4a91",
       email: "alex@example.com",
       displayName: "Alex Walker",
+      role: "User",
       ...overrides,
     },
     accessToken: "access-token",

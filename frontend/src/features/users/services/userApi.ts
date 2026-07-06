@@ -3,6 +3,7 @@ import type {
   RawEnumValue,
   RawUserResponse,
   UpdateUserRoleRequest,
+  UpdateUserStatusRequest,
   UserResponse,
   UserRole,
   UserStatus,
@@ -25,17 +26,27 @@ export interface UserApi {
     userId: string,
     request: UpdateUserRoleRequest,
   ): Promise<UserResponse>;
+  updateUserStatus(
+    accessToken: string,
+    userId: string,
+    request: UpdateUserStatusRequest,
+  ): Promise<UserResponse>;
 }
 
 const trimTrailingSlash = (value: string) => value.replace(/\/+$/, "");
 
 const userRoleLabels: UserRole[] = ["User", "Admin", "Moderator"];
-const userStatusLabels: UserStatus[] = ["Active", "Disabled", "Deleted"];
+const userStatusLabels: UserStatus[] = ["Active", "Suspended", "Deleted"];
 const authProviderLabels: AuthProvider[] = ["Local", "Google"];
 const userRoleValues: Record<UserRole, number> = {
   User: 0,
   Admin: 1,
   Moderator: 2,
+};
+const userStatusValues: Record<UserStatus, number> = {
+  Active: 0,
+  Suspended: 1,
+  Deleted: 2,
 };
 
 function normalizeEnum<TValue extends string>(
@@ -115,6 +126,19 @@ export function createUserApi(baseUrl: string = "/api/users"): UserApi {
         {
           method: "PUT",
           body: JSON.stringify({ role: userRoleValues[request.role] }),
+        },
+      );
+
+      return normalizeUser(user);
+    },
+    async updateUserStatus(accessToken, userId, request) {
+      const user = await requestJson<RawUserResponse>(
+        normalizedBaseUrl,
+        `/${userId}/status`,
+        accessToken,
+        {
+          method: "PUT",
+          body: JSON.stringify({ status: userStatusValues[request.status] }),
         },
       );
 

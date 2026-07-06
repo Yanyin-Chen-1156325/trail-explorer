@@ -52,6 +52,24 @@ public class UpdateUserRoleIntegrationTests : IClassFixture<CustomWebApplication
     }
 
     [Fact]
+    public async Task UpdateUserRole_WithModeratorRole_ReturnsForbidden()
+    {
+        var client = _factory.CreateClient();
+        var actor = await SeedUserAsync("moderator.actor@example.com", UserRole.Moderator);
+        var targetUser = await SeedUserAsync("moderator.target@example.com", UserRole.User);
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+            "Bearer",
+            CreateAccessToken(actor));
+
+        var response = await client.PutAsJsonAsync($"/api/users/{targetUser.Id}/role", new UpdateUserRoleRequest
+        {
+            Role = UserRole.Admin
+        });
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    [Fact]
     public async Task UpdateUserRole_WithAdminRole_UpdatesRole()
     {
         var client = _factory.CreateClient();
@@ -79,6 +97,26 @@ public class UpdateUserRoleIntegrationTests : IClassFixture<CustomWebApplication
 
         Assert.NotNull(updatedUser);
         Assert.Equal(UserRole.Moderator, updatedUser.Role);
+    }
+
+    [Fact]
+    public async Task UpdateUserRole_WhenAdminTargetsSelf_ReturnsBadRequest()
+    {
+        var client = _factory.CreateClient();
+        var admin = await SeedUserAsync("self.admin@example.com", UserRole.Admin);
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+            "Bearer",
+            CreateAccessToken(admin));
+
+        var response = await client.PutAsJsonAsync($"/api/users/{admin.Id}/role", new UpdateUserRoleRequest
+        {
+            Role = UserRole.User
+        });
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        var body = await response.Content.ReadAsStringAsync();
+        Assert.Contains("You cannot change your own role", body);
     }
 
     [Fact]

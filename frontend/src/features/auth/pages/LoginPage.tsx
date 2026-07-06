@@ -1,4 +1,4 @@
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   CheckCircle2,
@@ -65,6 +65,10 @@ function LoginPage() {
     useState<LoginFormValues>(initialFormValues);
   const [formErrors, setFormErrors] = useState<LoginFormErrors>({});
   const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    clearError();
+  }, [clearError]);
 
   const updateField = <K extends keyof LoginFormValues>(
     fieldName: K,

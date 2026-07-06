@@ -1,6 +1,6 @@
 export type UserRole = "User" | "Admin" | "Moderator";
 
-export type UserStatus = "Active" | "Disabled" | "Deleted";
+export type UserStatus = "Active" | "Suspended" | "Deleted";
 
 export type AuthProvider = "Local" | "Google";
 
@@ -17,6 +17,10 @@ export interface UserResponse {
 
 export interface UpdateUserRoleRequest {
   role: UserRole;
+}
+
+export interface UpdateUserStatusRequest {
+  status: UserStatus;
 }
 
 export type RawEnumValue<TValue extends string> = TValue | number;
