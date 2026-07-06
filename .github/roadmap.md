@@ -65,50 +65,11 @@
 
 ---
 
-## Epic 2 - Trail Discovery
-
-### Database
-
-- [x] Create Trail entity
-- [x] Configure Trail table
+## Epic 2 - DOC Trail Synchronisation
 
 ### Backend
 
-- [ ] Get Trails Data From DOC
-- [x] Create Get Trails API
-- [x] Create Get Trail By Id API
-- [ ] Implement Search API
-- [ ] Implement Filter API
-- [ ] Implement Pagination
-
-### Caching
-
-- [ ] Cache Trail List
-- [ ] Cache Trail Details
-
-### Frontend
-
-- [ ] Create Trail API client
-- [ ] Create Explore page
-- [ ] Create Trail Card component
-- [ ] Create Trail Detail page
-- [ ] Add Search UI
-- [ ] Add Difficulty Filter
-
-### Testing
-
-- [ ] Trail API tests
-- [ ] Search tests
-- [ ] Filter tests
-- [ ] Trail Card tests
-
----
-
-## Epic 3 - DOC Trail Synchronisation
-
-### Backend
-
-- [ ] Research DOC API
+- [x] Research DOC API
 - [ ] Create DocApiClient
 - [ ] Create DOC DTOs
 - [ ] Implement DOC API integration
@@ -128,6 +89,44 @@
 
 - [ ] DOC API client tests
 - [ ] Synchronisation service tests
+
+---
+
+## Epic 3 - Trail Discovery
+
+### Database
+
+- [ ] Create Trail entity
+- [ ] Configure Trail table
+
+### Backend
+
+- [ ] Create Get Trails API
+- [ ] Create Get Trail By Id API
+- [ ] Implement Search API
+- [ ] Implement Filter API
+- [ ] Implement Pagination
+
+### Caching
+
+- [ ] Cache Trail List
+- [ ] Cache Trail Details
+
+### Frontend
+
+- [ ] Create Trail API client
+- [ ] Create Explore page (use map)
+- [ ] Create Trail Card component
+- [ ] Create Trail Detail page
+- [ ] Add Search UI
+- [ ] Add Difficulty Filter
+
+### Testing
+
+- [ ] Trail API tests
+- [ ] Search tests
+- [ ] Filter tests
+- [ ] Trail Card tests
 
 ---
 
