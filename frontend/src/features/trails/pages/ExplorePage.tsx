@@ -1,4 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import "leaflet/dist/leaflet.css";
+
+import type { ComponentType, PropsWithChildren } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   AlertCircle,
   Loader2,
@@ -8,6 +11,8 @@ import {
   Search,
   X,
 } from "lucide-react";
+import { Link } from "react-router-dom";
+import { CircleMarker, MapContainer, Popup, TileLayer } from "react-leaflet";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -23,10 +28,15 @@ type LoadState =
   | { status: "empty" }
   | { status: "error"; message: string };
 
-interface MapMarker {
+type MapCenter = [number, number];
+
+interface MappedTrail {
   trail: TrailResponse;
-  left: string;
-  top: string;
+  position: MapCenter;
+}
+
+interface PopupMarkerHandle {
+  openPopup: () => void;
 }
 
 const trailApi = createTrailApi(trailsApiBaseUrl);
@@ -36,80 +46,194 @@ const difficultyOptions: Array<TrailDifficulty | "All"> = [
   "Moderate",
   "Hard",
 ];
+const TrailMapContainer = MapContainer as unknown as ComponentType<
+  PropsWithChildren<{
+    center: MapCenter;
+    className: string;
+    scrollWheelZoom: boolean;
+    zoom: number;
+  }>
+>;
+const TrailTileLayer = TileLayer as unknown as ComponentType<{
+  attribution: string;
+  url: string;
+}>;
+const TrailCircleMarker = CircleMarker as unknown as ComponentType<
+  PropsWithChildren<{
+    center: MapCenter;
+    color: string;
+    fillColor: string;
+    fillOpacity: number;
+    radius: number;
+    ref?: (instance: PopupMarkerHandle | null) => void;
+    weight: number;
+  }>
+>;
 
-function createMapMarkers(trails: TrailResponse[]): MapMarker[] {
-  return trails.slice(0, 8).map((trail, index) => {
-    const left = 16 + ((index * 19 + trail.name.length * 3) % 68);
-    const top = 18 + ((index * 23 + trail.region.length * 5) % 58);
-
-    return {
-      trail,
-      left: `${left}%`,
-      top: `${top}%`,
-    };
-  });
+function hasCoordinates(
+  trail: TrailResponse,
+): trail is TrailResponse & { latitude: number; longitude: number } {
+  return typeof trail.latitude === "number" && typeof trail.longitude === "number";
 }
 
-function ExploreMap({ trails }: { trails: TrailResponse[] }) {
-  const markers = useMemo(() => createMapMarkers(trails), [trails]);
+function createMappedTrails(trails: TrailResponse[]): MappedTrail[] {
+  return trails
+    .filter(hasCoordinates)
+    .slice(0, 12)
+    .map((trail) => ({
+      trail,
+      position: [trail.latitude, trail.longitude],
+    }));
+}
+
+function getMapCenter(mappedTrails: MappedTrail[]): MapCenter {
+  if (mappedTrails.length === 0) {
+    return [-43.532, 172.636];
+  }
+
+  const totals = mappedTrails.reduce(
+    (current, marker) => ({
+      latitude: current.latitude + marker.position[0],
+      longitude: current.longitude + marker.position[1],
+    }),
+    { latitude: 0, longitude: 0 },
+  );
+
+  return [
+    totals.latitude / mappedTrails.length,
+    totals.longitude / mappedTrails.length,
+  ];
+}
+
+function ExploreMap({
+  selectedTrailId,
+  trails,
+}: {
+  selectedTrailId: string | null;
+  trails: TrailResponse[];
+}) {
+  const markerRefs = useRef(new Map<string, PopupMarkerHandle>());
+  const mappedTrails = useMemo(() => createMappedTrails(trails), [trails]);
+  const center = useMemo(() => getMapCenter(mappedTrails), [mappedTrails]);
+
+  useEffect(() => {
+    if (!selectedTrailId) {
+      return;
+    }
+
+    markerRefs.current.get(selectedTrailId)?.openPopup();
+  }, [mappedTrails, selectedTrailId]);
 
   return (
     <section
       aria-label="Trail map"
       className="relative min-h-[420px] overflow-hidden rounded-lg border border-white/10 bg-[#071511] shadow-2xl shadow-black/25"
     >
-      <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(16,185,129,0.18)_0_1px,transparent_1px_56px),linear-gradient(45deg,rgba(148,163,184,0.12)_0_1px,transparent_1px_46px)]" />
-      <div className="absolute inset-x-[-10%] top-[18%] h-28 rotate-[-8deg] rounded-full bg-[#0EA5E9]/18 blur-2xl" />
-      <div className="absolute bottom-[-18%] left-[20%] h-64 w-80 rounded-full bg-[#10B981]/18 blur-3xl" />
-      <div className="absolute inset-8 rounded-[2rem] border border-emerald-300/10" />
-
-      <div className="absolute left-[8%] top-[16%] h-24 w-[68%] rounded-full border-t-2 border-dashed border-emerald-200/30" />
-      <div className="absolute bottom-[18%] right-[10%] h-32 w-[62%] rounded-full border-b-2 border-dashed border-sky-200/25" />
-
-      {markers.map((marker) => (
-        <div
-          className="absolute -translate-x-1/2 -translate-y-1/2"
-          key={marker.trail.id}
-          style={{ left: marker.left, top: marker.top }}
+      {mappedTrails.length > 0 ? (
+        <TrailMapContainer
+          center={center}
+          className="min-h-[420px] w-full"
+          scrollWheelZoom={false}
+          zoom={8}
         >
-          <div className="group relative">
-            <span className="absolute left-1/2 top-1/2 size-8 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#10B981]/20 ring-1 ring-[#10B981]/40" />
-            <span className="relative flex size-5 items-center justify-center rounded-full bg-[#10B981] text-[#052E1A] shadow-lg shadow-black/30">
-              <MapPin aria-hidden="true" className="size-3.5" />
-            </span>
-            <span className="pointer-events-none absolute left-1/2 top-8 hidden w-56 -translate-x-1/2 rounded-lg border border-white/10 bg-[#0F172A] p-3 text-left shadow-xl shadow-black/35 group-hover:block">
-              <span className="block truncate text-sm font-bold text-white">
-                {marker.trail.name}
-              </span>
-              <span className="mt-1 block truncate text-xs text-white/60">
-                {marker.trail.region} - {marker.trail.distanceKm} km
-              </span>
-            </span>
-          </div>
+          <TrailTileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          {mappedTrails.map((marker) => {
+            const isSelected = selectedTrailId === marker.trail.id;
+
+            return (
+              <TrailCircleMarker
+                center={marker.position}
+                color={isSelected ? "#065F46" : "#047857"}
+                fillColor={isSelected ? "#34D399" : "#10B981"}
+                fillOpacity={0.9}
+                key={marker.trail.id}
+                radius={isSelected ? 11 : 8}
+                ref={(instance) => {
+                  if (instance) {
+                    markerRefs.current.set(marker.trail.id, instance);
+                    return;
+                  }
+
+                  markerRefs.current.delete(marker.trail.id);
+                }}
+                weight={isSelected ? 3 : 2}
+              >
+                <Popup>
+                  <div className="min-w-44 text-sm">
+                    <p className="font-bold text-slate-950">
+                      {marker.trail.name}
+                    </p>
+                    <p className="mt-1 text-xs text-slate-600">
+                      {marker.trail.region} - {marker.trail.distanceKm} km
+                    </p>
+                    <p className="mt-1 text-xs font-semibold text-emerald-700">
+                      {marker.trail.difficulty}
+                    </p>
+                    <Link
+                      className="mt-2 inline-flex text-xs font-bold text-emerald-700 underline-offset-2 hover:underline"
+                      to={`/trails/${marker.trail.id}`}
+                    >
+                      View trail
+                    </Link>
+                  </div>
+                </Popup>
+              </TrailCircleMarker>
+            );
+          })}
+        </TrailMapContainer>
+      ) : (
+        <div className="flex min-h-[420px] flex-col items-center justify-center p-8 text-center">
+          <MapPin aria-hidden="true" className="size-10 text-[#86EFAC]" />
+          <h2 className="mt-4 text-lg font-bold">No mapped coordinates</h2>
+          <p className="mt-2 max-w-md text-sm text-[#94A3B8]">
+            Trails loaded successfully, but this page has no DOC coordinates to
+            display on the map yet.
+          </p>
         </div>
-      ))}
+      )}
 
       <div className="absolute bottom-5 left-5 right-5 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-white/10 bg-[#061813]/84 p-4 text-white backdrop-blur-md">
         <div>
-          <p className="text-sm font-bold">Canterbury trail map</p>
+          <p className="text-sm font-bold">DOC trail map</p>
           <p className="mt-1 text-xs text-white/60">
-            Showing the first mapped trails from the current page.
+            Showing mapped DOC coordinates from the current page.
           </p>
         </div>
         <div className="flex items-center gap-2 text-xs font-semibold text-[#86EFAC]">
           <RouteIcon aria-hidden="true" className="size-4" />
-          {markers.length} markers
+          {mappedTrails.length} markers
         </div>
       </div>
     </section>
   );
 }
 
-function TrailSummaryList({ trails }: { trails: TrailResponse[] }) {
+function TrailSummaryList({
+  onTrailSelect,
+  selectedTrailId,
+  trails,
+}: {
+  onTrailSelect: (trailId: string) => void;
+  selectedTrailId: string | null;
+  trails: TrailResponse[];
+}) {
   return (
     <section className="grid gap-3" aria-label="Trail summaries">
       {trails.slice(0, 5).map((trail) => (
-        <TrailCard key={trail.id} linkToDetails trail={trail} />
+        <button
+          aria-pressed={selectedTrailId === trail.id}
+          className={`block rounded-lg text-left transition focus:outline-none focus:ring-2 focus:ring-[#22C55E]/60 ${
+            selectedTrailId === trail.id ? "ring-2 ring-[#22C55E]/60" : ""
+          }`}
+          key={trail.id}
+          type="button"
+          onClick={() => onTrailSelect(trail.id)}
+        >
+          <TrailCard trail={trail} />
+        </button>
       ))}
     </section>
   );
@@ -122,6 +246,7 @@ function ExplorePage() {
   const [activeDifficulty, setActiveDifficulty] = useState<
     TrailDifficulty | "All"
   >("All");
+  const [selectedTrailId, setSelectedTrailId] = useState<string | null>(null);
   const hasActiveFilters = Boolean(activeSearch) || activeDifficulty !== "All";
 
   useEffect(() => {
@@ -184,6 +309,7 @@ function ExplorePage() {
     setSearchInput("");
     setActiveSearch("");
     setActiveDifficulty("All");
+    setSelectedTrailId(null);
   };
 
   return (
@@ -350,7 +476,10 @@ function ExplorePage() {
           ) : null}
 
           {loadState.status === "success" ? (
-            <ExploreMap trails={loadState.trails} />
+            <ExploreMap
+              selectedTrailId={selectedTrailId}
+              trails={loadState.trails}
+            />
           ) : null}
         </section>
 
@@ -366,7 +495,11 @@ function ExplorePage() {
           </Card>
 
           {loadState.status === "success" ? (
-            <TrailSummaryList trails={loadState.trails} />
+            <TrailSummaryList
+              selectedTrailId={selectedTrailId}
+              trails={loadState.trails}
+              onTrailSelect={setSelectedTrailId}
+            />
           ) : null}
         </aside>
       </div>

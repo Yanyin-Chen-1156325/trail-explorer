@@ -112,6 +112,8 @@ public class TrailSyncService : ITrailSyncService
 
     private static Trail CreateTrail(DocTrailImportCandidate candidate, DateTime now)
     {
+        var coordinates = CoordinateConversionService.ConvertNztmToWgs84(candidate.X, candidate.Y);
+
         return new Trail
         {
             Id = Guid.NewGuid(),
@@ -122,6 +124,10 @@ public class TrailSyncService : ITrailSyncService
             Difficulty = MapDifficulty(candidate.DifficultyText),
             DistanceKm = ParseDistanceKm(candidate.DistanceText),
             Description = candidate.Description?.Trim() ?? string.Empty,
+            CoordinateX = candidate.X,
+            CoordinateY = candidate.Y,
+            Latitude = coordinates?.Latitude,
+            Longitude = coordinates?.Longitude,
             IsActive = true,
             CreatedAt = now,
             UpdatedAt = now
@@ -139,6 +145,11 @@ public class TrailSyncService : ITrailSyncService
         trail.Difficulty = MapDifficulty(candidate.DifficultyText);
         trail.DistanceKm = ParseDistanceKm(candidate.DistanceText);
         trail.Description = candidate.Description?.Trim() ?? string.Empty;
+        trail.CoordinateX = candidate.X;
+        trail.CoordinateY = candidate.Y;
+        var coordinates = CoordinateConversionService.ConvertNztmToWgs84(candidate.X, candidate.Y);
+        trail.Latitude = coordinates?.Latitude;
+        trail.Longitude = coordinates?.Longitude;
         trail.IsActive = true;
         trail.UpdatedAt = now;
     }

@@ -32,5 +32,13 @@ public class TrailConfiguration : IEntityTypeConfiguration<Trail>
         builder.Property(x => x.Description)
             .IsRequired()
             .HasMaxLength(4000);
+
+        builder.Property(x => x.CoordinateX);
+
+        builder.Property(x => x.CoordinateY);
+
+        builder.Property(x => x.Latitude);
+
+        builder.Property(x => x.Longitude);
     }
 }

@@ -11,6 +11,8 @@ export interface TrailResponse {
   difficulty: TrailDifficulty;
   distanceKm: number;
   description: string;
+  latitude?: number | null;
+  longitude?: number | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -24,6 +26,8 @@ export interface RawTrailResponse {
   difficulty: RawTrailDifficulty;
   distanceKm: number;
   description: string;
+  latitude?: number | null;
+  longitude?: number | null;
   createdAt: string;
   updatedAt: string;
 }

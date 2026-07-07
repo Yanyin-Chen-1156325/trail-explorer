@@ -110,6 +110,8 @@ public class TrailServiceTests
         Assert.NotNull(response);
         Assert.Equal(trail.Id, response.Id);
         Assert.Equal("Active Trail", response.Name);
+        Assert.Equal(trail.Latitude, response.Latitude);
+        Assert.Equal(trail.Longitude, response.Longitude);
     }
 
     [Fact]
@@ -190,6 +192,10 @@ public class TrailServiceTests
             Difficulty = difficulty,
             DistanceKm = 5,
             Description = description ?? $"{name} description",
+            CoordinateX = 1572954.6221,
+            CoordinateY = 5150889.4148,
+            Latitude = -43.781,
+            Longitude = 172.664,
             IsActive = isActive,
             CreatedAt = now,
             UpdatedAt = now

@@ -25,7 +25,9 @@ public class TrailSyncServiceTests
                     Region = "Canterbury",
                     Description = "Trail introduction",
                     DistanceText = "20 km",
-                    DifficultyText = "Easy"
+                    DifficultyText = "Easy",
+                    X = 1572954.6221,
+                    Y = 5150889.4148
                 }
             ]);
         var service = CreateService(context, integrationService);
@@ -47,6 +49,10 @@ public class TrailSyncServiceTests
         Assert.Equal("Trail introduction", trail.Description);
         Assert.Equal(20, trail.DistanceKm);
         Assert.Equal(TrailDifficulty.Easy, trail.Difficulty);
+        Assert.Equal(1572954.6221, trail.CoordinateX);
+        Assert.Equal(5150889.4148, trail.CoordinateY);
+        Assert.InRange(trail.Latitude.GetValueOrDefault(), -44.0, -43.0);
+        Assert.InRange(trail.Longitude.GetValueOrDefault(), 172.0, 173.5);
         Assert.True(trail.IsActive);
     }
 
@@ -81,7 +87,9 @@ public class TrailSyncServiceTests
                     Region = "Canterbury",
                     Description = "Updated description",
                     DistanceText = "12.5 km",
-                    DifficultyText = "Moderate"
+                    DifficultyText = "Moderate",
+                    X = 1480769.1942,
+                    Y = 5244426.8577
                 }
             ]);
         var service = CreateService(context, integrationService);
@@ -102,6 +110,10 @@ public class TrailSyncServiceTests
         Assert.Equal("Updated description", trail.Description);
         Assert.Equal(12.5m, trail.DistanceKm);
         Assert.Equal(TrailDifficulty.Moderate, trail.Difficulty);
+        Assert.Equal(1480769.1942, trail.CoordinateX);
+        Assert.Equal(5244426.8577, trail.CoordinateY);
+        Assert.InRange(trail.Latitude.GetValueOrDefault(), -43.5, -42.5);
+        Assert.InRange(trail.Longitude.GetValueOrDefault(), 170.0, 172.0);
         Assert.True(trail.IsActive);
         Assert.True(trail.UpdatedAt > existingTrail.CreatedAt);
     }

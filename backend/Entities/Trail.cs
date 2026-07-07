@@ -20,6 +20,14 @@ public class Trail
 
     public string Description { get; set; } = string.Empty;
 
+    public double? CoordinateX { get; set; }
+
+    public double? CoordinateY { get; set; }
+
+    public double? Latitude { get; set; }
+
+    public double? Longitude { get; set; }
+
     public bool IsActive { get; set; }
 
     public DateTime CreatedAt { get; set; }
