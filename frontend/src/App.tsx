@@ -3,6 +3,7 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Mountain, RouteIcon, Trophy } from "lucide-react";
 
 import { HomePage } from "./features/home/pages/HomePage";
+import { ExplorePage, TrailDetailPage } from "./features/trails";
 import { UserManagementPage } from "./features/users";
 import {
   LoginPage,
@@ -140,6 +141,8 @@ function App() {
 
           <Route element={<ProtectedRoute />}>
             <Route element={<ProtectedHomePage />} path="/dashboard" />
+            <Route element={<ExplorePage />} path="/trails" />
+            <Route element={<TrailDetailPage />} path="/trails/:trailId" />
             <Route element={<ManageUsersRoute />} path="/admin/users" />
           </Route>
         </Route>

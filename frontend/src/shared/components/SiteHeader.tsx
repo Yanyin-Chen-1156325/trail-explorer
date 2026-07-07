@@ -119,6 +119,7 @@ function SiteHeader() {
   const sessionNavigationItems = session
     ? [
         { label: "Dashboard", to: "/dashboard" },
+        { label: "Trails", to: "/trails" },
         ...(canManageUsers
           ? [{ label: "Manage Users", to: "/admin/users" }]
           : []),
@@ -139,7 +140,7 @@ function SiteHeader() {
             <NavLink
               className={({ isActive }) =>
                 `rounded-lg text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#22C55E]/60 ${
-                  isActive && item.to === "/"
+                  isActive
                     ? "text-[#86EFAC]"
                     : "text-white/85 hover:text-white"
                 }`

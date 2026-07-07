@@ -113,19 +113,24 @@
 
 ### Frontend
 
-- [ ] Create Trail API client
-- [ ] Create Explore page (use map)
-- [ ] Create Trail Card component
-- [ ] Create Trail Detail page
-- [ ] Add Search UI
-- [ ] Add Difficulty Filter
+- [x] Create Trail API client
+- [x] Create Explore page (use map)
+- [x] Create Trail Card component
+- [x] Create Trail Detail page
+- [x] Add Search UI
+- [x] Add Difficulty Filter
 
-### Testing
+### Unit Testing
 
-- [ ] Trail API tests
-- [ ] Search tests
-- [ ] Filter tests
-- [ ] Trail Card tests
+- [x] Backend
+- [x] Frontend
+
+### Integration Testing
+
+- [x] Trail API tests
+- [x] Search tests
+- [x] Filter tests
+- [x] Trail Card tests
 
 ---
 
