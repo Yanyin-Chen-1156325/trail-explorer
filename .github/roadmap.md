@@ -155,12 +155,12 @@
 
 ### Security
 
-- [ ] Authorize Check-In Ownership
-- [ ] Protect Moderator APIs
+- [x] Authorize Check-In Ownership
+- [x] Protect Moderator APIs
 
 ### Logging
 
-- [ ] Log Trail Completion
+- [x] Log Trail Completion
 
 ### Frontend
 

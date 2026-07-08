@@ -8,10 +8,14 @@ namespace backend.Services;
 public class CheckInService : ICheckInService
 {
     private readonly ApplicationDbContext _context;
+    private readonly ILogger<CheckInService> _logger;
 
-    public CheckInService(ApplicationDbContext context)
+    public CheckInService(
+        ApplicationDbContext context,
+        ILogger<CheckInService> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
     public async Task<CheckInResponse> CreateCheckInAsync(Guid userId, CreateCheckInRequest request)
@@ -37,6 +41,13 @@ public class CheckInService : ICheckInService
 
         _context.CheckIns.Add(checkIn);
         await _context.SaveChangesAsync();
+
+        _logger.LogInformation(
+            "Trail completed: {CheckInId} by user {UserId} on trail {TrailId} at {CompletedDate}",
+            checkIn.Id,
+            checkIn.UserId,
+            checkIn.TrailId,
+            checkIn.CompletedDate);
 
         return ToCheckInResponse(checkIn);
     }
