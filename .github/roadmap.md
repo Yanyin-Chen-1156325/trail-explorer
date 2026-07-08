@@ -176,7 +176,7 @@
 ### Unit Testing
 
 - [x] Backend
-- [ ] Frontend
+- [x] Frontend
 
 ### Intergration Testing
 
