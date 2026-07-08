@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { trailsApiBaseUrl } from "@/config/api";
+import { CheckInForm } from "@/features/checkins";
 import { createTrailApi, TrailApiError } from "../services/trailApi";
 import type { TrailResponse } from "../types/trail";
 
@@ -164,6 +165,8 @@ function TrailDetailPage() {
             </section>
 
             <aside className="space-y-4">
+              <CheckInForm trailId={loadState.trail.id} />
+
               <Card className="border-white/10 bg-[#071511] text-white shadow-xl shadow-black/20">
                 <CardContent className="p-5">
                   <h2 className="text-base font-bold">Trail stats</h2>

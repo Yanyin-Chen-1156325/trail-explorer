@@ -120,8 +120,12 @@ function SiteHeader() {
     ? [
         { label: "Dashboard", to: "/dashboard" },
         { label: "Trails", to: "/trails" },
+        { label: "Check-ins", to: "/checkins" },
         ...(canManageUsers
-          ? [{ label: "Manage Users", to: "/admin/users" }]
+          ? [
+              { label: "Moderation", to: "/moderation/checkins" },
+              { label: "Manage Users", to: "/admin/users" },
+            ]
           : []),
       ]
     : [];

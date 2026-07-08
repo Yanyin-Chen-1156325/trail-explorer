@@ -9,6 +9,7 @@ interface ConfirmationDialogProps {
   description: string;
   isOpen: boolean;
   isProcessing?: boolean;
+  processingLabel?: string;
   title: string;
   onCancel: () => void;
   onConfirm: () => void;
@@ -21,6 +22,7 @@ function ConfirmationDialog({
   description,
   isOpen,
   isProcessing = false,
+  processingLabel = "Updating",
   title,
   onCancel,
   onConfirm,
@@ -59,7 +61,7 @@ function ConfirmationDialog({
               type="button"
               onClick={onConfirm}
             >
-              {isProcessing ? "Updating" : confirmLabel}
+              {isProcessing ? processingLabel : confirmLabel}
             </Button>
           </div>
         </Dialog.Content>

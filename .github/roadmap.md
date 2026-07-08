@@ -164,16 +164,21 @@
 
 ### Frontend
 
-- [ ] Create Check-In form
-- [ ] Create Check-In History page
-- [ ] Create Edit Check-In UI
-- [ ] Create Delete Check-In UI
-- [ ] Create Moderation Page
-- [ ] Display All Check-Ins
-- [ ] Hide Check-In
-- [ ] Restore Check-In
+- [x] Create Check-In form
+- [x] Create Check-In History page
+- [x] Create Edit Check-In UI
+- [x] Create Delete Check-In UI
+- [x] Create Moderation Page
+- [x] Display All Check-Ins
+- [x] Hide Check-In
+- [x] Restore Check-In
 
-### Testing
+### Unit Testing
+
+- [x] Backend
+- [ ] Frontend
+
+### Intergration Testing
 
 - [ ] Check-In API tests
 - [ ] Check-In UI tests

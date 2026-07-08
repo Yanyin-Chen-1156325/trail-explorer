@@ -6,3 +6,4 @@ export const apiBaseUrl =
 export const authApiBaseUrl = `${apiBaseUrl}/auth`;
 export const trailsApiBaseUrl = `${apiBaseUrl}/trails`;
 export const usersApiBaseUrl = `${apiBaseUrl}/users`;
+export const checkInsApiBaseUrl = `${apiBaseUrl}/checkins`;

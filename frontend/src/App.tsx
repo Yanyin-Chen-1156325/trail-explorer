@@ -13,6 +13,7 @@ import {
   useAuthStore,
 } from "./features/auth";
 import { PublicLayout } from "./shared/layouts/PublicLayout";
+import { CheckInHistoryPage, CheckInModerationPage } from "./features/checkins";
 
 export function ProtectedHomePage() {
   const session = useAuthStore((state) => state.session);
@@ -128,6 +129,56 @@ export function ManageUsersRoute() {
   return <UserManagementPage />;
 }
 
+export function CheckInModerationRoute() {
+  const session = useAuthStore((state) => state.session);
+  const refreshSession = useAuthStore((state) => state.refreshSession);
+  const [hasRefreshedRole, setHasRefreshedRole] = useState(false);
+  const canModerate =
+    session?.user.role === "Admin" || session?.user.role === "Moderator";
+
+  useEffect(() => {
+    if (!session || canModerate || hasRefreshedRole) {
+      return;
+    }
+
+    let isCurrent = true;
+
+    const refreshRole = async () => {
+      try {
+        await refreshSession();
+      } catch {
+        // ProtectedRoute will redirect if the refresh clears the session.
+      } finally {
+        if (isCurrent) {
+          setHasRefreshedRole(true);
+        }
+      }
+    };
+
+    void refreshRole();
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [canModerate, hasRefreshedRole, refreshSession, session]);
+
+  if (session && !canModerate && !hasRefreshedRole) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-[#0F172A] px-4 text-[#F8FAFC]">
+        <div className="rounded-lg border border-white/10 bg-[#1E293B] px-5 py-4 text-sm text-[#94A3B8]">
+          Checking moderation permissions
+        </div>
+      </main>
+    );
+  }
+
+  if (!canModerate) {
+    return <Navigate replace to="/dashboard" />;
+  }
+
+  return <CheckInModerationPage />;
+}
+
 function App() {
   return (
     <BrowserRouter>
@@ -143,6 +194,11 @@ function App() {
             <Route element={<ProtectedHomePage />} path="/dashboard" />
             <Route element={<ExplorePage />} path="/trails" />
             <Route element={<TrailDetailPage />} path="/trails/:trailId" />
+            <Route element={<CheckInHistoryPage />} path="/checkins" />
+            <Route
+              element={<CheckInModerationRoute />}
+              path="/moderation/checkins"
+            />
             <Route element={<ManageUsersRoute />} path="/admin/users" />
           </Route>
         </Route>
