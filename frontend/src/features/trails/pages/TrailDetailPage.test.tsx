@@ -3,6 +3,7 @@ import { render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { createTestSession, resetAuthStore } from "@/features/auth/testUtils";
 import { createTrailResponse, mockJsonResponse } from "../testUtils";
 
 import { TrailDetailPage } from "./TrailDetailPage";
@@ -26,9 +27,11 @@ function renderWithRoutes(ui: ReactElement, path: string) {
 describe("TrailDetailPage", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
+    resetAuthStore();
   });
 
   it("loads and displays trail detail content", async () => {
+    resetAuthStore({ session: createTestSession() });
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       await mockJsonResponse(
         createTrailResponse({
@@ -47,6 +50,10 @@ describe("TrailDetailPage", () => {
     expect(screen.getAllByText("Hard").length).toBeGreaterThan(0);
     expect(screen.getByText("12.4 km")).toBeInTheDocument();
     expect(screen.getByText("doc-summit-route")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Check in" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Record completion" }),
+    ).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Back to trails" })).toHaveAttribute(
       "href",
       "/trails",

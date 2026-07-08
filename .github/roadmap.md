@@ -180,8 +180,8 @@
 
 ### Intergration Testing
 
-- [ ] Check-In API tests
-- [ ] Check-In UI tests
+- [x] Check-In API tests
+- [x] Check-In UI tests
 
 ---
 

@@ -1,5 +1,6 @@
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { Route, Routes } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useAuthStore } from "@/features/auth";
@@ -7,7 +8,12 @@ import { createTestSession, resetAuthStore } from "@/features/auth/testUtils";
 import { renderWithRouter } from "@/test/renderWithRouter";
 import { SiteHeader } from "@/shared/components/SiteHeader";
 
-import { ManageUsersRoute, ProtectedHomePage } from "./App";
+import { CheckInModerationRoute, ManageUsersRoute, ProtectedHomePage } from "./App";
+
+vi.mock("@/features/checkins", () => ({
+  CheckInHistoryPage: () => <p>Check-in history page</p>,
+  CheckInModerationPage: () => <p>Check-in moderation page</p>,
+}));
 
 describe("ProtectedHomePage", () => {
   beforeEach(() => {
@@ -75,6 +81,27 @@ describe("SiteHeader", () => {
     ).toBeGreaterThan(0);
   });
 
+  it("shows check-in navigation for signed-in users", () => {
+    resetAuthStore({ session: createTestSession({ role: "User" }) });
+
+    renderWithRouter(<SiteHeader />);
+
+    expect(
+      screen.getAllByRole("link", { name: /check-ins/i }).length,
+    ).toBeGreaterThan(0);
+    expect(screen.queryByRole("link", { name: /moderation/i })).not.toBeInTheDocument();
+  });
+
+  it("shows check-in moderation navigation for moderators", () => {
+    resetAuthStore({ session: createTestSession({ role: "Moderator" }) });
+
+    renderWithRouter(<SiteHeader />);
+
+    expect(
+      screen.getAllByRole("link", { name: /moderation/i }).length,
+    ).toBeGreaterThan(0);
+  });
+
   it("shows manage users for admins", () => {
     resetAuthStore({ session: createTestSession({ role: "Admin" }) });
 
@@ -107,5 +134,42 @@ describe("SiteHeader", () => {
 
     expect(screen.getByText("machi@example.com")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /logout/i })).toBeInTheDocument();
+  });
+});
+
+describe("CheckInModerationRoute", () => {
+  beforeEach(() => {
+    resetAuthStore();
+  });
+
+  it("renders moderation UI for moderators", async () => {
+    resetAuthStore({ session: createTestSession({ role: "Moderator" }) });
+
+    renderWithRouter(
+      <Routes>
+        <Route element={<CheckInModerationRoute />} path="/moderation/checkins" />
+      </Routes>,
+      { initialEntries: ["/moderation/checkins"] },
+    );
+
+    expect(await screen.findByText("Check-in moderation page")).toBeInTheDocument();
+  });
+
+  it("redirects regular users away from moderation after refreshing role", async () => {
+    resetAuthStore({
+      session: createTestSession({ role: "User" }),
+      refreshSession: async () => undefined,
+    });
+
+    renderWithRouter(
+      <Routes>
+        <Route element={<CheckInModerationRoute />} path="/moderation/checkins" />
+        <Route element={<p>Dashboard destination</p>} path="/dashboard" />
+      </Routes>,
+      { initialEntries: ["/moderation/checkins"] },
+    );
+
+    expect(screen.getByText("Checking moderation permissions")).toBeInTheDocument();
+    expect(await screen.findByText("Dashboard destination")).toBeInTheDocument();
   });
 });
