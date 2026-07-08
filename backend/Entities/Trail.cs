@@ -33,4 +33,6 @@ public class Trail
     public DateTime CreatedAt { get; set; }
 
     public DateTime UpdatedAt { get; set; }
+
+    public ICollection<CheckIn> CheckIns { get; set; } = [];
 }

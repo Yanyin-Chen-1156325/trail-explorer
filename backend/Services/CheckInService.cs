@@ -1,0 +1,158 @@
+using backend.Data;
+using backend.DTOs.CheckIn;
+using backend.Entities;
+using Microsoft.EntityFrameworkCore;
+
+namespace backend.Services;
+
+public class CheckInService : ICheckInService
+{
+    private readonly ApplicationDbContext _context;
+
+    public CheckInService(ApplicationDbContext context)
+    {
+        _context = context;
+    }
+
+    public async Task<CheckInResponse> CreateCheckInAsync(Guid userId, CreateCheckInRequest request)
+    {
+        var trailExists = await _context.Trails
+            .AsNoTracking()
+            .AnyAsync(trail => trail.Id == request.TrailId && trail.IsActive);
+
+        if (!trailExists)
+        {
+            throw new KeyNotFoundException("Trail not found");
+        }
+
+        var checkIn = new CheckIn
+        {
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            TrailId = request.TrailId,
+            CompletedDate = request.CompletedDate,
+            Notes = request.Notes?.Trim(),
+            PhotoUrl = request.PhotoUrl?.Trim()
+        };
+
+        _context.CheckIns.Add(checkIn);
+        await _context.SaveChangesAsync();
+
+        return ToCheckInResponse(checkIn);
+    }
+
+    public async Task<CheckInResponse> UpdateCheckInAsync(
+        Guid checkInId,
+        Guid userId,
+        UpdateCheckInRequest request)
+    {
+        var checkIn = await _context.CheckIns
+            .FirstOrDefaultAsync(x => x.Id == checkInId);
+
+        if (checkIn is null)
+        {
+            throw new KeyNotFoundException("Check-in not found");
+        }
+
+        if (checkIn.UserId != userId)
+        {
+            throw new UnauthorizedAccessException("You can only update your own check-ins");
+        }
+
+        checkIn.CompletedDate = request.CompletedDate;
+        checkIn.Notes = request.Notes?.Trim();
+        checkIn.PhotoUrl = request.PhotoUrl?.Trim();
+
+        await _context.SaveChangesAsync();
+
+        return ToCheckInResponse(checkIn);
+    }
+
+    public async Task DeleteCheckInAsync(Guid checkInId, Guid userId)
+    {
+        var checkIn = await _context.CheckIns
+            .FirstOrDefaultAsync(x => x.Id == checkInId);
+
+        if (checkIn is null)
+        {
+            throw new KeyNotFoundException("Check-in not found");
+        }
+
+        if (checkIn.UserId != userId)
+        {
+            throw new UnauthorizedAccessException("You can only delete your own check-ins");
+        }
+
+        _context.CheckIns.Remove(checkIn);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task<IReadOnlyList<CheckInResponse>> GetUserCheckInHistoryAsync(Guid userId)
+    {
+        return await _context.CheckIns
+            .AsNoTracking()
+            .Where(x => x.UserId == userId && !x.IsHidden)
+            .OrderByDescending(x => x.CompletedDate)
+            .ThenBy(x => x.Id)
+            .Select(x => ToCheckInResponse(x))
+            .ToListAsync();
+    }
+
+    public async Task<IReadOnlyList<CheckInResponse>> GetAllCheckInsAsync()
+    {
+        return await _context.CheckIns
+            .AsNoTracking()
+            .OrderByDescending(x => x.CompletedDate)
+            .ThenBy(x => x.Id)
+            .Select(x => ToCheckInResponse(x))
+            .ToListAsync();
+    }
+
+    public async Task<CheckInResponse> HideCheckInAsync(Guid checkInId)
+    {
+        var checkIn = await _context.CheckIns
+            .FirstOrDefaultAsync(x => x.Id == checkInId);
+
+        if (checkIn is null)
+        {
+            throw new KeyNotFoundException("Check-in not found");
+        }
+
+        checkIn.IsHidden = true;
+
+        await _context.SaveChangesAsync();
+
+        return ToCheckInResponse(checkIn);
+    }
+
+    public async Task<CheckInResponse> RestoreCheckInAsync(Guid checkInId)
+    {
+        var checkIn = await _context.CheckIns
+            .FirstOrDefaultAsync(x => x.Id == checkInId);
+
+        if (checkIn is null)
+        {
+            throw new KeyNotFoundException("Check-in not found");
+        }
+
+        checkIn.IsHidden = false;
+
+        await _context.SaveChangesAsync();
+
+        return ToCheckInResponse(checkIn);
+    }
+
+    private static CheckInResponse ToCheckInResponse(CheckIn checkIn)
+    {
+        return new CheckInResponse
+        {
+            Id = checkIn.Id,
+            UserId = checkIn.UserId,
+            TrailId = checkIn.TrailId,
+            CompletedDate = checkIn.CompletedDate,
+            Notes = checkIn.Notes,
+            PhotoUrl = checkIn.PhotoUrl,
+            IsHidden = checkIn.IsHidden
+        };
+    }
+}

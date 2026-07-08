@@ -138,20 +138,20 @@
 
 ### Database
 
-- [ ] Create CheckIn entity
-- [ ] Configure CheckIn table
-- [ ] Add User → CheckIns relationship
-- [ ] Add Trail → CheckIns relationship
+- [x] Create CheckIn entity
+- [x] Configure CheckIn table
+- [x] Add User → CheckIns relationship
+- [x] Add Trail → CheckIns relationship
 
 ### Backend
 
-- [ ] Create Check-In API
-- [ ] Create Update Check-In API
-- [ ] Create Delete Check-In API
-- [ ] Create User Check-In History API
-- [ ] Create Get All Check-Ins API
-- [ ] Create Hide Check-In API
-- [ ] Create Restore Check-In API
+- [x] Create Check-In API
+- [x] Create Update Check-In API
+- [x] Create Delete Check-In API
+- [x] Create User Check-In History API
+- [x] Create Get All Check-Ins API
+- [x] Create Hide Check-In API
+- [x] Create Restore Check-In API
 
 ### Security
 

@@ -17,6 +17,8 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<Trail> Trails { get; set; } = null!;
 
+    public DbSet<CheckIn> CheckIns { get; set; } = null!;
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -24,5 +26,6 @@ public class ApplicationDbContext : DbContext
         modelBuilder.ApplyConfiguration(new UserConfiguration());
         modelBuilder.ApplyConfiguration(new RefreshTokenConfiguration());
         modelBuilder.ApplyConfiguration(new TrailConfiguration());
+        modelBuilder.ApplyConfiguration(new CheckInConfiguration());
     }
 }
