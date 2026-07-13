@@ -213,8 +213,8 @@
 
 ### Integration Testing
 
-- [ ] XP calculation tests
-- [ ] Level calculation tests
+- [x] XP calculation tests
+- [x] Level calculation tests
 
 ---
 

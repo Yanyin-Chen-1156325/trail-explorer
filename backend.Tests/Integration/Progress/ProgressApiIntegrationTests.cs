@@ -62,6 +62,55 @@ public class ProgressApiIntegrationTests : IClassFixture<CustomWebApplicationFac
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
 
+    [Fact]
+    public async Task GetMyProgress_CalculatesXpFromCompletedTrailDistancesAndDifficulty()
+    {
+        var client = _factory.CreateClient();
+        await ResetProgressDataAsync();
+        var user = await SeedUserAsync("xp.integration.user@example.com", UserRole.User);
+        var easyTrail = await SeedTrailAsync("xp-easy-trail", "XP Easy Trail", 5m, TrailDifficulty.Easy);
+        var moderateTrail = await SeedTrailAsync("xp-moderate-trail", "XP Moderate Trail", 10m, TrailDifficulty.Moderate);
+        var hardTrail = await SeedTrailAsync("xp-hard-trail", "XP Hard Trail", 12m, TrailDifficulty.Hard);
+        await SeedCheckInAsync(user.Id, easyTrail.Id);
+        await SeedCheckInAsync(user.Id, moderateTrail.Id);
+        await SeedCheckInAsync(user.Id, hardTrail.Id);
+        client.DefaultRequestHeaders.Authorization = CreateAuthorizationHeader(user);
+
+        var response = await client.GetAsync("/api/progress/me");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var progress = await response.Content.ReadFromJsonAsync<UserProgressResponse>();
+        Assert.NotNull(progress);
+        Assert.Equal(350, progress.TotalXp);
+    }
+
+    [Fact]
+    public async Task GetMyProgress_CalculatesLevelProgressFromTotalXp()
+    {
+        var client = _factory.CreateClient();
+        await ResetProgressDataAsync();
+        var user = await SeedUserAsync("level.integration.user@example.com", UserRole.User);
+        var hardTrail = await SeedTrailAsync("level-hard-trail", "Level Hard Trail", 50m, TrailDifficulty.Hard);
+        await SeedCheckInAsync(user.Id, hardTrail.Id);
+        client.DefaultRequestHeaders.Authorization = CreateAuthorizationHeader(user);
+
+        var response = await client.GetAsync("/api/progress/me");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var progress = await response.Content.ReadFromJsonAsync<UserProgressResponse>();
+        Assert.NotNull(progress);
+        Assert.Equal(750, progress.TotalXp);
+        Assert.Equal(2, progress.CurrentLevel);
+        Assert.Equal(500, progress.CurrentLevelMinimumXp);
+        Assert.Equal(3, progress.NextLevel);
+        Assert.Equal(1_000, progress.NextLevelMinimumXp);
+        Assert.Equal(250, progress.XpIntoCurrentLevel);
+        Assert.Equal(500, progress.XpRequiredForNextLevel);
+        Assert.Equal(50m, progress.ProgressPercent);
+    }
+
     private async Task ResetProgressDataAsync()
     {
         using var scope = _factory.Services.CreateScope();
