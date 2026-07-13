@@ -40,6 +40,9 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddSingleton<ITrailCacheInvalidator, TrailCacheInvalidator>();
 builder.Services.AddScoped<ITrailService, TrailService>();
 builder.Services.AddScoped<ICheckInService, CheckInService>();
+builder.Services.AddScoped<IXpCalculatorService, XpCalculatorService>();
+builder.Services.AddScoped<ILevelCalculatorService, LevelCalculatorService>();
+builder.Services.AddScoped<IUserProgressService, UserProgressService>();
 builder.Services.AddScoped<ITrailSyncService, TrailSyncService>();
 builder.Services.AddScoped<IDocTrailIntegrationService, DocTrailIntegrationService>();
 builder.Services.AddHttpClient<IDocApiClient, DocApiClient>((serviceProvider, client) =>

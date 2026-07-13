@@ -189,19 +189,29 @@
 
 ### Gamification
 
-- [ ] Create XpCalculatorService
-- [ ] Implement XP Formula
-- [ ] Create LevelCalculatorService
-- [ ] Implement Level Rules
-- [ ] Create User Progress DTO
+- [x] Create XpCalculatorService
+- [x] Implement XP Formula
+- [x] Create LevelCalculatorService
+- [x] Implement Level Rules
+- [x] Create User Progress DTO
+- [x] Create User Progress Service
+- [x] Calculate User Total XP From Check-Ins
+- [x] Create Get My Progress API
+- [x] Protect Progress API
 
 ### Frontend
 
-- [ ] Create XP Progress Bar
-- [ ] Display Current Level
-- [ ] Display XP Progress
+- [x] Create XP Progress Bar
+- [x] Display Current Level
+- [x] Display XP Progress
+- [x] Create Progress API client
 
-### Testing
+### Unit Testing
+
+- [x] Backend
+- [x] Frontend
+
+### Integration Testing
 
 - [ ] XP calculation tests
 - [ ] Level calculation tests
@@ -255,6 +265,7 @@
 ### Frontend
 
 - [ ] Create Dashboard page
+- [ ] Display User Progress On Dashboard
 - [ ] Create Statistics Cards
 - [ ] Create Achievement Summary
 - [ ] Create Progress Widgets
