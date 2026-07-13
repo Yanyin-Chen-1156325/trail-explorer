@@ -15,3 +15,7 @@ export { ProtectedRoute } from "./components/ProtectedRoute";
 export { PublicOnlyRoute } from "./components/PublicOnlyRoute";
 export { RegisterPage } from "./pages/RegisterPage";
 export { useAuthStore } from "./store/authStore";
+export {
+  getHttpErrorStatus,
+  runAuthenticatedRequest,
+} from "./utils/authenticatedRequest";

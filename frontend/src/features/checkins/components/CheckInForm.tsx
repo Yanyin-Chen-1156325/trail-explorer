@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { checkInsApiBaseUrl } from "@/config/api";
-import { useAuthStore } from "@/features/auth";
+import { runAuthenticatedRequest, useAuthStore } from "@/features/auth";
 
 import { CheckInApiError, createCheckInApi } from "../services/checkInApi";
 
@@ -55,12 +55,14 @@ function CheckInForm({ trailId }: CheckInFormProps) {
     setSubmitState({ status: "submitting" });
 
     try {
-      await checkInApi.createCheckIn(session.accessToken, {
-        trailId,
-        completedDate: toCompletedDate(completedDate),
-        notes: notes.trim() || undefined,
-        photoUrl: photoUrl.trim() || undefined,
-      });
+      await runAuthenticatedRequest((accessToken) =>
+        checkInApi.createCheckIn(accessToken, {
+          trailId,
+          completedDate: toCompletedDate(completedDate),
+          notes: notes.trim() || undefined,
+          photoUrl: photoUrl.trim() || undefined,
+        }),
+      );
 
       setSubmitState({
         status: "success",

@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { checkInsApiBaseUrl } from "@/config/api";
-import { useAuthStore } from "@/features/auth";
+import { runAuthenticatedRequest, useAuthStore } from "@/features/auth";
 
 import { EditCheckInForm } from "../components/EditCheckInForm";
 import { CheckInApiError, createCheckInApi } from "../services/checkInApi";
@@ -75,10 +75,12 @@ function CheckInHistoryPage() {
     setSavingCheckInId(checkInId);
 
     try {
-      const updatedCheckIn = await checkInApi.updateCheckIn(
-        session.accessToken,
-        checkInId,
-        request,
+      const updatedCheckIn = await runAuthenticatedRequest((accessToken) =>
+        checkInApi.updateCheckIn(
+          accessToken,
+          checkInId,
+          request,
+        ),
       );
 
       updateCheckInInState(updatedCheckIn);
@@ -128,7 +130,9 @@ function CheckInHistoryPage() {
     setDeleteMessage(null);
 
     try {
-      await checkInApi.deleteCheckIn(session.accessToken, deleteCheckInId);
+      await runAuthenticatedRequest((accessToken) =>
+        checkInApi.deleteCheckIn(accessToken, deleteCheckInId),
+      );
       removeCheckInFromState(deleteCheckInId);
       setDeleteCheckInId(null);
       setDeleteMessage("Check-in deleted.");
@@ -161,8 +165,8 @@ function CheckInHistoryPage() {
       setLoadState({ status: "loading" });
 
       try {
-        const checkIns = await checkInApi.getMyCheckInHistory(
-          session.accessToken,
+        const checkIns = await runAuthenticatedRequest((accessToken) =>
+          checkInApi.getMyCheckInHistory(accessToken),
         );
 
         if (!isCurrent) {

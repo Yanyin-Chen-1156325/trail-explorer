@@ -16,9 +16,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { usersApiBaseUrl } from "@/config/api";
-import { useAuthStore } from "@/features/auth";
+import {
+  getHttpErrorStatus,
+  runAuthenticatedRequest,
+  useAuthStore,
+} from "@/features/auth";
 
-import { createUserApi, UserApiError } from "../services/userApi";
+import { createUserApi } from "../services/userApi";
 import type { UserResponse, UserRole, UserStatus } from "../types/user";
 
 const userApi = createUserApi(usersApiBaseUrl);
@@ -65,7 +69,6 @@ function statusClassName(status: UserResponse["status"]) {
 
 function UserManagementPage() {
   const session = useAuthStore((state) => state.session);
-  const refreshSession = useAuthStore((state) => state.refreshSession);
   const accessToken = session?.accessToken;
   const currentUserId = session?.user.userId;
   const currentUserRole = session?.user.role;
@@ -92,8 +95,8 @@ function UserManagementPage() {
     [users],
   );
 
-  const loadUsers = useCallback(async (token: string | undefined, hasRetried = false) => {
-    if (!token) {
+  const loadUsers = useCallback(async () => {
+    if (!accessToken) {
       setUsers([]);
       setError("A valid session is required to load users.");
       setIsLoading(false);
@@ -105,27 +108,12 @@ function UserManagementPage() {
     setSuccessMessage(null);
 
     try {
-      const nextUsers = await userApi.getUsers(token);
+      const nextUsers = await runAuthenticatedRequest((token) =>
+        userApi.getUsers(token),
+      );
       setUsers(nextUsers);
     } catch (requestError) {
-      if (
-        requestError instanceof UserApiError &&
-        (requestError.status === 401 || requestError.status === 403)
-      ) {
-        if (!hasRetried) {
-          try {
-            await refreshSession();
-            const refreshedToken = useAuthStore.getState().session?.accessToken;
-
-            if (refreshedToken) {
-              await loadUsers(refreshedToken, true);
-              return;
-            }
-          } catch {
-            // Fall through to the permission error below.
-          }
-        }
-
+      if (getHttpErrorStatus(requestError) === 403) {
         setError("You need an admin or moderator account to view the user list.");
       } else if (requestError instanceof Error) {
         setError(requestError.message);
@@ -135,7 +123,7 @@ function UserManagementPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [refreshSession]);
+  }, [accessToken]);
 
   const requestRoleChange = useCallback((user: UserResponse, role: UserRole) => {
     if (role === user.role) {
@@ -184,56 +172,53 @@ function UserManagementPage() {
   );
 
   const confirmRoleChange = useCallback(async () => {
-      if (!pendingRoleChange) {
-        return;
-      }
+    if (!pendingRoleChange) {
+      return;
+    }
 
-      const { user, role } = pendingRoleChange;
+    const { user, role } = pendingRoleChange;
 
-      if (role === user.role) {
-        setPendingRoleChange(null);
-        return;
-      }
+    if (role === user.role) {
+      setPendingRoleChange(null);
+      return;
+    }
 
-      if (!accessToken) {
-        setError("A valid session is required to update user roles.");
-        setPendingRoleChange(null);
-        return;
-      }
+    if (!accessToken) {
+      setError("A valid session is required to update user roles.");
+      setPendingRoleChange(null);
+      return;
+    }
 
-      setUpdatingUserId(user.id);
-      setError(null);
-      setSuccessMessage(null);
+    setUpdatingUserId(user.id);
+    setError(null);
+    setSuccessMessage(null);
 
-      try {
-        const updatedUser = await userApi.updateUserRole(accessToken, user.id, {
+    try {
+      const updatedUser = await runAuthenticatedRequest((token) =>
+        userApi.updateUserRole(token, user.id, {
           role,
-        });
+        }),
+      );
 
-        setUsers((currentUsers) =>
-          currentUsers.map((currentUser) =>
-            currentUser.id === updatedUser.id ? updatedUser : currentUser,
-          ),
-        );
-        setSuccessMessage(`${updatedUser.displayName} is now ${updatedUser.role}.`);
-        setPendingRoleChange(null);
-      } catch (requestError) {
-        if (
-          requestError instanceof UserApiError &&
-          (requestError.status === 401 || requestError.status === 403)
-        ) {
-          setError("You need an admin account to change user roles.");
-        } else if (requestError instanceof Error) {
-          setError(requestError.message);
-        } else {
-          setError("User role could not be updated.");
-        }
-      } finally {
-        setUpdatingUserId(null);
+      setUsers((currentUsers) =>
+        currentUsers.map((currentUser) =>
+          currentUser.id === updatedUser.id ? updatedUser : currentUser,
+        ),
+      );
+      setSuccessMessage(`${updatedUser.displayName} is now ${updatedUser.role}.`);
+      setPendingRoleChange(null);
+    } catch (requestError) {
+      if (getHttpErrorStatus(requestError) === 403) {
+        setError("You need an admin account to change user roles.");
+      } else if (requestError instanceof Error) {
+        setError(requestError.message);
+      } else {
+        setError("User role could not be updated.");
       }
-    },
-    [accessToken, pendingRoleChange],
-  );
+    } finally {
+      setUpdatingUserId(null);
+    }
+  }, [accessToken, pendingRoleChange]);
 
   const confirmStatusChange = useCallback(async () => {
     if (!pendingStatusChange) {
@@ -258,9 +243,11 @@ function UserManagementPage() {
     setSuccessMessage(null);
 
     try {
-      const updatedUser = await userApi.updateUserStatus(accessToken, user.id, {
-        status,
-      });
+      const updatedUser = await runAuthenticatedRequest((token) =>
+        userApi.updateUserStatus(token, user.id, {
+          status,
+        }),
+      );
 
       setUsers((currentUsers) =>
         currentUsers.map((currentUser) =>
@@ -272,10 +259,7 @@ function UserManagementPage() {
       );
       setPendingStatusChange(null);
     } catch (requestError) {
-      if (
-        requestError instanceof UserApiError &&
-        (requestError.status === 401 || requestError.status === 403)
-      ) {
+      if (getHttpErrorStatus(requestError) === 403) {
         setError("You need an admin or moderator account to change user statuses.");
       } else if (requestError instanceof Error) {
         setError(requestError.message);
@@ -289,7 +273,7 @@ function UserManagementPage() {
 
   useEffect(() => {
     const timerId = window.setTimeout(() => {
-      void loadUsers(accessToken);
+      void loadUsers();
     }, 0);
 
     return () => window.clearTimeout(timerId);
@@ -380,7 +364,7 @@ function UserManagementPage() {
                   disabled={isLoading}
                   type="button"
                   variant="outline"
-                  onClick={() => void loadUsers(accessToken)}
+                  onClick={() => void loadUsers()}
                 >
                   <RefreshCw
                     aria-hidden="true"

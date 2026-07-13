@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { checkInsApiBaseUrl } from "@/config/api";
-import { useAuthStore } from "@/features/auth";
+import { runAuthenticatedRequest, useAuthStore } from "@/features/auth";
 
 import { CheckInApiError, createCheckInApi } from "../services/checkInApi";
 import type { CheckInResponse } from "../types/checkIn";
@@ -92,9 +92,8 @@ function CheckInModerationPage() {
     setHideMessage(null);
 
     try {
-      const updatedCheckIn = await checkInApi.hideCheckIn(
-        session.accessToken,
-        hideCheckInId,
+      const updatedCheckIn = await runAuthenticatedRequest((accessToken) =>
+        checkInApi.hideCheckIn(accessToken, hideCheckInId),
       );
 
       replaceCheckInInState(updatedCheckIn);
@@ -127,9 +126,8 @@ function CheckInModerationPage() {
     setRestoreMessage(null);
 
     try {
-      const updatedCheckIn = await checkInApi.restoreCheckIn(
-        session.accessToken,
-        restoreCheckInId,
+      const updatedCheckIn = await runAuthenticatedRequest((accessToken) =>
+        checkInApi.restoreCheckIn(accessToken, restoreCheckInId),
       );
 
       replaceCheckInInState(updatedCheckIn);
@@ -162,7 +160,9 @@ function CheckInModerationPage() {
       setLoadState({ status: "loading" });
 
       try {
-        const checkIns = await checkInApi.getAllCheckIns(session.accessToken);
+        const checkIns = await runAuthenticatedRequest((accessToken) =>
+          checkInApi.getAllCheckIns(accessToken),
+        );
 
         if (!isCurrent) {
           return;
