@@ -3,10 +3,8 @@ import { Link } from "react-router-dom";
 import {
   AlertCircle,
   CalendarCheck,
-  Camera,
   CheckCircle2,
   Edit3,
-  ExternalLink,
   Loader2,
   MapPin,
   RouteIcon,
@@ -337,26 +335,6 @@ function CheckInHistoryPage() {
                       </Link>
                     </Button>
 
-                    {checkIn.photoUrl ? (
-                      <Button
-                        asChild
-                        className="border-white/15 bg-white/5 text-white hover:bg-white/10"
-                        variant="outline"
-                      >
-                        <a
-                          href={checkIn.photoUrl}
-                          rel="noreferrer"
-                          target="_blank"
-                        >
-                          <Camera aria-hidden="true" className="size-4" />
-                          Photo
-                          <ExternalLink
-                            aria-hidden="true"
-                            className="size-3"
-                          />
-                        </a>
-                      </Button>
-                    ) : null}
                   </div>
 
                   {editingCheckInId === checkIn.id ? (

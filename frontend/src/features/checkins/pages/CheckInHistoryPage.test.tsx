@@ -51,7 +51,6 @@ describe("CheckInHistoryPage", () => {
             id: "check-in-2",
             trailId: "trail-2",
             notes: null,
-            photoUrl: null,
           }),
         ]),
       }),
@@ -74,7 +73,6 @@ describe("CheckInHistoryPage", () => {
     const user = userEvent.setup();
     const updatedCheckIn = createCheckInResponse({
       notes: "Updated completion notes.",
-      photoUrl: null,
     });
     const checkInApi = createMockApi({
       getMyCheckInHistory: vi.fn().mockResolvedValue([

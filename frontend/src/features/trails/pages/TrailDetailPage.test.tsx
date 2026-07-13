@@ -38,7 +38,10 @@ describe("TrailDetailPage", () => {
           name: "Summit Route",
           difficulty: "Hard",
           distanceKm: 12.4,
-          docId: "doc-summit-route",
+          city: "Akaroa",
+          region: "Canterbury",
+          latitude: -43.81234,
+          longitude: 172.91234,
         }),
       ),
     );
@@ -49,7 +52,9 @@ describe("TrailDetailPage", () => {
     expect(await screen.findByRole("heading", { name: "Summit Route" })).toBeInTheDocument();
     expect(screen.getAllByText("Hard").length).toBeGreaterThan(0);
     expect(screen.getByText("12.4 km")).toBeInTheDocument();
-    expect(screen.getByText("doc-summit-route")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Trail location" })).toBeInTheDocument();
+    expect(screen.getAllByText("Akaroa, Canterbury").length).toBeGreaterThan(0);
+    expect(screen.getByText("-43.81234, 172.91234")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Check in" })).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: "Record completion" }),

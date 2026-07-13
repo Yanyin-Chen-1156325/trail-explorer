@@ -1,3 +1,6 @@
+import "leaflet/dist/leaflet.css";
+
+import type { ComponentType, PropsWithChildren } from "react";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
@@ -9,9 +12,11 @@ import {
   Mountain,
   RouteIcon,
 } from "lucide-react";
+import { CircleMarker, MapContainer, Popup, TileLayer } from "react-leaflet";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { trailsApiBaseUrl } from "@/config/api";
 import { CheckInForm } from "@/features/checkins";
 import { createTrailApi, TrailApiError } from "../services/trailApi";
@@ -23,7 +28,34 @@ type LoadState =
   | { status: "not-found" }
   | { status: "error"; message: string };
 
+type MapCenter = [number, number];
+
 const trailApi = createTrailApi(trailsApiBaseUrl);
+const TrailMapContainer = MapContainer as unknown as ComponentType<
+  PropsWithChildren<{
+    center: MapCenter;
+    className: string;
+    scrollWheelZoom: boolean;
+    zoom: number;
+  }>
+>;
+const TrailTileLayer = TileLayer as unknown as ComponentType<{
+  attribution: string;
+  url: string;
+}>;
+const TrailCircleMarker = CircleMarker as unknown as ComponentType<
+  PropsWithChildren<{
+    center: MapCenter;
+    color: string;
+    fillColor: string;
+    fillOpacity: number;
+    eventHandlers?: {
+      click: () => void;
+    };
+    radius: number;
+    weight: number;
+  }>
+>;
 
 function difficultyClassName(difficulty: TrailResponse["difficulty"]) {
   if (difficulty === "Hard") {
@@ -41,6 +73,122 @@ function formatDate(value: string) {
   return new Intl.DateTimeFormat(undefined, {
     dateStyle: "medium",
   }).format(new Date(value));
+}
+
+function hasCoordinates(
+  trail: TrailResponse,
+): trail is TrailResponse & { latitude: number; longitude: number } {
+  return typeof trail.latitude === "number" && typeof trail.longitude === "number";
+}
+
+function formatCoordinate(value: number) {
+  return value.toFixed(5);
+}
+
+function createGoogleMapsUrl(latitude: number, longitude: number) {
+  const query = `${latitude},${longitude}`;
+
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+    query,
+  )}`;
+}
+
+function TrailLocationMap({ trail }: { trail: TrailResponse }) {
+  const [isGoogleMapsDialogOpen, setIsGoogleMapsDialogOpen] = useState(false);
+  const hasMappedLocation = hasCoordinates(trail);
+  const center: MapCenter = hasMappedLocation
+    ? [trail.latitude, trail.longitude]
+    : [-43.532, 172.636];
+  const googleMapsUrl = hasMappedLocation
+    ? createGoogleMapsUrl(trail.latitude, trail.longitude)
+    : "";
+
+  const openGoogleMaps = () => {
+    if (!googleMapsUrl) {
+      return;
+    }
+
+    window.open(googleMapsUrl, "_blank", "noopener,noreferrer");
+    setIsGoogleMapsDialogOpen(false);
+  };
+
+  return (
+    <section className="border-t border-white/10 p-6 sm:p-8">
+      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h2 className="text-lg font-bold">Trail location</h2>
+          <p className="mt-2 flex items-center gap-2 text-sm text-[#94A3B8]">
+            <MapPin aria-hidden="true" className="size-4 text-[#86EFAC]" />
+            {trail.city}, {trail.region}
+          </p>
+        </div>
+        {hasMappedLocation ? (
+          <div className="rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-xs font-semibold text-white/70">
+            {formatCoordinate(trail.latitude)}, {formatCoordinate(trail.longitude)}
+          </div>
+        ) : null}
+      </div>
+
+      <div className="overflow-hidden rounded-lg border border-white/10 bg-[#0B1F1A]">
+        {hasMappedLocation ? (
+          <TrailMapContainer
+            center={center}
+            className="h-[320px] w-full"
+            scrollWheelZoom={false}
+            zoom={11}
+          >
+            <TrailTileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+            <TrailCircleMarker
+              center={center}
+              color="#047857"
+              eventHandlers={{
+                click: () => setIsGoogleMapsDialogOpen(true),
+              }}
+              fillColor="#10B981"
+              fillOpacity={0.9}
+              radius={10}
+              weight={2}
+            >
+              <Popup>
+                <div className="min-w-44 text-sm">
+                  <p className="font-bold text-slate-950">{trail.name}</p>
+                  <p className="mt-1 text-xs text-slate-600">
+                    {trail.city}, {trail.region}
+                  </p>
+                  <p className="mt-1 text-xs font-semibold text-emerald-700">
+                    {trail.distanceKm} km - {trail.difficulty}
+                  </p>
+                </div>
+              </Popup>
+            </TrailCircleMarker>
+          </TrailMapContainer>
+        ) : (
+          <div className="flex min-h-[260px] flex-col items-center justify-center p-8 text-center">
+            <MapPin aria-hidden="true" className="size-10 text-[#86EFAC]" />
+            <h3 className="mt-4 text-base font-bold">No mapped coordinates</h3>
+            <p className="mt-2 max-w-md text-sm leading-6 text-[#94A3B8]">
+              This trail has a DOC location label, but no latitude and longitude
+              are available yet.
+            </p>
+          </div>
+        )}
+      </div>
+
+      <ConfirmationDialog
+        cancelLabel="Stay here"
+        confirmLabel="Open Google Maps"
+        description={`Open ${trail.name} in Google Maps. On mobile, this may open the Google Maps app if it is installed.`}
+        isOpen={isGoogleMapsDialogOpen}
+        title="Open location?"
+        onCancel={() => setIsGoogleMapsDialogOpen(false)}
+        onConfirm={openGoogleMaps}
+        onOpenChange={setIsGoogleMapsDialogOpen}
+      />
+    </section>
+  );
 }
 
 function TrailDetailPage() {
@@ -162,6 +310,8 @@ function TrailDetailPage() {
                     "No trail description available yet."}
                 </p>
               </div>
+
+              <TrailLocationMap trail={loadState.trail} />
             </section>
 
             <aside className="space-y-4">
@@ -199,18 +349,6 @@ function TrailDetailPage() {
                       </div>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-white/10 bg-white/[0.04] text-white">
-                <CardContent className="p-5">
-                  <h2 className="text-base font-bold">Source</h2>
-                  <p className="mt-3 text-sm text-[#94A3B8]">
-                    DOC trail reference
-                  </p>
-                  <p className="mt-2 break-all rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-xs text-white/72">
-                    {loadState.trail.docId}
-                  </p>
                 </CardContent>
               </Card>
             </aside>

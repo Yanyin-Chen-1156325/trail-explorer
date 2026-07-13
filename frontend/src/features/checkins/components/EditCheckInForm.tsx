@@ -41,7 +41,6 @@ function EditCheckInForm({
     toDateInputValue(checkIn.completedDate),
   );
   const [notes, setNotes] = useState(checkIn.notes ?? "");
-  const [photoUrl, setPhotoUrl] = useState(checkIn.photoUrl ?? "");
   const [feedback, setFeedback] = useState<FeedbackState>({ status: "idle" });
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -52,7 +51,6 @@ function EditCheckInForm({
       await onSave({
         completedDate: toCompletedDate(completedDate),
         notes: notes.trim() || undefined,
-        photoUrl: photoUrl.trim() || undefined,
       });
 
       setFeedback({
@@ -97,18 +95,6 @@ function EditCheckInForm({
           placeholder="How was the trail?"
           value={notes}
           onChange={(event) => setNotes(event.target.value)}
-        />
-      </label>
-
-      <label className="block space-y-2">
-        <span className="text-xs font-semibold text-white/70">Photo URL</span>
-        <Input
-          className="border-white/10 bg-black/20 text-white"
-          maxLength={2048}
-          placeholder="https://example.com/photo.jpg"
-          type="url"
-          value={photoUrl}
-          onChange={(event) => setPhotoUrl(event.target.value)}
         />
       </label>
 

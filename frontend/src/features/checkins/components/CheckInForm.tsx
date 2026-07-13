@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import type { FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
 import { CalendarCheck, CheckCircle2, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -29,10 +30,10 @@ function toCompletedDate(value: string) {
 }
 
 function CheckInForm({ trailId }: CheckInFormProps) {
+  const navigate = useNavigate();
   const session = useAuthStore((state) => state.session);
   const [completedDate, setCompletedDate] = useState(getTodayInputValue);
   const [notes, setNotes] = useState("");
-  const [photoUrl, setPhotoUrl] = useState("");
   const [submitState, setSubmitState] = useState<SubmitState>({
     status: "idle",
   });
@@ -60,7 +61,6 @@ function CheckInForm({ trailId }: CheckInFormProps) {
           trailId,
           completedDate: toCompletedDate(completedDate),
           notes: notes.trim() || undefined,
-          photoUrl: photoUrl.trim() || undefined,
         }),
       );
 
@@ -69,7 +69,7 @@ function CheckInForm({ trailId }: CheckInFormProps) {
         message: "Trail completion recorded.",
       });
       setNotes("");
-      setPhotoUrl("");
+      navigate("/checkins");
     } catch (error) {
       setSubmitState({
         status: "error",
@@ -117,20 +117,6 @@ function CheckInForm({ trailId }: CheckInFormProps) {
               placeholder="How was the trail?"
               value={notes}
               onChange={(event) => setNotes(event.target.value)}
-            />
-          </label>
-
-          <label className="block space-y-2">
-            <span className="text-xs font-semibold text-white/70">
-              Photo URL
-            </span>
-            <Input
-              className="border-white/10 bg-black/20 text-white"
-              maxLength={2048}
-              placeholder="https://example.com/photo.jpg"
-              type="url"
-              value={photoUrl}
-              onChange={(event) => setPhotoUrl(event.target.value)}
             />
           </label>
 

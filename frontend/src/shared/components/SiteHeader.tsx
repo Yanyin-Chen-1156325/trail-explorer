@@ -16,10 +16,6 @@ import {
 import { ThemeToggle } from "@/shared/components/ThemeToggle";
 import type { AuthSession } from "@/features/auth/store/authStore";
 
-const navigationItems = [
-  { label: "Home", to: "/" },
-];
-
 function Logo() {
   return (
     <Link
@@ -129,10 +125,7 @@ function SiteHeader() {
           : []),
       ]
     : [];
-  const visibleNavigationItems = [
-    ...navigationItems,
-    ...sessionNavigationItems,
-  ];
+  const visibleNavigationItems = sessionNavigationItems;
 
   return (
     <header className="sticky top-0 z-40 border-b border-white/10 bg-[#061813]/85 text-white shadow-lg shadow-black/10 backdrop-blur-xl">

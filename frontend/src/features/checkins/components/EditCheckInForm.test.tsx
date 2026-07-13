@@ -17,7 +17,6 @@ describe("EditCheckInForm", () => {
         checkIn={createCheckInResponse({
           completedDate: "2026-01-01T00:00:00.000Z",
           notes: "Original notes",
-          photoUrl: "https://example.com/original.jpg",
         })}
         isSaving={false}
         onCancel={vi.fn()}
@@ -29,18 +28,12 @@ describe("EditCheckInForm", () => {
     await user.type(screen.getByLabelText("Completion date"), "2026-01-03");
     await user.clear(screen.getByLabelText("Notes"));
     await user.type(screen.getByLabelText("Notes"), "  Updated notes  ");
-    await user.clear(screen.getByLabelText("Photo URL"));
-    await user.type(
-      screen.getByLabelText("Photo URL"),
-      "  https://example.com/updated.jpg  ",
-    );
     await user.click(screen.getByRole("button", { name: "Save changes" }));
 
     await waitFor(() => {
       expect(onSave).toHaveBeenCalledWith({
         completedDate: expectedCompletedDate,
         notes: "Updated notes",
-        photoUrl: "https://example.com/updated.jpg",
       });
     });
     expect(await screen.findByText("Check-in updated.")).toBeInTheDocument();
