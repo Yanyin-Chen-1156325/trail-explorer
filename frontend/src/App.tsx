@@ -14,6 +14,7 @@ import {
 } from "./features/auth";
 import { PublicLayout } from "./shared/layouts/PublicLayout";
 import { CheckInHistoryPage, CheckInModerationPage } from "./features/checkins";
+import { BadgeWallPage } from "./features/badges";
 
 export function ProtectedHomePage() {
   const session = useAuthStore((state) => state.session);
@@ -195,6 +196,7 @@ function App() {
             <Route element={<ExplorePage />} path="/trails" />
             <Route element={<TrailDetailPage />} path="/trails/:trailId" />
             <Route element={<CheckInHistoryPage />} path="/checkins" />
+            <Route element={<BadgeWallPage />} path="/badges" />
             <Route
               element={<CheckInModerationRoute />}
               path="/moderation/checkins"

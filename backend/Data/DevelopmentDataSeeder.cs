@@ -1,5 +1,6 @@
 using backend.Entities;
 using backend.Enums;
+using backend.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace backend.Data;
@@ -12,6 +13,8 @@ public static class DevelopmentDataSeeder
 
     public static async Task SeedAsync(ApplicationDbContext dbContext)
     {
+        var hasChanges = false;
+
         var adminUser = await dbContext.Users
             .FirstOrDefaultAsync(user => user.Email == AdminEmail);
 
@@ -32,27 +35,53 @@ public static class DevelopmentDataSeeder
                 UpdatedAt = now
             });
 
-            await dbContext.SaveChangesAsync();
-            return;
-        }
-
-        var hasChanges = false;
-
-        if (adminUser.Role != UserRole.Admin)
-        {
-            adminUser.Role = UserRole.Admin;
             hasChanges = true;
         }
-
-        if (adminUser.Status != UserStatus.Active)
+        else
         {
-            adminUser.Status = UserStatus.Active;
+            if (adminUser.Role != UserRole.Admin)
+            {
+                adminUser.Role = UserRole.Admin;
+                hasChanges = true;
+            }
+
+            if (adminUser.Status != UserStatus.Active)
+            {
+                adminUser.Status = UserStatus.Active;
+                hasChanges = true;
+            }
+
+            if (hasChanges)
+            {
+                adminUser.UpdatedAt = DateTime.UtcNow;
+            }
+        }
+
+        var existingBadgeNames = await dbContext.Badges
+            .Select(badge => badge.Name)
+            .ToListAsync();
+
+        var existingBadgeNameSet = existingBadgeNames.ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var badgesToAdd = BadgeRuleCatalog.BadgeDefinitions
+            .Where(badge => !existingBadgeNameSet.Contains(badge.Name))
+            .Select(badge => new Badge
+            {
+                Id = Guid.NewGuid(),
+                Name = badge.Name,
+                Description = badge.Description,
+                IconUrl = badge.IconUrl,
+                Type = badge.Type
+            })
+            .ToList();
+
+        if (badgesToAdd.Count > 0)
+        {
+            dbContext.Badges.AddRange(badgesToAdd);
             hasChanges = true;
         }
 
         if (hasChanges)
         {
-            adminUser.UpdatedAt = DateTime.UtcNow;
             await dbContext.SaveChangesAsync();
         }
     }

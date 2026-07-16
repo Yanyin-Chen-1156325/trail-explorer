@@ -19,6 +19,10 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<CheckIn> CheckIns { get; set; } = null!;
 
+    public DbSet<Badge> Badges { get; set; } = null!;
+
+    public DbSet<UserBadge> UserBadges { get; set; } = null!;
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -27,5 +31,6 @@ public class ApplicationDbContext : DbContext
         modelBuilder.ApplyConfiguration(new RefreshTokenConfiguration());
         modelBuilder.ApplyConfiguration(new TrailConfiguration());
         modelBuilder.ApplyConfiguration(new CheckInConfiguration());
+        modelBuilder.ApplyConfiguration(new UserBadgeConfiguration());
     }
 }

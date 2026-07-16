@@ -222,32 +222,37 @@
 
 ### Database
 
-- [ ] Create Badge entity
-- [ ] Create UserBadge entity
-- [ ] Seed default badges
-- [ ] Configure UserBadge composite key
-- [ ] Add User → UserBadges relationship
+- [x] Create Badge entity
+- [x] Create UserBadge entity
+- [x] Seed default badges
+- [x] Configure UserBadge composite key
+- [x] Add User → UserBadges relationship
 
 ### Gamification
 
-- [ ] Create BadgeEvaluationService
-- [ ] Create BadgeUnlockService
-- [ ] Implement Completion badges
-- [ ] Implement Distance badges
-- [ ] Implement Region badges
-- [ ] Implement Difficulty badges
-- [ ] Implement Streak badges
+- [x] Create BadgeEvaluationService
+- [x] Create BadgeUnlockService
+- [x] Implement Completion badges
+- [x] Implement Distance badges
+- [x] Implement Region badges
+- [x] Implement Difficulty badges
+- [x] Implement Streak badges
 
 ### Frontend
 
-- [ ] Create Badge Card
-- [ ] Create Badge Wall
-- [ ] Create Badge Unlock Modal
+- [x] Create Badge Card
+- [x] Create Badge Wall
+- [x] Create Badge Unlock Modal
+
+### Unit Testing
+
+- [x] Backend
+- [x] Frontend
 
 ### Testing
 
-- [ ] Badge Engine tests
-- [ ] Badge UI tests
+- [x] Badge Engine tests
+- [x] Badge UI tests
 
 ---
 

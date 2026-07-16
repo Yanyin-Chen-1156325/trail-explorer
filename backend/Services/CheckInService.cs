@@ -8,13 +8,16 @@ namespace backend.Services;
 public class CheckInService : ICheckInService
 {
     private readonly ApplicationDbContext _context;
+    private readonly IBadgeUnlockService _badgeUnlockService;
     private readonly ILogger<CheckInService> _logger;
 
     public CheckInService(
         ApplicationDbContext context,
+        IBadgeUnlockService badgeUnlockService,
         ILogger<CheckInService> logger)
     {
         _context = context;
+        _badgeUnlockService = badgeUnlockService;
         _logger = logger;
     }
 
@@ -41,6 +44,7 @@ public class CheckInService : ICheckInService
 
         _context.CheckIns.Add(checkIn);
         await _context.SaveChangesAsync();
+        await _badgeUnlockService.UnlockEligibleBadgesAsync(userId);
 
         _logger.LogInformation(
             "Trail completed: {CheckInId} by user {UserId} on trail {TrailId} at {CompletedDate}",

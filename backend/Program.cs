@@ -43,6 +43,9 @@ builder.Services.AddScoped<ICheckInService, CheckInService>();
 builder.Services.AddScoped<IXpCalculatorService, XpCalculatorService>();
 builder.Services.AddScoped<ILevelCalculatorService, LevelCalculatorService>();
 builder.Services.AddScoped<IUserProgressService, UserProgressService>();
+builder.Services.AddScoped<IBadgeEvaluationService, BadgeEvaluationService>();
+builder.Services.AddScoped<IBadgeUnlockService, BadgeUnlockService>();
+builder.Services.AddScoped<IBadgeService, BadgeService>();
 builder.Services.AddScoped<ITrailSyncService, TrailSyncService>();
 builder.Services.AddScoped<IDocTrailIntegrationService, DocTrailIntegrationService>();
 builder.Services.AddHttpClient<IDocApiClient, DocApiClient>((serviceProvider, client) =>

@@ -243,7 +243,10 @@ public class CheckInServiceTests
 
     private static CheckInService CreateService(ApplicationDbContext context)
     {
-        return new CheckInService(context, Mock.Of<ILogger<CheckInService>>());
+        return new CheckInService(
+            context,
+            Mock.Of<IBadgeUnlockService>(),
+            Mock.Of<ILogger<CheckInService>>());
     }
 
     private static User CreateUser(string email = "user@example.com")
