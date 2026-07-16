@@ -103,4 +103,28 @@ describe("BadgeWall", () => {
     expect(screen.getByText("Completion progression")).toBeInTheDocument();
     expect(screen.getByText("3/10 trails")).toBeInTheDocument();
   });
+
+  it("hides difficulty badge progression groups", () => {
+    renderWithRouter(
+      <BadgeWall
+        badges={[
+          createBadgeResponse({
+            id: "completion-1",
+            name: "First Trail",
+            type: "Completion",
+          }),
+          createBadgeResponse({
+            id: "difficulty-1",
+            name: "Expert Explorer",
+            type: "Difficulty",
+          }),
+        ]}
+      />,
+    );
+
+    expect(screen.getByText("Completion progression")).toBeInTheDocument();
+    expect(screen.getByText("First Trail")).toBeInTheDocument();
+    expect(screen.queryByText("Difficulty progression")).not.toBeInTheDocument();
+    expect(screen.queryByText("Expert Explorer")).not.toBeInTheDocument();
+  });
 });

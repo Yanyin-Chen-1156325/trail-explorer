@@ -24,6 +24,7 @@ public class TrailSyncServiceTests
                     CityOrLocation = "Christchurch area",
                     Region = "Canterbury",
                     Description = "Trail introduction",
+                    ImageUrl = "  https://www.doc.govt.nz/thumbs/large/link/trail.jpg  ",
                     DistanceText = "20 km",
                     DifficultyText = "Easy",
                     X = 1572954.6221,
@@ -47,6 +48,7 @@ public class TrailSyncServiceTests
         Assert.Equal("Christchurch area", trail.City);
         Assert.Equal("Canterbury", trail.Region);
         Assert.Equal("Trail introduction", trail.Description);
+        Assert.Equal("https://www.doc.govt.nz/thumbs/large/link/trail.jpg", trail.ImageUrl);
         Assert.Equal(20, trail.DistanceKm);
         Assert.Equal(TrailDifficulty.Easy, trail.Difficulty);
         Assert.Equal(1572954.6221, trail.CoordinateX);
@@ -86,6 +88,7 @@ public class TrailSyncServiceTests
                     CityOrLocation = "Christchurch area",
                     Region = "Canterbury",
                     Description = "Updated description",
+                    ImageUrl = "https://www.doc.govt.nz/thumbs/large/link/updated.jpg",
                     DistanceText = "12.5 km",
                     DifficultyText = "Moderate",
                     X = 1480769.1942,
@@ -108,6 +111,7 @@ public class TrailSyncServiceTests
         Assert.Equal("Christchurch area", trail.City);
         Assert.Equal("Canterbury", trail.Region);
         Assert.Equal("Updated description", trail.Description);
+        Assert.Equal("https://www.doc.govt.nz/thumbs/large/link/updated.jpg", trail.ImageUrl);
         Assert.Equal(12.5m, trail.DistanceKm);
         Assert.Equal(TrailDifficulty.Moderate, trail.Difficulty);
         Assert.Equal(1480769.1942, trail.CoordinateX);

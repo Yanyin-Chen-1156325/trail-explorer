@@ -26,7 +26,6 @@ const badgeTypeOrder: BadgeType[] = [
   "Completion",
   "Distance",
   "Region",
-  "Difficulty",
   "Streak",
 ];
 
@@ -284,8 +283,9 @@ function BadgeWall({
   isLoading = false,
   onRetry,
 }: BadgeWallProps) {
-  const unlockedCount = badges.filter((badge) => badge.isUnlocked).length;
-  const badgeGroups = groupBadgesByType(badges);
+  const visibleBadges = badges.filter((badge) => badge.type !== "Difficulty");
+  const unlockedCount = visibleBadges.filter((badge) => badge.isUnlocked).length;
+  const badgeGroups = groupBadgesByType(visibleBadges);
 
   if (isLoading) {
     return (
@@ -318,7 +318,7 @@ function BadgeWall({
     );
   }
 
-  if (badges.length === 0) {
+  if (visibleBadges.length === 0) {
     return (
       <div className="flex min-h-[360px] flex-col items-center justify-center rounded-lg border border-white/10 bg-[#071511] p-8 text-center">
         <Award aria-hidden="true" className="size-10 text-[#C4B5FD]" />
@@ -339,12 +339,14 @@ function BadgeWall({
         </div>
         <div className="rounded-lg border border-white/10 bg-white/[0.04] p-4">
           <p className="text-xs font-bold uppercase text-white/50">Available</p>
-          <p className="mt-1 text-2xl font-black text-white">{badges.length}</p>
+          <p className="mt-1 text-2xl font-black text-white">
+            {visibleBadges.length}
+          </p>
         </div>
         <div className="rounded-lg border border-white/10 bg-white/[0.04] p-4">
           <p className="text-xs font-bold uppercase text-white/50">Progress</p>
           <p className="mt-1 text-2xl font-black text-[#C4B5FD]">
-            {Math.round((unlockedCount / badges.length) * 100)}%
+            {Math.round((unlockedCount / visibleBadges.length) * 100)}%
           </p>
         </div>
       </div>

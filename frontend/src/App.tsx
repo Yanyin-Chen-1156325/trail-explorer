@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router-dom";
 import { Mountain, RouteIcon, Trophy } from "lucide-react";
 
 import { HomePage } from "./features/home/pages/HomePage";
@@ -15,6 +21,16 @@ import {
 import { PublicLayout } from "./shared/layouts/PublicLayout";
 import { CheckInHistoryPage, CheckInModerationPage } from "./features/checkins";
 import { BadgeWallPage } from "./features/badges";
+
+export function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [pathname]);
+
+  return null;
+}
 
 export function ProtectedHomePage() {
   const session = useAuthStore((state) => state.session);
@@ -183,6 +199,7 @@ export function CheckInModerationRoute() {
 function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
         <Route element={<PublicLayout />}>
           <Route element={<HomePage />} path="/" />

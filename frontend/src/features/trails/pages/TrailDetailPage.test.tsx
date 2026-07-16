@@ -40,6 +40,7 @@ describe("TrailDetailPage", () => {
           distanceKm: 12.4,
           city: "Akaroa",
           region: "Canterbury",
+          imageUrl: "https://www.doc.govt.nz/thumbs/large/link/summit.jpg",
           latitude: -43.81234,
           longitude: 172.91234,
         }),
@@ -54,6 +55,10 @@ describe("TrailDetailPage", () => {
     expect(screen.getByText("12.4 km")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Trail location" })).toBeInTheDocument();
     expect(screen.getAllByText("Akaroa, Canterbury").length).toBeGreaterThan(0);
+    expect(screen.getByRole("img", { name: "Summit Route hero image" })).toHaveStyle({
+      backgroundImage:
+        'linear-gradient(90deg, rgba(2, 6, 23, 0.48), rgba(2, 6, 23, 0.12)), url("https://www.doc.govt.nz/thumbs/large/link/summit.jpg")',
+    });
     expect(screen.getByText("-43.81234, 172.91234")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Check in" })).toBeInTheDocument();
     expect(
@@ -87,5 +92,24 @@ describe("TrailDetailPage", () => {
 
     expect(await screen.findByText("Trail unavailable")).toBeInTheDocument();
     expect(screen.getByText("Unable to reach trails")).toBeInTheDocument();
+  });
+
+  it("keeps fallback hero background when a trail has no image", async () => {
+    resetAuthStore({ session: createTestSession() });
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      await mockJsonResponse(
+        createTrailResponse({
+          name: "No Image Track",
+          imageUrl: null,
+        }),
+      ),
+    );
+
+    renderTrailDetailPage("/trails/trail-no-image");
+
+    const hero = await screen.findByRole("img", {
+      name: "No Image Track hero image",
+    });
+    expect((hero as HTMLElement).style.backgroundImage).not.toContain("url(");
   });
 });

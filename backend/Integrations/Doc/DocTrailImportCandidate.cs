@@ -12,6 +12,8 @@ public class DocTrailImportCandidate
 
     public string? Description { get; set; }
 
+    public string? ImageUrl { get; set; }
+
     public string? DistanceText { get; set; }
 
     public string? DifficultyText { get; set; }

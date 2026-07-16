@@ -12,6 +12,7 @@ function createTrailResponse(
     difficulty: "Easy",
     distanceKm: 8.5,
     description: "A sheltered forest walk with river views.",
+    imageUrl: "https://www.doc.govt.nz/thumbs/large/link/forest-loop.jpg",
     latitude: -43.781,
     longitude: 172.664,
     createdAt: "2026-01-10T00:00:00.000Z",

@@ -97,6 +97,7 @@
 
 - [x] Create Trail entity
 - [x] Configure Trail table
+- [x] Add Trail ImageUrl field
 
 ### Backend
 
@@ -105,6 +106,8 @@
 - [x] Implement Search API
 - [x] Implement Filter API
 - [x] Implement Pagination
+- [x] Map DOC introductionThumbnail into Trail ImageUrl
+- [x] Return ImageUrl in TrailResponse
 
 ### Caching
 
@@ -119,6 +122,8 @@
 - [x] Create Trail Detail page
 - [x] Add Search UI
 - [x] Add Difficulty Filter
+- [x] Use Trail ImageUrl as Trail Detail hero background
+- [x] Add fallback hero background for trails without images
 
 ### Unit Testing
 
@@ -131,6 +136,8 @@
 - [x] Search tests
 - [x] Filter tests
 - [x] Trail Card tests
+- [x] Trail image synchronisation tests
+- [x] Trail Detail hero image tests
 
 ---
 

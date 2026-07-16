@@ -110,6 +110,7 @@ public class TrailServiceTests
         Assert.NotNull(response);
         Assert.Equal(trail.Id, response.Id);
         Assert.Equal("Active Trail", response.Name);
+        Assert.Equal(trail.ImageUrl, response.ImageUrl);
         Assert.Equal(trail.Latitude, response.Latitude);
         Assert.Equal(trail.Longitude, response.Longitude);
     }
@@ -192,6 +193,7 @@ public class TrailServiceTests
             Difficulty = difficulty,
             DistanceKm = 5,
             Description = description ?? $"{name} description",
+            ImageUrl = "https://www.doc.govt.nz/thumbs/large/link/test.jpg",
             CoordinateX = 1572954.6221,
             CoordinateY = 5150889.4148,
             Latitude = -43.781,

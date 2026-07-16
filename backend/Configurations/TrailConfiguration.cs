@@ -33,6 +33,9 @@ public class TrailConfiguration : IEntityTypeConfiguration<Trail>
             .IsRequired()
             .HasMaxLength(4000);
 
+        builder.Property(x => x.ImageUrl)
+            .HasMaxLength(2048);
+
         builder.Property(x => x.CoordinateX);
 
         builder.Property(x => x.CoordinateY);

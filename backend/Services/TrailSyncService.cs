@@ -124,6 +124,7 @@ public class TrailSyncService : ITrailSyncService
             Difficulty = MapDifficulty(candidate.DifficultyText),
             DistanceKm = ParseDistanceKm(candidate.DistanceText),
             Description = candidate.Description?.Trim() ?? string.Empty,
+            ImageUrl = NormalizeOptionalText(candidate.ImageUrl),
             CoordinateX = candidate.X,
             CoordinateY = candidate.Y,
             Latitude = coordinates?.Latitude,
@@ -145,6 +146,7 @@ public class TrailSyncService : ITrailSyncService
         trail.Difficulty = MapDifficulty(candidate.DifficultyText);
         trail.DistanceKm = ParseDistanceKm(candidate.DistanceText);
         trail.Description = candidate.Description?.Trim() ?? string.Empty;
+        trail.ImageUrl = NormalizeOptionalText(candidate.ImageUrl);
         trail.CoordinateX = candidate.X;
         trail.CoordinateY = candidate.Y;
         var coordinates = CoordinateConversionService.ConvertNztmToWgs84(candidate.X, candidate.Y);
@@ -158,6 +160,13 @@ public class TrailSyncService : ITrailSyncService
     {
         return string.IsNullOrWhiteSpace(value)
             ? fallback
+            : value.Trim();
+    }
+
+    private static string? NormalizeOptionalText(string? value)
+    {
+        return string.IsNullOrWhiteSpace(value)
+            ? null
             : value.Trim();
     }
 

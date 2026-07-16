@@ -171,6 +171,7 @@ public class DocTrailIntegrationService : IDocTrailIntegrationService
             Region = detail.Region?.FirstOrDefault() ?? summary.Region?.FirstOrDefault(),
             CityOrLocation = detail.LocationArray?.FirstOrDefault() ?? detail.LocationString,
             Description = detail.Introduction,
+            ImageUrl = detail.IntroductionThumbnail,
             DistanceText = detail.Distance,
             DifficultyText = detail.WalkTrackCategory?.FirstOrDefault() ??
                 detail.MtbTrackCategory?.FirstOrDefault(),

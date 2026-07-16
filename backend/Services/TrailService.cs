@@ -129,6 +129,7 @@ public class TrailService : ITrailService
             Difficulty = trail.Difficulty,
             DistanceKm = trail.DistanceKm,
             Description = trail.Description,
+            ImageUrl = trail.ImageUrl,
             Latitude = trail.Latitude,
             Longitude = trail.Longitude,
             CreatedAt = trail.CreatedAt,

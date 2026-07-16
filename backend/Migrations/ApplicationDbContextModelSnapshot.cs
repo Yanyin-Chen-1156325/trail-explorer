@@ -153,6 +153,10 @@ namespace backend.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("ImageUrl")
+                        .HasMaxLength(2048)
+                        .HasColumnType("TEXT");
+
                     b.Property<double?>("Latitude")
                         .HasColumnType("REAL");
 

@@ -67,6 +67,7 @@ public class TrailApiIntegrationTests : IClassFixture<CustomWebApplicationFactor
         Assert.Equal(trail.DocId, trailResponse.DocId);
         Assert.Equal(trail.Name, trailResponse.Name);
         Assert.Equal(trail.Difficulty, trailResponse.Difficulty);
+        Assert.Equal(trail.ImageUrl, trailResponse.ImageUrl);
     }
 
     [Fact]
@@ -339,6 +340,7 @@ public class TrailApiIntegrationTests : IClassFixture<CustomWebApplicationFactor
             Difficulty = difficulty,
             DistanceKm = 7.5m,
             Description = description ?? $"{name} integration test trail",
+            ImageUrl = "https://www.doc.govt.nz/thumbs/large/link/integration.jpg",
             IsActive = isActive,
             CreatedAt = now,
             UpdatedAt = now

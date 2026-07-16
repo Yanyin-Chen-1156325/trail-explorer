@@ -34,6 +34,7 @@ public class DocTrailIntegrationServiceTests
                     AssetId = "canterbury-1",
                     Name = "Christchurch to Little River Rail Trail",
                     Introduction = "Trail introduction",
+                    IntroductionThumbnail = "https://www.doc.govt.nz/thumbs/large/link/trail.jpg",
                     Distance = "20 km",
                     WalkTrackCategory = ["Easy"],
                     LocationArray = ["Christchurch area"],
@@ -53,6 +54,7 @@ public class DocTrailIntegrationServiceTests
         Assert.Equal("Canterbury", candidate.Region);
         Assert.Equal("Christchurch area", candidate.CityOrLocation);
         Assert.Equal("Trail introduction", candidate.Description);
+        Assert.Equal("https://www.doc.govt.nz/thumbs/large/link/trail.jpg", candidate.ImageUrl);
         Assert.Equal("20 km", candidate.DistanceText);
         Assert.Equal("Easy", candidate.DifficultyText);
         Assert.Equal("https://www.doc.govt.nz/link/canterbury-1.aspx", candidate.StaticLink);

@@ -20,6 +20,8 @@ public class Trail
 
     public string Description { get; set; } = string.Empty;
 
+    public string? ImageUrl { get; set; }
+
     public double? CoordinateX { get; set; }
 
     public double? CoordinateY { get; set; }

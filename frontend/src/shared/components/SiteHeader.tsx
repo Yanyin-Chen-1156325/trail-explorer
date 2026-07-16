@@ -19,7 +19,7 @@ import type { AuthSession } from "@/features/auth/store/authStore";
 function Logo() {
   return (
     <Link
-      className="flex items-center gap-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#22C55E]/60"
+      className="flex items-center gap-3 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-[#22C55E]/60"
       to="/"
     >
       <span className="flex size-10 items-center justify-center rounded-xl border border-[#86EFAC]/40 bg-[#14532D]/70 text-[#BBF7D0] shadow-lg shadow-black/20">

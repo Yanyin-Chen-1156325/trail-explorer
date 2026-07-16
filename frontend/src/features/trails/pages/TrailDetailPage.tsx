@@ -1,6 +1,7 @@
 import "leaflet/dist/leaflet.css";
 
 import type { ComponentType, PropsWithChildren } from "react";
+import type { CSSProperties } from "react";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
@@ -91,6 +92,16 @@ function createGoogleMapsUrl(latitude: number, longitude: number) {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
     query,
   )}`;
+}
+
+function createHeroBackgroundStyle(trail: TrailResponse): CSSProperties | undefined {
+  if (!trail.imageUrl) {
+    return undefined;
+  }
+
+  return {
+    backgroundImage: `linear-gradient(90deg, rgba(2, 6, 23, 0.48), rgba(2, 6, 23, 0.12)), url("${trail.imageUrl}")`,
+  };
 }
 
 function TrailLocationMap({ trail }: { trail: TrailResponse }) {
@@ -283,8 +294,13 @@ function TrailDetailPage() {
         {loadState.status === "success" ? (
           <article className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
             <section className="overflow-hidden rounded-lg border border-white/10 bg-[#071511] shadow-2xl shadow-black/25">
-              <div className="relative min-h-72 bg-[linear-gradient(135deg,rgba(16,185,129,0.2)_0_1px,transparent_1px_58px),linear-gradient(45deg,rgba(14,165,233,0.14)_0_1px,transparent_1px_46px)]">
-                <div className="absolute inset-0 bg-gradient-to-br from-[#10B981]/22 via-transparent to-[#0EA5E9]/20" />
+              <div
+                aria-label={`${loadState.trail.name} hero image`}
+                className="relative min-h-72 bg-[linear-gradient(135deg,rgba(16,185,129,0.2)_0_1px,transparent_1px_58px),linear-gradient(45deg,rgba(14,165,233,0.14)_0_1px,transparent_1px_46px)] bg-cover bg-center"
+                role="img"
+                style={createHeroBackgroundStyle(loadState.trail)}
+              >
+                <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/55 via-transparent to-transparent" />
                 <div className="absolute bottom-6 left-6 right-6">
                   <span
                     className={`inline-flex rounded-lg border px-3 py-1 text-xs font-bold ${difficultyClassName(
