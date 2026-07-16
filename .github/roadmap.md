@@ -267,25 +267,25 @@
 
 ### Backend
 
-- [ ] Create Dashboard API
-- [ ] Calculate User Summary
-- [ ] Calculate Trail Statistics
-- [ ] Calculate Distance Statistics
-- [ ] Calculate Weekly Streak
-- [ ] Calculate Leaderboard Rank
+- [x] Create Dashboard API
+- [x] Calculate User Summary
+- [x] Calculate Trail Statistics
+- [x] Calculate Distance Statistics
+- [x] Calculate Weekly Streak
+- [x] Calculate Leaderboard Rank
 
 ### Frontend
 
-- [ ] Create Dashboard page
-- [ ] Display User Progress On Dashboard
-- [ ] Create Statistics Cards
-- [ ] Create Achievement Summary
-- [ ] Create Progress Widgets
+- [x] Create Dashboard page
+- [x] Display User Progress On Dashboard
+- [x] Create Statistics Cards
+- [x] Create Achievement Summary
+- [x] Create Progress Widgets
 
 ### Testing
 
-- [ ] Dashboard API tests
-- [ ] Dashboard UI tests
+- [x] Dashboard API tests
+- [x] Dashboard UI tests
 
 ---
 

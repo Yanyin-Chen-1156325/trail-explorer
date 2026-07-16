@@ -7,4 +7,4 @@ export {
   createBadgeApi,
   type BadgeApi,
 } from "./services/badgeApi";
-export type { BadgeResponse, BadgeType } from "./types/badge";
+export type { BadgeResponse, BadgeType, RawBadgeType } from "./types/badge";

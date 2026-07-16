@@ -8,3 +8,4 @@ export const trailsApiBaseUrl = `${apiBaseUrl}/trails`;
 export const usersApiBaseUrl = `${apiBaseUrl}/users`;
 export const checkInsApiBaseUrl = `${apiBaseUrl}/checkins`;
 export const badgesApiBaseUrl = `${apiBaseUrl}/badges`;
+export const dashboardApiBaseUrl = `${apiBaseUrl}/dashboard`;
