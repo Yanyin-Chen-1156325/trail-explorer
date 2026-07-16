@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { leaderboardApiBaseUrl, leaderboardHubUrl } from "@/config/api";
 import { runAuthenticatedRequest, useAuthStore } from "@/features/auth";
+import { useToastStore } from "@/shared/store/toastStore";
 
 import {
   LeaderboardApiError,
@@ -68,6 +69,7 @@ function LeaderboardPage() {
   const [badgeNotifications, setBadgeNotifications] = useState<
     LeaderboardBadgeUnlock[]
   >([]);
+  const showToast = useToastStore((state) => state.showToast);
   const leaderboardApi = useMemo(
     () => createLeaderboardApi(leaderboardApiBaseUrl),
     [],
@@ -91,12 +93,19 @@ function LeaderboardPage() {
       );
       setLoadState({ status: "success", leaderboard });
     } catch (error) {
+      const message =
+        error instanceof LeaderboardApiError
+          ? error.message
+          : "Unable to load the leaderboard.";
+
       setLoadState({
         status: "error",
-        message:
-          error instanceof LeaderboardApiError
-            ? error.message
-            : "Unable to load the leaderboard.",
+        message,
+      });
+      showToast({
+        title: "Leaderboard unavailable",
+        description: message,
+        variant: "error",
       });
     }
   };
@@ -138,6 +147,11 @@ function LeaderboardPage() {
 
         setBadgeNotifications((current) => [badge, ...current].slice(0, 4));
         setRealtimeMessage(`${badge.name} badge unlocked`);
+        showToast({
+          title: `Badge unlocked: ${badge.name}`,
+          description: badge.description,
+          variant: "success",
+        });
       },
       onLeaderboardUpdated: (leaderboard) => {
         if (!isCurrent) {
@@ -146,6 +160,11 @@ function LeaderboardPage() {
 
         setLoadState({ status: "success", leaderboard });
         setRealtimeMessage("Leaderboard updated");
+        showToast({
+          title: "Leaderboard updated",
+          description: "Rankings refreshed from live trail activity.",
+          variant: "info",
+        });
       },
       onRankingUpdated: (ranking: LeaderboardRankingUpdate) => {
         if (!isCurrent || ranking.userId !== currentUserId) {
@@ -185,7 +204,7 @@ function LeaderboardPage() {
       setIsRealtimeConnected(false);
       void client.stop();
     };
-  }, [currentUserId, session?.accessToken]);
+  }, [currentUserId, session?.accessToken, showToast]);
 
   const currentUserEntry =
     loadState.status === "success" && currentUserId

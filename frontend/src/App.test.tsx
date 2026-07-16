@@ -112,6 +112,22 @@ describe("SiteHeader", () => {
     ).toBeGreaterThan(0);
   });
 
+  it("keeps desktop and mobile navigation at their responsive breakpoints", () => {
+    resetAuthStore({ session: createTestSession({ role: "User" }) });
+
+    renderWithRouter(<SiteHeader />);
+
+    expect(screen.getByRole("navigation", { name: "Primary" })).toHaveClass(
+      "hidden",
+      "lg:flex",
+    );
+    expect(
+      screen
+        .getByRole("button", { name: "Open navigation menu" })
+        .parentElement,
+    ).toHaveClass("lg:hidden");
+  });
+
   it("shows the signed-in user's name and keeps logout in the account menu", async () => {
     const user = userEvent.setup();
     resetAuthStore({

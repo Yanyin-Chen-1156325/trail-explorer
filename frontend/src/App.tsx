@@ -23,6 +23,7 @@ import { CheckInHistoryPage, CheckInModerationPage } from "./features/checkins";
 import { BadgeWallPage } from "./features/badges";
 import { DashboardPage } from "./features/dashboard";
 import { LeaderboardPage } from "./features/leaderboard";
+import { ToastProvider } from "./shared/components/ToastProvider";
 
 export function ScrollToTop() {
   const { pathname } = useLocation();
@@ -202,6 +203,7 @@ function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
+      <ToastProvider />
       <Routes>
         <Route element={<PublicLayout />}>
           <Route element={<HomePage />} path="/" />
