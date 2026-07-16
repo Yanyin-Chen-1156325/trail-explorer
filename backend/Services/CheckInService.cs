@@ -9,15 +9,18 @@ public class CheckInService : ICheckInService
 {
     private readonly ApplicationDbContext _context;
     private readonly IBadgeUnlockService _badgeUnlockService;
+    private readonly ILeaderboardNotificationService _leaderboardNotificationService;
     private readonly ILogger<CheckInService> _logger;
 
     public CheckInService(
         ApplicationDbContext context,
         IBadgeUnlockService badgeUnlockService,
+        ILeaderboardNotificationService leaderboardNotificationService,
         ILogger<CheckInService> logger)
     {
         _context = context;
         _badgeUnlockService = badgeUnlockService;
+        _leaderboardNotificationService = leaderboardNotificationService;
         _logger = logger;
     }
 
@@ -44,7 +47,19 @@ public class CheckInService : ICheckInService
 
         _context.CheckIns.Add(checkIn);
         await _context.SaveChangesAsync();
-        await _badgeUnlockService.UnlockEligibleBadgesAsync(userId);
+        var unlockedBadges = await _badgeUnlockService.UnlockEligibleBadgesAsync(userId);
+
+        if (unlockedBadges.Count > 0)
+        {
+            await _leaderboardNotificationService.BroadcastBadgeUnlocksAsync(
+                userId,
+                unlockedBadges,
+                DateTime.UtcNow);
+        }
+        else
+        {
+            await _leaderboardNotificationService.BroadcastLeaderboardChangedAsync(userId);
+        }
 
         _logger.LogInformation(
             "Trail completed: {CheckInId} by user {UserId} on trail {TrailId} at {CompletedDate}",
@@ -79,6 +94,7 @@ public class CheckInService : ICheckInService
         checkIn.PhotoUrl = request.PhotoUrl?.Trim();
 
         await _context.SaveChangesAsync();
+        await _leaderboardNotificationService.BroadcastLeaderboardChangedAsync(userId);
 
         return ToCheckInResponse(checkIn);
     }
@@ -98,8 +114,10 @@ public class CheckInService : ICheckInService
             throw new UnauthorizedAccessException("You can only delete your own check-ins");
         }
 
+        var removedUserId = checkIn.UserId;
         _context.CheckIns.Remove(checkIn);
         await _context.SaveChangesAsync();
+        await _leaderboardNotificationService.BroadcastLeaderboardChangedAsync(removedUserId);
     }
 
     public async Task<IReadOnlyList<CheckInResponse>> GetUserCheckInHistoryAsync(Guid userId)
@@ -136,6 +154,7 @@ public class CheckInService : ICheckInService
         checkIn.IsHidden = true;
 
         await _context.SaveChangesAsync();
+        await _leaderboardNotificationService.BroadcastLeaderboardChangedAsync(checkIn.UserId);
 
         return ToCheckInResponse(checkIn);
     }
@@ -153,6 +172,7 @@ public class CheckInService : ICheckInService
         checkIn.IsHidden = false;
 
         await _context.SaveChangesAsync();
+        await _leaderboardNotificationService.BroadcastLeaderboardChangedAsync(checkIn.UserId);
 
         return ToCheckInResponse(checkIn);
     }

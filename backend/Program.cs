@@ -2,6 +2,7 @@ using backend.BackgroundServices;
 using backend.Authentication;
 using backend.Data;
 using backend.Enums;
+using backend.Hubs;
 using backend.Integrations.Doc;
 using backend.Services;
 using backend.Validators;
@@ -17,6 +18,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
 builder.Services.AddOpenApi();
+builder.Services.AddSignalR();
 
 // Add DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -45,6 +47,8 @@ builder.Services.AddScoped<ILevelCalculatorService, LevelCalculatorService>();
 builder.Services.AddScoped<IUserProgressService, UserProgressService>();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddScoped<IStreakCalculatorService, StreakCalculatorService>();
+builder.Services.AddScoped<ILeaderboardService, LeaderboardService>();
+builder.Services.AddScoped<ILeaderboardNotificationService, LeaderboardNotificationService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IBadgeEvaluationService, BadgeEvaluationService>();
 builder.Services.AddScoped<IBadgeUnlockService, BadgeUnlockService>();
@@ -80,6 +84,22 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = jwtOptions.Audience,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Secret))
     };
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var accessToken = context.Request.Query["access_token"];
+            var path = context.HttpContext.Request.Path;
+
+            if (!string.IsNullOrEmpty(accessToken) &&
+                path.StartsWithSegments("/hubs/leaderboard"))
+            {
+                context.Token = accessToken;
+            }
+
+            return Task.CompletedTask;
+        }
+    };
 });
 
 builder.Services.AddAuthorization(options =>
@@ -98,7 +118,8 @@ builder.Services.AddCors(options =>
         policy
             .WithOrigins("http://localhost:5173")
             .AllowAnyHeader()
-            .AllowAnyMethod();
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
 
@@ -136,6 +157,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<LeaderboardHub>("/hubs/leaderboard");
 
 app.Run();
 

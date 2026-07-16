@@ -118,6 +118,7 @@ function SiteHeader() {
         { label: "Trails", to: "/trails" },
         { label: "Check-ins", to: "/checkins" },
         { label: "Badges", to: "/badges" },
+        { label: "Leaderboard", to: "/leaderboard" },
         ...(canManageUsers
           ? [
               { label: "Moderation", to: "/moderation/checkins" },

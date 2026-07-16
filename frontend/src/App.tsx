@@ -22,6 +22,7 @@ import { PublicLayout } from "./shared/layouts/PublicLayout";
 import { CheckInHistoryPage, CheckInModerationPage } from "./features/checkins";
 import { BadgeWallPage } from "./features/badges";
 import { DashboardPage } from "./features/dashboard";
+import { LeaderboardPage } from "./features/leaderboard";
 
 export function ScrollToTop() {
   const { pathname } = useLocation();
@@ -215,6 +216,7 @@ function App() {
             <Route element={<TrailDetailPage />} path="/trails/:trailId" />
             <Route element={<CheckInHistoryPage />} path="/checkins" />
             <Route element={<BadgeWallPage />} path="/badges" />
+            <Route element={<LeaderboardPage />} path="/leaderboard" />
             <Route
               element={<CheckInModerationRoute />}
               path="/moderation/checkins"

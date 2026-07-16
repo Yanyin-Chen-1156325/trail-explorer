@@ -12,6 +12,7 @@ public class DashboardService : IDashboardService
     private readonly IXpCalculatorService _xpCalculatorService;
     private readonly ILevelCalculatorService _levelCalculatorService;
     private readonly IStreakCalculatorService _streakCalculatorService;
+    private readonly ILeaderboardService _leaderboardService;
     private readonly TimeProvider _timeProvider;
 
     public DashboardService(
@@ -19,12 +20,14 @@ public class DashboardService : IDashboardService
         IXpCalculatorService xpCalculatorService,
         ILevelCalculatorService levelCalculatorService,
         IStreakCalculatorService streakCalculatorService,
+        ILeaderboardService leaderboardService,
         TimeProvider timeProvider)
     {
         _context = context;
         _xpCalculatorService = xpCalculatorService;
         _levelCalculatorService = levelCalculatorService;
         _streakCalculatorService = streakCalculatorService;
+        _leaderboardService = leaderboardService;
         _timeProvider = timeProvider;
     }
 
@@ -52,7 +55,7 @@ public class DashboardService : IDashboardService
         var weeklyStreak = _streakCalculatorService.CalculateWeeklyStreak(
             completedTrails.Select(trail => trail.CompletedDate),
             currentDateUtc);
-        var leaderboardRank = await CalculateLeaderboardRankAsync(userId);
+        var leaderboardRank = await _leaderboardService.GetUserRankAsync(userId);
         var recentBadges = await GetRecentBadgesAsync(userId);
         var recentCheckIns = completedTrails
             .OrderByDescending(trail => trail.CompletedDate)
@@ -115,47 +118,6 @@ public class DashboardService : IDashboardService
             levelProgress.ProgressPercent);
     }
 
-    private async Task<int> CalculateLeaderboardRankAsync(Guid userId)
-    {
-        var checkIns = await _context.CheckIns
-            .AsNoTracking()
-            .Where(checkIn => !checkIn.IsHidden)
-            .Select(checkIn => new LeaderboardTrailData(
-                checkIn.UserId,
-                checkIn.Trail.DistanceKm,
-                checkIn.Trail.Difficulty))
-            .ToListAsync();
-
-        var userIds = await _context.Users
-            .AsNoTracking()
-            .Select(user => user.Id)
-            .ToListAsync();
-        var ranking = userIds
-            .GroupJoin(
-                checkIns,
-                id => id,
-                checkIn => checkIn.UserId,
-                (id, userCheckIns) =>
-                {
-                    var userTrails = userCheckIns.ToList();
-
-                    return new LeaderboardUserSummary(
-                        id,
-                        userTrails.Sum(trail =>
-                            _xpCalculatorService.CalculateXp(trail.DistanceKm, trail.Difficulty)),
-                        userTrails.Count,
-                        userTrails.Sum(trail => trail.DistanceKm));
-                })
-            .OrderByDescending(summary => summary.TotalXp)
-            .ThenByDescending(summary => summary.CompletedTrails)
-            .ThenByDescending(summary => summary.TotalDistanceKm)
-            .ThenBy(summary => summary.UserId)
-            .ToList();
-        var rank = ranking.FindIndex(summary => summary.UserId == userId);
-
-        return rank >= 0 ? rank + 1 : 0;
-    }
-
     private async Task<IReadOnlyList<DashboardBadgeResponse>> GetRecentBadgesAsync(Guid userId)
     {
         return await _context.UserBadges
@@ -183,14 +145,4 @@ public class DashboardService : IDashboardService
         Enums.TrailDifficulty Difficulty,
         DateTime CompletedDate);
 
-    private sealed record LeaderboardTrailData(
-        Guid UserId,
-        decimal DistanceKm,
-        Enums.TrailDifficulty Difficulty);
-
-    private sealed record LeaderboardUserSummary(
-        Guid UserId,
-        int TotalXp,
-        int CompletedTrails,
-        decimal TotalDistanceKm);
 }

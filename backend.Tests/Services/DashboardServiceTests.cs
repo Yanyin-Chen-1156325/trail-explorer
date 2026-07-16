@@ -4,6 +4,7 @@ using backend.Enums;
 using backend.Services;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace backend.Tests.Services;
 
@@ -85,11 +86,19 @@ public class DashboardServiceTests
         ApplicationDbContext context,
         DateTimeOffset utcNow)
     {
+        var xpCalculatorService = new XpCalculatorService();
+        var levelCalculatorService = new LevelCalculatorService();
+
         return new DashboardService(
             context,
-            new XpCalculatorService(),
-            new LevelCalculatorService(),
+            xpCalculatorService,
+            levelCalculatorService,
             new StreakCalculatorService(),
+            new LeaderboardService(
+                context,
+                xpCalculatorService,
+                levelCalculatorService,
+                new MemoryCache(new MemoryCacheOptions())),
             new FixedTimeProvider(utcNow));
     }
 

@@ -282,7 +282,12 @@
 - [x] Create Achievement Summary
 - [x] Create Progress Widgets
 
-### Testing
+### Unit Testing
+
+- [x] Backend
+- [x] Frontend
+
+### Integration Testing
 
 - [x] Dashboard API tests
 - [x] Dashboard UI tests
@@ -293,29 +298,34 @@
 
 ### Backend
 
-- [ ] Create Leaderboard API
-- [ ] Create Leaderboard Hub
-- [ ] Broadcast XP Updates
-- [ ] Broadcast Ranking Updates
-- [ ] Broadcast Badge Unlock Events
+- [x] Create Leaderboard API
+- [x] Create Leaderboard Hub
+- [x] Broadcast XP Updates
+- [x] Broadcast Ranking Updates
+- [x] Broadcast Badge Unlock Events
 
 ### Caching
 
-- [ ] Cache Leaderboard
-- [ ] Invalidate Leaderboard Cache on XP Updates
+- [x] Cache Leaderboard
+- [x] Invalidate Leaderboard Cache on XP Updates
 
 ### Frontend
 
-- [ ] Create Leaderboard page
-- [ ] Create SignalR Client Service
-- [ ] Connect SignalR client
-- [ ] Handle real-time updates
-- [ ] Display badge notifications
+- [x] Create Leaderboard page
+- [x] Create SignalR Client Service
+- [x] Connect SignalR client
+- [x] Handle real-time updates
+- [x] Display badge notifications
 
-### Testing
+### Unit Testing
 
-- [ ] Leaderboard tests
-- [ ] SignalR integration tests
+- [x] Backend
+- [x] Frontend
+
+### Integration Testing
+
+- [x] Leaderboard tests
+- [x] SignalR integration tests
 
 ---
 
@@ -341,7 +351,12 @@
 - [ ] Empty States
 - [ ] Error States
 
-### Testing
+### Unit Testing
+
+- [ ] Backend
+- [ ] Frontend
+
+### Integration Testing
 
 - [ ] Theme tests
 - [ ] Responsive tests
@@ -374,8 +389,4 @@
 
 ### Video
 
-- [ ] Record AI Usage Demo
-- [ ] Record Design Decisions Demo
-- [ ] Record Architecture Demo
-- [ ] Record Feature Demonstration
 - [ ] Record Final Submission Video

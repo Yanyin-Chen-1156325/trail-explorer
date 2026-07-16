@@ -9,3 +9,8 @@ export const usersApiBaseUrl = `${apiBaseUrl}/users`;
 export const checkInsApiBaseUrl = `${apiBaseUrl}/checkins`;
 export const badgesApiBaseUrl = `${apiBaseUrl}/badges`;
 export const dashboardApiBaseUrl = `${apiBaseUrl}/dashboard`;
+export const leaderboardApiBaseUrl = `${apiBaseUrl}/leaderboard`;
+
+export const leaderboardHubUrl = import.meta.env.VITE_API_BASE_URL
+  ? `${new URL(import.meta.env.VITE_API_BASE_URL).origin}/hubs/leaderboard`
+  : "/hubs/leaderboard";

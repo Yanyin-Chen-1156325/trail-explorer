@@ -243,9 +243,15 @@ public class CheckInServiceTests
 
     private static CheckInService CreateService(ApplicationDbContext context)
     {
+        var badgeUnlockService = new Mock<IBadgeUnlockService>();
+        badgeUnlockService
+            .Setup(service => service.UnlockEligibleBadgesAsync(It.IsAny<Guid>()))
+            .ReturnsAsync([]);
+
         return new CheckInService(
             context,
-            Mock.Of<IBadgeUnlockService>(),
+            badgeUnlockService.Object,
+            Mock.Of<ILeaderboardNotificationService>(),
             Mock.Of<ILogger<CheckInService>>());
     }
 
