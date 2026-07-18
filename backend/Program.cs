@@ -20,9 +20,20 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 builder.Services.AddSignalR();
 
-// Add DbContext
+// // Add DbContext - SQLite
+// builder.Services.AddDbContext<ApplicationDbContext>(options =>
+//     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Add DbContext - PostgreSQL
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(
+        builder.Configuration.GetConnectionString("Postgres"),
+        npgsqlOptions =>
+        {
+            npgsqlOptions.MigrationsHistoryTable(
+                "__EFMigrationsHistory",
+                "trail_explorer");
+        }));
 
 // Add Authentication Services
 var jwtOptions = builder.Configuration.GetSection("Jwt").Get<JwtOptions>()

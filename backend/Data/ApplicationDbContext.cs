@@ -25,6 +25,8 @@ public class ApplicationDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.HasDefaultSchema("trail_explorer");
+
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.ApplyConfiguration(new UserConfiguration());
