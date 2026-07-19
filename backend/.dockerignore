@@ -1,0 +1,5 @@
+bin
+obj
+trail-explorer.db
+appsettings.Development.json
+*.log
