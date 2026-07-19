@@ -72,8 +72,8 @@ function HeroSection() {
           className="h-full w-full object-cover opacity-35 dark:opacity-100"
           src={trailHeroImage}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#F7F8F3] via-[#F7F8F3]/90 to-[#F7F8F3]/45 dark:from-[#03130F] dark:via-[#03130F]/80 dark:to-[#03130F]/35" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#EEF4E8] via-transparent to-[#F7F8F3]/20 dark:from-[#061813] dark:to-[#061813]/20" />
+        <div className="absolute inset-0 bg-linear-to-r from-[#F7F8F3] via-[#F7F8F3]/90 to-[#F7F8F3]/45 dark:from-[#03130F] dark:via-[#03130F]/80 dark:to-[#03130F]/35" />
+        <div className="absolute inset-0 bg-linear-to-t from-[#EEF4E8] via-transparent to-[#F7F8F3]/20 dark:from-[#061813] dark:to-[#061813]/20" />
       </div>
 
       <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:py-24">

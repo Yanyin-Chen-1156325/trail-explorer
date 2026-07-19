@@ -144,7 +144,7 @@ function TrailLocationMap({ trail }: { trail: TrailResponse }) {
         {hasMappedLocation ? (
           <TrailMapContainer
             center={center}
-            className="h-[320px] w-full"
+            className="h-80 w-full"
             scrollWheelZoom={false}
             zoom={11}
           >
@@ -177,7 +177,7 @@ function TrailLocationMap({ trail }: { trail: TrailResponse }) {
             </TrailCircleMarker>
           </TrailMapContainer>
         ) : (
-          <div className="flex min-h-[260px] flex-col items-center justify-center p-8 text-center">
+          <div className="flex min-h-65 flex-col items-center justify-center p-8 text-center">
             <MapPin aria-hidden="true" className="size-10 text-[#86EFAC]" />
             <h3 className="mt-4 text-base font-bold">No mapped coordinates</h3>
             <p className="mt-2 max-w-md text-sm leading-6 text-[#56655D] dark:text-[#94A3B8]">
@@ -207,14 +207,14 @@ function TrailDetailPage() {
   const [loadState, setLoadState] = useState<LoadState>({ status: "loading" });
 
   useEffect(() => {
-    if (!trailId) {
-      setLoadState({ status: "not-found" });
-      return;
-    }
-
     let isCurrent = true;
 
     const loadTrail = async () => {
+      if (!trailId) {
+        setLoadState({ status: "not-found" });
+        return;
+      }
+
       setLoadState({ status: "loading" });
 
       try {
@@ -265,14 +265,14 @@ function TrailDetailPage() {
         </Button>
 
         {loadState.status === "loading" ? (
-          <div className="flex min-h-[420px] items-center justify-center rounded-lg border border-black/10 bg-white text-[#56655D] dark:border-white/10 dark:bg-[#071511] dark:text-[#94A3B8]">
+          <div className="flex min-h-105 items-center justify-center rounded-lg border border-black/10 bg-white text-[#56655D] dark:border-white/10 dark:bg-[#071511] dark:text-[#94A3B8]">
             <Loader2 aria-hidden="true" className="mr-2 size-5 animate-spin" />
             Loading trail details
           </div>
         ) : null}
 
         {loadState.status === "not-found" ? (
-          <div className="flex min-h-[420px] flex-col items-center justify-center rounded-lg border border-black/10 bg-white p-8 text-center dark:border-white/10 dark:bg-[#071511]">
+          <div className="flex min-h-105 flex-col items-center justify-center rounded-lg border border-black/10 bg-white p-8 text-center dark:border-white/10 dark:bg-[#071511]">
             <MapPin aria-hidden="true" className="size-10 text-[#86EFAC]" />
             <h1 className="mt-4 text-2xl font-black">Trail not found</h1>
             <p className="mt-2 max-w-md text-sm text-[#56655D] dark:text-[#94A3B8]">
@@ -282,7 +282,7 @@ function TrailDetailPage() {
         ) : null}
 
         {loadState.status === "error" ? (
-          <div className="flex min-h-[420px] flex-col items-center justify-center rounded-lg border border-red-400/25 bg-red-500/10 p-8 text-center">
+          <div className="flex min-h-105 flex-col items-center justify-center rounded-lg border border-red-400/25 bg-red-500/10 p-8 text-center">
             <AlertCircle aria-hidden="true" className="size-10 text-red-300" />
             <h1 className="mt-4 text-2xl font-black">Trail unavailable</h1>
             <p className="mt-2 max-w-md text-sm text-[#991B1B] dark:text-red-100/75">
@@ -300,7 +300,7 @@ function TrailDetailPage() {
                 role="img"
                 style={createHeroBackgroundStyle(loadState.trail)}
               >
-                <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/75 via-[#020617]/25 to-[#020617]/10" />
+                <div className="absolute inset-0 bg-linear-to-t from-[#020617]/75 via-[#020617]/25 to-[#020617]/10" />
                 <div className="absolute bottom-6 left-6 right-6">
                   <span
                     className={`inline-flex rounded-lg border px-3 py-1 text-xs font-bold ${difficultyClassName(

@@ -130,10 +130,30 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("DevelopmentFrontend", policy =>
+    options.AddPolicy("Frontend", policy =>
     {
+        var configuredOrigins = builder.Configuration
+            .GetSection("Cors:AllowedOrigins")
+            .Get<string[]>() ?? [];
+        var allowedOrigins = configuredOrigins
+            .Where(origin => !string.IsNullOrWhiteSpace(origin))
+            .ToArray();
+
+        if (builder.Environment.IsDevelopment())
+        {
+            allowedOrigins = allowedOrigins
+                .Append("http://localhost:5173")
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+        }
+
+        if (allowedOrigins.Length == 0)
+        {
+            return;
+        }
+
         policy
-            .WithOrigins("http://localhost:5173")
+            .WithOrigins(allowedOrigins)
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
@@ -171,11 +191,11 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 
     app.MapScalarApiReference();
-
-    app.UseCors("DevelopmentFrontend");
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("Frontend");
 
 app.UseAuthentication();
 app.UseAuthorization();

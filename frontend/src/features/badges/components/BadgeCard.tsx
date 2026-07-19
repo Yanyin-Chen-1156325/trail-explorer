@@ -69,7 +69,7 @@ function BadgeCard({ badge }: BadgeCardProps) {
             className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-bold ${
               badge.isUnlocked
                 ? "border-emerald-300/25 bg-emerald-400/10 text-emerald-100"
-                : "border-white/10 bg-white/[0.04] text-white/58"
+                : "border-white/10 bg-white/4 text-white/58"
             }`}
           >
             {badge.isUnlocked ? (
@@ -93,7 +93,7 @@ function BadgeCard({ badge }: BadgeCardProps) {
           </p>
         </div>
 
-        <div className="mt-5 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-xs font-semibold text-[#94A3B8]">
+        <div className="mt-5 rounded-lg border border-white/10 bg-white/4 px-3 py-2 text-xs font-semibold text-[#94A3B8]">
           {badge.isUnlocked
             ? `Unlocked ${formatUnlockedDate(badge.unlockedAt)}`
             : "Keep completing trails to unlock"}

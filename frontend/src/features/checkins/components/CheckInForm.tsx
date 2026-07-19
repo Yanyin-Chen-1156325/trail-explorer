@@ -103,7 +103,7 @@ function CheckInForm({ trailId }: CheckInFormProps) {
             </span>
             <Input
               required
-              className="border-black/10 bg-[#F7F8F3] text-[#0B1511] [color-scheme:light] dark:border-white/10 dark:bg-black/20 dark:text-white dark:[color-scheme:dark]"
+              className="border-black/10 bg-[#F7F8F3] text-[#0B1511] scheme-light dark:border-white/10 dark:bg-black/20 dark:text-white dark:scheme-dark"
               max={getTodayInputValue()}
               type="date"
               value={completedDate}

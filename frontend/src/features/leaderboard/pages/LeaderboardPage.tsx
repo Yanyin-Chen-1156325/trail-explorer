@@ -75,6 +75,9 @@ function LeaderboardPage() {
     [],
   );
   const currentUserId = session?.user.userId;
+  const hasRealtimeConnection = Boolean(
+    session?.accessToken && isRealtimeConnected,
+  );
 
   const loadLeaderboard = async () => {
     if (!session?.accessToken) {
@@ -131,12 +134,14 @@ function LeaderboardPage() {
   }, [leaderboardApi, session?.accessToken]);
 
   useEffect(() => {
+    let isCurrent = true;
+
     if (!session?.accessToken) {
-      setIsRealtimeConnected(false);
-      return;
+      return () => {
+        isCurrent = false;
+      };
     }
 
-    let isCurrent = true;
     const client = createLeaderboardSignalRClient({
       accessToken: session.accessToken,
       hubUrl: leaderboardHubUrl,
@@ -185,6 +190,8 @@ function LeaderboardPage() {
     });
 
     const connect = async () => {
+      setIsRealtimeConnected(false);
+
       try {
         await client.start();
         if (isCurrent) {
@@ -229,13 +236,13 @@ function LeaderboardPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-[#CBD5E1]">
-            {isRealtimeConnected ? (
+          <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/4 px-3 py-2 text-sm text-[#CBD5E1]">
+            {hasRealtimeConnection ? (
               <Wifi aria-hidden="true" className="size-4 text-emerald-300" />
             ) : (
               <WifiOff aria-hidden="true" className="size-4 text-amber-300" />
             )}
-            {isRealtimeConnected ? "Live updates connected" : "Live updates offline"}
+            {hasRealtimeConnection ? "Live updates connected" : "Live updates offline"}
           </div>
         </section>
 
@@ -301,14 +308,14 @@ function LeaderboardPage() {
         ) : null}
 
         {loadState.status === "loading" ? (
-          <div className="flex min-h-[420px] items-center justify-center rounded-lg border border-white/10 bg-[#071511] text-[#94A3B8]">
+          <div className="flex min-h-105 items-center justify-center rounded-lg border border-white/10 bg-[#071511] text-[#94A3B8]">
             <Loader2 aria-hidden="true" className="mr-2 size-5 animate-spin" />
             Loading leaderboard
           </div>
         ) : null}
 
         {loadState.status === "error" ? (
-          <div className="flex min-h-[420px] flex-col items-center justify-center rounded-lg border border-red-400/25 bg-red-500/10 p-8 text-center">
+          <div className="flex min-h-105 flex-col items-center justify-center rounded-lg border border-red-400/25 bg-red-500/10 p-8 text-center">
             <AlertCircle aria-hidden="true" className="size-10 text-red-300" />
             <h2 className="mt-4 text-lg font-bold">Leaderboard unavailable</h2>
             <p className="mt-2 max-w-md text-sm text-red-100/75">
@@ -360,23 +367,23 @@ function LeaderboardPage() {
                         {entry.userId === currentUserId ? " - You" : ""}
                       </p>
                     </div>
-                    <div className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2">
+                    <div className="rounded-lg border border-white/10 bg-white/4 px-3 py-2">
                       <p className="text-xs uppercase text-white/45">XP</p>
                       <p className="font-bold text-[#FCD34D]">
                         {formatNumber(entry.totalXp)}
                       </p>
                     </div>
-                    <div className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2">
+                    <div className="rounded-lg border border-white/10 bg-white/4 px-3 py-2">
                       <p className="text-xs uppercase text-white/45">Trails</p>
                       <p className="font-bold">{formatNumber(entry.completedTrails)}</p>
                     </div>
-                    <div className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2">
+                    <div className="rounded-lg border border-white/10 bg-white/4 px-3 py-2">
                       <p className="text-xs uppercase text-white/45">Distance</p>
                       <p className="font-bold">
                         {formatDistance(entry.totalDistanceKm)} km
                       </p>
                     </div>
-                    <div className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2">
+                    <div className="rounded-lg border border-white/10 bg-white/4 px-3 py-2">
                       <p className="text-xs uppercase text-white/45">Badges</p>
                       <p className="font-bold text-[#C4B5FD]">
                         {formatNumber(entry.unlockedBadges)}

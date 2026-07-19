@@ -423,7 +423,7 @@ function UserManagementPage() {
               {!isLoading && !error && users.length > 0 ? (
                 <>
                   <div className="hidden overflow-x-auto md:block">
-                    <table className="w-full min-w-[760px] text-left text-sm">
+                    <table className="w-full min-w-190 text-left text-sm">
                       <thead className="border-b border-black/10 bg-[#F7F8F3] text-xs uppercase tracking-wide text-[#56655D] dark:border-white/10 dark:bg-[#0F172A]/70 dark:text-[#94A3B8]">
                         <tr>
                           <th className="px-5 py-4 font-semibold">User</th>

@@ -118,13 +118,13 @@ function XPProgressBar({ progress }: XPProgressBarProps) {
         </div>
 
         <div className="mt-4 grid gap-3 text-sm text-[#94A3B8] sm:grid-cols-2">
-          <div className="rounded-lg border border-white/10 bg-white/[0.04] p-3">
+          <div className="rounded-lg border border-white/10 bg-white/4 p-3">
             <p className="text-xs uppercase text-white/50">Level floor</p>
             <p className="mt-1 font-bold text-white">
               {formatNumber(progress.currentLevelMinimumXp)} XP
             </p>
           </div>
-          <div className="rounded-lg border border-white/10 bg-white/[0.04] p-3">
+          <div className="rounded-lg border border-white/10 bg-white/4 p-3">
             <p className="text-xs uppercase text-white/50">Next level</p>
             <p className="mt-1 font-bold text-white">
               {hasNextLevel

@@ -79,7 +79,7 @@ function EditCheckInForm({
         </span>
         <Input
           required
-          className="border-white/10 bg-black/20 text-white [color-scheme:dark]"
+          className="border-white/10 bg-black/20 text-white scheme-dark"
           max={getTodayInputValue()}
           type="date"
           value={completedDate}

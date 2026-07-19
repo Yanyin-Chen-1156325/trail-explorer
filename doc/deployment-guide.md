@@ -113,6 +113,7 @@ Jwt__Audience=TrailExplorerAPI
 Jwt__AccessTokenExpirationMinutes=15
 Jwt__RefreshTokenExpirationDays=7
 GoogleOAuth__ClientId=<Google OAuth client id>
+Cors__AllowedOrigins__0=https://<vercel-frontend-domain>
 DocApi__BaseUrl=https://api.doc.govt.nz
 DocApi__ApiKey=<DOC API key>
 TrailSynchronisation__Enabled=false
@@ -195,6 +196,23 @@ services:
 
 Do not bake database credentials into Docker images.
 
+### 3.4 Production Docker Compose
+
+Use `docker-compose.prod.yml` only for production-like container deployment. It sets:
+
+```text
+ASPNETCORE_ENVIRONMENT=Production
+```
+
+and requires production secrets through environment variables instead of local fallback values.
+
+Prepare an environment file from `.env.production.example`, then run:
+
+```powershell
+docker compose --env-file .env.production -f docker-compose.prod.yml build
+docker compose --env-file .env.production -f docker-compose.prod.yml up -d
+```
+
 ---
 
 ## 4. Azure Backend Deployment SOP
@@ -227,15 +245,12 @@ After deployment, configure Azure environment variables listed in section 2.1.
 Check:
 
 ```text
-https://<azure-backend-domain>/openapi/v1.json
-https://<azure-backend-domain>/scalar/v1
-```
-
-Also verify one API endpoint:
-
-```text
 GET https://<azure-backend-domain>/api/trails
 ```
+
+OpenAPI and Scalar are enabled only in Development. Do not use production OpenAPI endpoints as a deployment health check unless the backend is explicitly changed to expose them safely.
+
+Also verify browser requests from the Vercel frontend are allowed by `Cors__AllowedOrigins__0`.
 
 ---
 
@@ -277,6 +292,7 @@ Before final submission:
 * `trail_explorer.__EFMigrationsHistory` exists.
 * Azure backend has `ConnectionStrings__Postgres`.
 * Azure backend has production JWT, Google OAuth, and DOC API settings.
+* Azure backend has `Cors__AllowedOrigins__0` set to the Vercel frontend origin.
 * Backend public URL responds.
 * Vercel has `VITE_API_BASE_URL`.
 * Frontend public URL loads.

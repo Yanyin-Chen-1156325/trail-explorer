@@ -119,7 +119,7 @@ function WorkspaceStatCard({
   detail: string;
 }) {
   return (
-    <div className="rounded-lg border border-white/10 bg-white/[0.04] p-4">
+    <div className="rounded-lg border border-white/10 bg-white/4 p-4">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-xs font-bold uppercase text-[#94A3B8]">{label}</p>
@@ -213,7 +213,7 @@ function WorkspacePanel({
         </div>
 
         {workspaceState.status === "loading" ? (
-          <div className="mt-5 flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-[#94A3B8]">
+          <div className="mt-5 flex items-center gap-2 rounded-lg border border-white/10 bg-white/4 px-4 py-3 text-sm text-[#94A3B8]">
             <Loader2 aria-hidden="true" className="size-4 animate-spin" />
             Loading workspace summary
           </div>
@@ -442,14 +442,14 @@ function DashboardPage() {
         </section>
 
         {loadState.status === "loading" ? (
-          <div className="flex min-h-[420px] items-center justify-center rounded-lg border border-white/10 bg-[#071511] text-[#94A3B8]">
+          <div className="flex min-h-105 items-center justify-center rounded-lg border border-white/10 bg-[#071511] text-[#94A3B8]">
             <Loader2 aria-hidden="true" className="mr-2 size-5 animate-spin" />
             Loading dashboard
           </div>
         ) : null}
 
         {loadState.status === "error" ? (
-          <div className="flex min-h-[420px] flex-col items-center justify-center rounded-lg border border-red-400/25 bg-red-500/10 p-8 text-center">
+          <div className="flex min-h-105 flex-col items-center justify-center rounded-lg border border-red-400/25 bg-red-500/10 p-8 text-center">
             <AlertCircle aria-hidden="true" className="size-10 text-red-300" />
             <h2 className="mt-4 text-lg font-bold">Dashboard unavailable</h2>
             <p className="mt-2 max-w-md text-sm text-red-100/75">
@@ -550,7 +550,7 @@ function DashboardPage() {
                     <ol className="mt-5 grid gap-3" aria-label="Recent badges">
                       {loadState.dashboard.recentBadges.map((badge) => (
                         <li
-                          className="flex items-start gap-3 rounded-lg border border-white/10 bg-white/[0.04] p-3"
+                          className="flex items-start gap-3 rounded-lg border border-white/10 bg-white/4 p-3"
                           key={`${badge.id}-${badge.unlockedAt}`}
                         >
                           <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-[#8B5CF6]/20 text-[#C4B5FD]">
@@ -566,7 +566,7 @@ function DashboardPage() {
                       ))}
                     </ol>
                   ) : (
-                    <div className="mt-5 rounded-lg border border-white/10 bg-white/[0.04] p-5 text-sm text-[#94A3B8]">
+                    <div className="mt-5 rounded-lg border border-white/10 bg-white/4 p-5 text-sm text-[#94A3B8]">
                       No badges unlocked yet.
                     </div>
                   )}
@@ -601,7 +601,7 @@ function DashboardPage() {
                     >
                       {loadState.dashboard.recentCheckIns.map((checkIn) => (
                         <li
-                          className="rounded-lg border border-white/10 bg-white/[0.04] p-3"
+                          className="rounded-lg border border-white/10 bg-white/4 p-3"
                           key={checkIn.id}
                         >
                           <div className="flex items-start justify-between gap-3">
@@ -621,7 +621,7 @@ function DashboardPage() {
                       ))}
                     </ol>
                   ) : (
-                    <div className="mt-5 rounded-lg border border-white/10 bg-white/[0.04] p-5 text-sm text-[#94A3B8]">
+                    <div className="mt-5 rounded-lg border border-white/10 bg-white/4 p-5 text-sm text-[#94A3B8]">
                       No check-ins yet.
                     </div>
                   )}

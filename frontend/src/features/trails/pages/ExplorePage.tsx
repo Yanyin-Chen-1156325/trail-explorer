@@ -107,12 +107,12 @@ function ExploreMap({ trails }: { trails: TrailResponse[] }) {
   return (
     <section
       aria-label="Trail map"
-      className="relative min-h-[420px] overflow-hidden rounded-lg border border-white/10 bg-[#071511] shadow-2xl shadow-black/25"
+      className="relative min-h-105 overflow-hidden rounded-lg border border-white/10 bg-[#071511] shadow-2xl shadow-black/25"
     >
       {mappedTrails.length > 0 ? (
         <TrailMapContainer
           center={center}
-          className="min-h-[420px] w-full"
+          className="min-h-105 w-full"
           scrollWheelZoom={false}
           zoom={8}
         >
@@ -153,7 +153,7 @@ function ExploreMap({ trails }: { trails: TrailResponse[] }) {
           ))}
         </TrailMapContainer>
       ) : (
-        <div className="flex min-h-[420px] flex-col items-center justify-center p-8 text-center">
+        <div className="flex min-h-105 flex-col items-center justify-center p-8 text-center">
           <MapPin aria-hidden="true" className="size-10 text-[#86EFAC]" />
           <h2 className="mt-4 text-lg font-bold">No mapped coordinates</h2>
           <p className="mt-2 max-w-md text-sm text-[#94A3B8]">
@@ -283,7 +283,7 @@ function ExplorePage() {
             </div>
 
             {loadState.status === "success" ? (
-              <div className="rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white/75">
+              <div className="rounded-lg border border-white/10 bg-white/4 px-4 py-3 text-sm text-white/75">
                 <span className="font-bold text-white">
                   {loadState.totalCount}
                 </span>{" "}
@@ -306,7 +306,7 @@ function ExplorePage() {
                   className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#94A3B8]"
                 />
                 <Input
-                  className="border-white/10 bg-white/[0.04] pl-9 text-white placeholder:text-[#94A3B8] focus-visible:border-[#10B981] focus-visible:ring-[#10B981]/25"
+                  className="border-white/10 bg-white/4 pl-9 text-white placeholder:text-[#94A3B8] focus-visible:border-[#10B981] focus-visible:ring-[#10B981]/25"
                   id="trail-search"
                   maxLength={100}
                   placeholder="Search by trail, city, region, or description"
@@ -380,14 +380,14 @@ function ExplorePage() {
           </form>
 
           {loadState.status === "loading" ? (
-            <div className="flex min-h-[420px] items-center justify-center rounded-lg border border-white/10 bg-[#071511] text-[#94A3B8]">
+            <div className="flex min-h-105 items-center justify-center rounded-lg border border-white/10 bg-[#071511] text-[#94A3B8]">
               <Loader2 aria-hidden="true" className="mr-2 size-5 animate-spin" />
               {activeSearch ? "Searching trails" : "Loading trail map"}
             </div>
           ) : null}
 
           {loadState.status === "error" ? (
-            <div className="flex min-h-[420px] flex-col items-center justify-center rounded-lg border border-red-400/25 bg-red-500/10 p-8 text-center">
+            <div className="flex min-h-105 flex-col items-center justify-center rounded-lg border border-red-400/25 bg-red-500/10 p-8 text-center">
               <AlertCircle aria-hidden="true" className="size-10 text-red-300" />
               <h2 className="mt-4 text-lg font-bold">Map unavailable</h2>
               <p className="mt-2 max-w-md text-sm text-red-100/75">
@@ -404,7 +404,7 @@ function ExplorePage() {
           ) : null}
 
           {loadState.status === "empty" ? (
-            <div className="flex min-h-[420px] flex-col items-center justify-center rounded-lg border border-white/10 bg-[#071511] p-8 text-center">
+            <div className="flex min-h-105 flex-col items-center justify-center rounded-lg border border-white/10 bg-[#071511] p-8 text-center">
               <MapPin aria-hidden="true" className="size-10 text-[#86EFAC]" />
               <h2 className="mt-4 text-lg font-bold">No trails found</h2>
               <p className="mt-2 max-w-md text-sm text-[#94A3B8]">

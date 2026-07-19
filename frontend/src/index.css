@@ -147,7 +147,7 @@
   }
 
   html:not(.dark) .theme-page .bg-white\/\[0\.04\],
-  html:not(.dark) .theme-page .bg-white\/\[0\.06\],
+  html:not(.dark) .theme-page .bg-white\/6,
   html:not(.dark) .theme-page .bg-white\/5,
   html:not(.dark) .theme-page .bg-white\/8,
   html:not(.dark) .theme-page .bg-black\/20,
@@ -183,7 +183,7 @@
     color: rgba(86, 101, 93, 0.7) !important;
   }
 
-  html:not(.dark) .theme-page .\[color-scheme\:dark\] {
+  html:not(.dark) .theme-page .scheme-dark {
     color-scheme: light !important;
   }
 

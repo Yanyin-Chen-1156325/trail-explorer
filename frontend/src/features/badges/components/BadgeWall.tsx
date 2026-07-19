@@ -157,7 +157,7 @@ function BadgeProgressCard({
             </div>
           </div>
 
-          <div className="w-fit rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm font-bold text-white">
+          <div className="w-fit rounded-lg border border-white/10 bg-white/4 px-3 py-2 text-sm font-bold text-white">
             {unlockedCount}/{badges.length}
           </div>
         </div>
@@ -197,7 +197,7 @@ function BadgeProgressCard({
                 className={`rounded-lg border p-3 ${
                   badge.isUnlocked
                     ? "border-emerald-300/25 bg-emerald-400/10"
-                    : "border-white/10 bg-white/[0.04]"
+                    : "border-white/10 bg-white/4"
                 }`}
                 key={badge.id}
               >
@@ -289,7 +289,7 @@ function BadgeWall({
 
   if (isLoading) {
     return (
-      <div className="flex min-h-[360px] items-center justify-center rounded-lg border border-white/10 bg-[#071511] text-[#94A3B8]">
+      <div className="flex min-h-90 items-center justify-center rounded-lg border border-white/10 bg-[#071511] text-[#94A3B8]">
         <Loader2 aria-hidden="true" className="mr-2 size-5 animate-spin" />
         Loading badges
       </div>
@@ -298,7 +298,7 @@ function BadgeWall({
 
   if (errorMessage) {
     return (
-      <div className="flex min-h-[360px] flex-col items-center justify-center rounded-lg border border-red-400/25 bg-red-500/10 p-8 text-center">
+      <div className="flex min-h-90 flex-col items-center justify-center rounded-lg border border-red-400/25 bg-red-500/10 p-8 text-center">
         <AlertCircle aria-hidden="true" className="size-10 text-red-300" />
         <h2 className="mt-4 text-lg font-bold">Badges unavailable</h2>
         <p className="mt-2 max-w-md text-sm text-red-100/75">
@@ -320,7 +320,7 @@ function BadgeWall({
 
   if (visibleBadges.length === 0) {
     return (
-      <div className="flex min-h-[360px] flex-col items-center justify-center rounded-lg border border-white/10 bg-[#071511] p-8 text-center">
+      <div className="flex min-h-90 flex-col items-center justify-center rounded-lg border border-white/10 bg-[#071511] p-8 text-center">
         <Award aria-hidden="true" className="size-10 text-[#C4B5FD]" />
         <h2 className="mt-4 text-lg font-bold">No badges available</h2>
         <p className="mt-2 max-w-md text-sm text-[#94A3B8]">
@@ -333,17 +333,17 @@ function BadgeWall({
   return (
     <section className="space-y-5" aria-label="Badge wall">
       <div className="grid gap-3 sm:grid-cols-3">
-        <div className="rounded-lg border border-white/10 bg-white/[0.04] p-4">
+        <div className="rounded-lg border border-white/10 bg-white/4 p-4">
           <p className="text-xs font-bold uppercase text-white/50">Unlocked</p>
           <p className="mt-1 text-2xl font-black text-white">{unlockedCount}</p>
         </div>
-        <div className="rounded-lg border border-white/10 bg-white/[0.04] p-4">
+        <div className="rounded-lg border border-white/10 bg-white/4 p-4">
           <p className="text-xs font-bold uppercase text-white/50">Available</p>
           <p className="mt-1 text-2xl font-black text-white">
             {visibleBadges.length}
           </p>
         </div>
-        <div className="rounded-lg border border-white/10 bg-white/[0.04] p-4">
+        <div className="rounded-lg border border-white/10 bg-white/4 p-4">
           <p className="text-xs font-bold uppercase text-white/50">Progress</p>
           <p className="mt-1 text-2xl font-black text-[#C4B5FD]">
             {Math.round((unlockedCount / visibleBadges.length) * 100)}%

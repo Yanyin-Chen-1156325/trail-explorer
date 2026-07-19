@@ -88,7 +88,6 @@ Frontend
 ### Features
 
 * Record completed trails
-* Upload optional photo
 * Add notes
 * View check-in history
 
@@ -161,11 +160,6 @@ Example milestones:
 * Banks Peninsula Explorer
 * Christchurch Explorer
 
-### Difficulty Badges
-
-* First Advanced Trail
-* First Expert Trail
-
 ### Weekly Streak Badges
 
 * 2 Week Streak
@@ -191,16 +185,6 @@ Notification examples:
 * XP gained
 * Level up
 * Weekly streak achieved
-
----
-
-## Weekly Streak System
-
-A streak is maintained when a user records at least one completed trail during a calendar week.
-
-Missing a week resets the streak.
-
-Streak values are calculated dynamically.
 
 ---
 

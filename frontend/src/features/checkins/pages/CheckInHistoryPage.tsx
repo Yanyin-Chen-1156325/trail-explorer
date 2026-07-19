@@ -149,17 +149,17 @@ function CheckInHistoryPage() {
   };
 
   useEffect(() => {
-    if (!session?.accessToken) {
-      setLoadState({
-        status: "error",
-        message: "Sign in again to view your check-ins.",
-      });
-      return;
-    }
-
     let isCurrent = true;
 
     const loadCheckIns = async () => {
+      if (!session?.accessToken) {
+        setLoadState({
+          status: "error",
+          message: "Sign in again to view your check-ins.",
+        });
+        return;
+      }
+
       setLoadState({ status: "loading" });
 
       try {
@@ -229,14 +229,14 @@ function CheckInHistoryPage() {
         </section>
 
         {loadState.status === "loading" ? (
-          <div className="flex min-h-[360px] items-center justify-center rounded-lg border border-white/10 bg-[#071511] text-[#94A3B8]">
+          <div className="flex min-h-90 items-center justify-center rounded-lg border border-white/10 bg-[#071511] text-[#94A3B8]">
             <Loader2 aria-hidden="true" className="mr-2 size-5 animate-spin" />
             Loading check-ins
           </div>
         ) : null}
 
         {loadState.status === "error" ? (
-          <div className="flex min-h-[360px] flex-col items-center justify-center rounded-lg border border-red-400/25 bg-red-500/10 p-8 text-center">
+          <div className="flex min-h-90 flex-col items-center justify-center rounded-lg border border-red-400/25 bg-red-500/10 p-8 text-center">
             <AlertCircle aria-hidden="true" className="size-10 text-red-300" />
             <h2 className="mt-4 text-lg font-bold">Check-ins unavailable</h2>
             <p className="mt-2 max-w-md text-sm text-red-100/75">
@@ -246,7 +246,7 @@ function CheckInHistoryPage() {
         ) : null}
 
         {loadState.status === "empty" ? (
-          <div className="flex min-h-[360px] flex-col items-center justify-center rounded-lg border border-white/10 bg-[#071511] p-8 text-center">
+          <div className="flex min-h-90 flex-col items-center justify-center rounded-lg border border-white/10 bg-[#071511] p-8 text-center">
             <MapPin aria-hidden="true" className="size-10 text-[#86EFAC]" />
             <h2 className="mt-4 text-lg font-bold">No check-ins yet</h2>
             <p className="mt-2 max-w-md text-sm text-[#94A3B8]">
@@ -289,7 +289,7 @@ function CheckInHistoryPage() {
                         <CalendarCheck aria-hidden="true" className="size-4" />
                         {formatDate(checkIn.completedDate)}
                       </span>
-                      <span className="truncate rounded-lg border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-white/65">
+                      <span className="truncate rounded-lg border border-white/10 bg-white/4 px-3 py-1 text-xs text-white/65">
                         Trail {checkIn.trailId}
                       </span>
                     </div>

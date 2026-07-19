@@ -6,6 +6,7 @@ using backend.Data;
 using backend.DTOs.Leaderboard;
 using backend.Entities;
 using backend.Enums;
+using backend.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -119,6 +120,9 @@ public class LeaderboardApiIntegrationTests : IClassFixture<CustomWebApplication
         dbContext.Trails.RemoveRange(await dbContext.Trails.ToListAsync());
         dbContext.Users.RemoveRange(await dbContext.Users.ToListAsync());
         await dbContext.SaveChangesAsync();
+
+        var leaderboardService = scope.ServiceProvider.GetRequiredService<ILeaderboardService>();
+        leaderboardService.InvalidateLeaderboardCache();
     }
 
     private async Task<User> SeedUserAsync(

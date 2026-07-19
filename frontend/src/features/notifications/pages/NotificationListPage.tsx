@@ -50,7 +50,7 @@ function NotificationItem({
       }`}
     >
       <CardContent className="grid gap-4 p-4 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-start">
-        <div className="flex size-11 items-center justify-center rounded-lg border border-white/10 bg-white/[0.06] text-[#86EFAC]">
+        <div className="flex size-11 items-center justify-center rounded-lg border border-white/10 bg-white/6 text-[#86EFAC]">
           <Icon aria-hidden="true" className="size-5" />
         </div>
         <div className="min-w-0">
@@ -181,14 +181,14 @@ function NotificationListPage() {
         </div>
 
         {isLoading ? (
-          <div className="flex min-h-[360px] items-center justify-center rounded-lg border border-white/10 bg-[#071511] text-[#94A3B8]">
+          <div className="flex min-h-90 items-center justify-center rounded-lg border border-white/10 bg-[#071511] text-[#94A3B8]">
             <Loader2 aria-hidden="true" className="mr-2 size-5 animate-spin" />
             Loading notifications
           </div>
         ) : null}
 
         {!isLoading && error ? (
-          <div className="flex min-h-[360px] flex-col items-center justify-center rounded-lg border border-red-400/25 bg-red-500/10 p-8 text-center">
+          <div className="flex min-h-90 flex-col items-center justify-center rounded-lg border border-red-400/25 bg-red-500/10 p-8 text-center">
             <AlertCircle aria-hidden="true" className="size-10 text-red-300" />
             <h2 className="mt-4 text-lg font-bold">
               Notifications unavailable

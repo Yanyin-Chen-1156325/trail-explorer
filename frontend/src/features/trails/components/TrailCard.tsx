@@ -23,7 +23,7 @@ function difficultyClassName(difficulty: TrailResponse["difficulty"]) {
 
 function TrailCard({ linkToDetails = false, trail }: TrailCardProps) {
   const card = (
-    <Card className="overflow-hidden border-white/10 bg-white/[0.04] text-white shadow-lg shadow-black/10 transition hover:-translate-y-0.5 hover:border-[#10B981]/35 hover:bg-white/[0.06]">
+    <Card className="overflow-hidden border-white/10 bg-white/4 text-white shadow-lg shadow-black/10 transition hover:-translate-y-0.5 hover:border-[#10B981]/35 hover:bg-white/6">
       <CardContent className="p-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
