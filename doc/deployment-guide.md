@@ -200,6 +200,7 @@ ASPNETCORE_ENVIRONMENT=Production
 ASPNETCORE_URLS=http://+:8080
 WEBSITES_PORT=8080
 WEBSITES_CONTAINER_START_TIME_LIMIT=600
+OpenApi__Enabled=true
 
 ConnectionStrings__Postgres=<Supabase PostgreSQL connection string>
 
@@ -270,7 +271,26 @@ https://trail-explorer-ana8cshcfbbrc0ff.australiasoutheast-01.azurewebsites.net/
 
 If `/health` does not respond, fix backend or Azure container routing before investigating frontend or CORS.
 
-### 3.6 Observed Backend Logs
+### 3.6 Scalar API Documentation
+
+OpenAPI and Scalar are available in Development by default. In Production, they are controlled by this app setting:
+
+```text
+OpenApi__Enabled=true
+```
+
+Enable this in Azure for submission so the Scalar API documentation can be accessed by markers. Disable it later if public API documentation is not required.
+
+Expected documentation URLs:
+
+```text
+https://trail-explorer-ana8cshcfbbrc0ff.australiasoutheast-01.azurewebsites.net/openapi/v1.json
+https://trail-explorer-ana8cshcfbbrc0ff.australiasoutheast-01.azurewebsites.net/scalar/v1
+```
+
+Use Scalar for the API documentation requirement. Do not use Swagger UI.
+
+### 3.7 Observed Backend Logs
 
 A successful startup should show:
 
@@ -354,10 +374,12 @@ Allow about 5 minutes for the Google OAuth origin setting to take effect.
 - Azure App Settings include `WEBSITES_PORT=8080`.
 - Azure App Settings include `ASPNETCORE_URLS=http://+:8080`.
 - Azure App Settings include `WEBSITES_CONTAINER_START_TIME_LIMIT=600`.
+- Azure App Settings include `OpenApi__Enabled=true` for submission.
 - Azure App Settings include the production database connection string.
 - Azure App Settings include production JWT settings.
 - Azure App Settings include `Cors__AllowedOrigins__0=https://trail-explorer-drab.vercel.app`.
 - Azure backend `/health` responds successfully.
+- Azure backend Scalar documentation responds successfully.
 - Vercel root directory is `frontend`.
 - Vercel `VITE_API_BASE_URL` points to the Azure backend `/api`.
 - Vercel has been redeployed after environment variable changes.

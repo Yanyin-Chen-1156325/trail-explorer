@@ -186,7 +186,10 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Configure the HTTP request pipeline
-if (app.Environment.IsDevelopment())
+var enableApiDocs = app.Environment.IsDevelopment()
+    || app.Configuration.GetValue<bool>("OpenApi:Enabled");
+
+if (enableApiDocs)
 {
     app.MapOpenApi();
 
@@ -200,6 +203,8 @@ app.UseCors("Frontend");
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapGet("/", () => Results.Ok(new { status = "ok" }));
+app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
 app.MapControllers();
 app.MapHub<LeaderboardHub>("/hubs/leaderboard");
 app.MapHub<NotificationHub>("/hubs/notifications");
