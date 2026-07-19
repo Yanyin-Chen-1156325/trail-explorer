@@ -23,7 +23,7 @@ function LogoutButton() {
   return (
     <div className="space-y-2">
       <Button
-        className="h-10 rounded-lg border border-white/10 bg-[#0F172A] px-4 text-sm font-semibold text-[#F8FAFC] hover:bg-white/10"
+        className="h-10 rounded-lg border border-black/10 bg-white px-4 text-sm font-semibold text-[#0B1511] hover:bg-black/5 dark:border-white/10 dark:bg-[#0F172A] dark:text-[#F8FAFC] dark:hover:bg-white/10"
         disabled={isLoading}
         onClick={handleLogout}
         type="button"

@@ -11,7 +11,7 @@ function ThemeToggle() {
   return (
     <Button
       aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
-      className="border-white/15 bg-white/5 text-white hover:bg-white/10"
+      className="border-black/10 bg-white/70 text-[#0B1511] hover:bg-white dark:border-white/15 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
       size="icon"
       type="button"
       variant="outline"

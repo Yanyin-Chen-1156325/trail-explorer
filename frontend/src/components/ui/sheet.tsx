@@ -64,7 +64,7 @@ function SheetContent({
       <Dialog.Content
         data-slot="sheet-content"
         className={cn(
-          "fixed z-50 gap-4 border-white/10 bg-[#071511] p-6 text-white shadow-lg transition ease-in-out data-[state=closed]:animate-out data-[state=open]:animate-in data-[state=closed]:duration-300 data-[state=open]:duration-500",
+          "fixed z-50 gap-4 border-black/10 bg-white p-6 text-[#0B1511] shadow-lg transition ease-in-out data-[state=closed]:animate-out data-[state=open]:animate-in data-[state=closed]:duration-300 data-[state=open]:duration-500 dark:border-white/10 dark:bg-[#071511] dark:text-white",
           sideClasses[side],
           className,
         )}
@@ -110,7 +110,7 @@ function SheetDescription({
   return (
     <Dialog.Description
       data-slot="sheet-description"
-      className={cn("text-sm text-white/65", className)}
+      className={cn("text-sm text-[#56655D] dark:text-white/65", className)}
       {...props}
     />
   );

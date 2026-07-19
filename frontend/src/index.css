@@ -128,3 +128,110 @@
     @apply font-sans;
     }
 }
+
+@layer components {
+  html:not(.dark) .theme-page {
+    background-color: #f7f8f3 !important;
+    color: #0b1511 !important;
+  }
+
+  html:not(.dark) .theme-page .bg-\[\#0F172A\],
+  html:not(.dark) .theme-page .bg-\[\#071511\],
+  html:not(.dark) .theme-page .bg-\[\#0B1F1A\] {
+    background-color: #ffffff !important;
+  }
+
+  html:not(.dark) .theme-page .bg-\[\#061813\]\/84 {
+    background-color: rgba(255, 255, 255, 0.9) !important;
+  }
+
+  html:not(.dark) .theme-page .bg-white\/\[0\.04\],
+  html:not(.dark) .theme-page .bg-white\/\[0\.06\],
+  html:not(.dark) .theme-page .bg-white\/5,
+  html:not(.dark) .theme-page .bg-white\/8,
+  html:not(.dark) .theme-page .bg-black\/20,
+  html:not(.dark) .theme-page .bg-black\/25,
+  html:not(.dark) .theme-page .bg-black\/30 {
+    background-color: rgba(11, 21, 17, 0.04) !important;
+  }
+
+  html:not(.dark) .theme-page .text-white,
+  html:not(.dark) .theme-page .text-\[\#CBD5E1\],
+  html:not(.dark) .theme-page .text-red-50,
+  html:not(.dark) .theme-page .text-red-100 {
+    color: #0b1511 !important;
+  }
+
+  html:not(.dark) .theme-page .text-\[\#94A3B8\],
+  html:not(.dark) .theme-page .text-white\/45,
+  html:not(.dark) .theme-page .text-white\/50,
+  html:not(.dark) .theme-page .text-white\/55,
+  html:not(.dark) .theme-page .text-white\/58,
+  html:not(.dark) .theme-page .text-white\/60,
+  html:not(.dark) .theme-page .text-white\/65,
+  html:not(.dark) .theme-page .text-white\/68,
+  html:not(.dark) .theme-page .text-white\/70,
+  html:not(.dark) .theme-page .text-white\/72,
+  html:not(.dark) .theme-page .text-white\/75 {
+    color: #56655d !important;
+  }
+
+  html:not(.dark) .theme-page .placeholder\:text-white\/35::placeholder {
+    color: rgba(86, 101, 93, 0.7) !important;
+  }
+
+  html:not(.dark) .theme-page .\[color-scheme\:dark\] {
+    color-scheme: light !important;
+  }
+
+  html:not(.dark) .theme-page .text-red-100\/75 {
+    color: #991b1b !important;
+  }
+
+  html:not(.dark) .theme-page .border-white\/10,
+  html:not(.dark) .theme-page .border-white\/15 {
+    border-color: rgba(11, 21, 17, 0.1) !important;
+  }
+
+  html:not(.dark) .theme-page .shadow-black\/20,
+  html:not(.dark) .theme-page .shadow-black\/25 {
+    --tw-shadow-color: rgba(11, 21, 17, 0.12) !important;
+  }
+
+  html:not(.dark) .theme-page .text-emerald-100 {
+    color: #047857 !important;
+  }
+
+  html:not(.dark) .theme-page .text-amber-100 {
+    color: #92400e !important;
+  }
+
+  html:not(.dark) .theme-page .text-sky-100 {
+    color: #0369a1 !important;
+  }
+
+  html:not(.dark) .theme-page .text-violet-100,
+  html:not(.dark) .theme-page .text-\[\#C4B5FD\],
+  html:not(.dark) .theme-page .text-\[\#EDE9FE\] {
+    color: #6d28d9 !important;
+  }
+
+  html:not(.dark) .theme-page .text-orange-100 {
+    color: #c2410c !important;
+  }
+
+  html:not(.dark) .theme-page .text-\[\#FCD34D\] {
+    color: #b45309 !important;
+  }
+
+  html:not(.dark) .theme-page .text-red-300,
+  html:not(.dark) .theme-page .text-red-100 {
+    color: #991b1b !important;
+  }
+
+  html:not(.dark) .theme-page .trail-detail-hero,
+  html:not(.dark) .theme-page .trail-detail-hero .text-white,
+  html:not(.dark) .theme-page .trail-detail-hero .text-white\/82 {
+    color: #ffffff !important;
+  }
+}

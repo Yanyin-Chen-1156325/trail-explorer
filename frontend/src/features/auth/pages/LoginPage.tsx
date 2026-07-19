@@ -218,7 +218,7 @@ function LoginPage() {
                 </div>
 
                 {error ? (
-                  <p className="rounded-lg border border-[#EF4444]/30 bg-[#EF4444]/10 px-4 py-3 text-sm text-red-100">
+                  <p className="rounded-lg border border-[#EF4444]/35 bg-[#FEF2F2] px-4 py-3 text-sm font-semibold text-[#991B1B] dark:border-[#EF4444]/30 dark:bg-[#EF4444]/10 dark:text-red-100">
                     {error}
                   </p>
                 ) : null}

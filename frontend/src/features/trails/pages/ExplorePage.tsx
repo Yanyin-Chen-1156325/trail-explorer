@@ -264,7 +264,7 @@ function ExplorePage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#0F172A] px-4 py-8 text-white sm:px-6 lg:px-8">
+    <main className="theme-page min-h-screen bg-[#0F172A] px-4 py-8 text-white sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl space-y-6">
         <section className="space-y-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">

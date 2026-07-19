@@ -82,7 +82,7 @@ function CheckInForm({ trailId }: CheckInFormProps) {
   };
 
   return (
-    <Card className="border-emerald-300/20 bg-[#0B1F1A] text-white shadow-xl shadow-black/20">
+    <Card className="border-emerald-200 bg-white text-[#0B1511] shadow-xl shadow-black/10 dark:border-emerald-300/20 dark:bg-[#0B1F1A] dark:text-white dark:shadow-black/20">
       <CardContent className="p-5">
         <div className="flex items-center gap-3">
           <div className="flex size-10 items-center justify-center rounded-lg bg-[#10B981]/15 text-[#86EFAC]">
@@ -90,18 +90,20 @@ function CheckInForm({ trailId }: CheckInFormProps) {
           </div>
           <div>
             <h2 className="text-base font-bold">Check in</h2>
-            <p className="text-xs text-[#94A3B8]">Record this trail completion</p>
+            <p className="text-xs text-[#56655D] dark:text-[#94A3B8]">
+              Record this trail completion
+            </p>
           </div>
         </div>
 
         <form className="mt-5 space-y-4" onSubmit={handleSubmit}>
           <label className="block space-y-2">
-            <span className="text-xs font-semibold text-white/70">
+            <span className="text-xs font-semibold text-[#34463C] dark:text-white/70">
               Completion date
             </span>
             <Input
               required
-              className="border-white/10 bg-black/20 text-white [color-scheme:dark]"
+              className="border-black/10 bg-[#F7F8F3] text-[#0B1511] [color-scheme:light] dark:border-white/10 dark:bg-black/20 dark:text-white dark:[color-scheme:dark]"
               max={getTodayInputValue()}
               type="date"
               value={completedDate}
@@ -110,9 +112,11 @@ function CheckInForm({ trailId }: CheckInFormProps) {
           </label>
 
           <label className="block space-y-2">
-            <span className="text-xs font-semibold text-white/70">Notes</span>
+            <span className="text-xs font-semibold text-[#34463C] dark:text-white/70">
+              Notes
+            </span>
             <textarea
-              className="min-h-24 w-full resize-y rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-white outline-none transition placeholder:text-white/35 focus-visible:border-[#10B981] focus-visible:ring-3 focus-visible:ring-[#10B981]/30"
+              className="min-h-24 w-full resize-y rounded-lg border border-black/10 bg-[#F7F8F3] px-3 py-2 text-sm text-[#0B1511] outline-none transition placeholder:text-[#56655D]/70 focus-visible:border-[#10B981] focus-visible:ring-3 focus-visible:ring-[#10B981]/30 dark:border-white/10 dark:bg-black/20 dark:text-white dark:placeholder:text-white/35"
               maxLength={2000}
               placeholder="How was the trail?"
               value={notes}
@@ -121,13 +125,13 @@ function CheckInForm({ trailId }: CheckInFormProps) {
           </label>
 
           {submitState.status === "error" ? (
-            <p className="rounded-lg border border-red-400/25 bg-red-500/10 px-3 py-2 text-sm text-red-100">
+            <p className="rounded-lg border border-red-400/35 bg-[#FEF2F2] px-3 py-2 text-sm font-semibold text-[#991B1B] dark:border-red-400/25 dark:bg-red-500/10 dark:text-red-100">
               {submitState.message}
             </p>
           ) : null}
 
           {submitState.status === "success" ? (
-            <p className="flex items-center gap-2 rounded-lg border border-emerald-300/25 bg-emerald-400/10 px-3 py-2 text-sm text-emerald-100">
+            <p className="flex items-center gap-2 rounded-lg border border-emerald-300/35 bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-700 dark:border-emerald-300/25 dark:bg-emerald-400/10 dark:text-emerald-100">
               <CheckCircle2 aria-hidden="true" className="size-4" />
               {submitState.message}
             </p>

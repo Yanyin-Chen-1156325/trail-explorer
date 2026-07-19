@@ -17,10 +17,31 @@ function applyTheme(theme: ThemePreference) {
   document.documentElement.classList.toggle("dark", theme === "dark");
 }
 
+function getStoredTheme(): ThemePreference | null {
+  if (typeof localStorage === "undefined") {
+    return null;
+  }
+
+  try {
+    const storedTheme = JSON.parse(
+      localStorage.getItem("trail-explorer-theme") ?? "null",
+    ) as { state?: { theme?: unknown } } | null;
+
+    return storedTheme?.state?.theme === "light" ||
+      storedTheme?.state?.theme === "dark"
+      ? storedTheme.state.theme
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+const initialTheme = getStoredTheme() ?? "dark";
+
 export const useThemeStore = create<ThemeState>()(
   persist(
     (set) => ({
-      theme: "dark",
+      theme: initialTheme,
       toggleTheme: () =>
         set((state) => {
           const nextTheme = state.theme === "dark" ? "light" : "dark";
@@ -42,4 +63,4 @@ export const useThemeStore = create<ThemeState>()(
   ),
 );
 
-applyTheme("dark");
+applyTheme(initialTheme);

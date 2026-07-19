@@ -124,23 +124,23 @@ function TrailLocationMap({ trail }: { trail: TrailResponse }) {
   };
 
   return (
-    <section className="border-t border-white/10 p-6 sm:p-8">
+    <section className="border-t border-black/10 p-6 dark:border-white/10 sm:p-8">
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h2 className="text-lg font-bold">Trail location</h2>
-          <p className="mt-2 flex items-center gap-2 text-sm text-[#94A3B8]">
+          <p className="mt-2 flex items-center gap-2 text-sm text-[#56655D] dark:text-[#94A3B8]">
             <MapPin aria-hidden="true" className="size-4 text-[#86EFAC]" />
             {trail.city}, {trail.region}
           </p>
         </div>
         {hasMappedLocation ? (
-          <div className="rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-xs font-semibold text-white/70">
+          <div className="rounded-lg border border-black/10 bg-black/5 px-3 py-2 text-xs font-semibold text-[#56655D] dark:border-white/10 dark:bg-black/20 dark:text-white/70">
             {formatCoordinate(trail.latitude)}, {formatCoordinate(trail.longitude)}
           </div>
         ) : null}
       </div>
 
-      <div className="overflow-hidden rounded-lg border border-white/10 bg-[#0B1F1A]">
+      <div className="overflow-hidden rounded-lg border border-black/10 bg-[#EEF4E8] dark:border-white/10 dark:bg-[#0B1F1A]">
         {hasMappedLocation ? (
           <TrailMapContainer
             center={center}
@@ -180,7 +180,7 @@ function TrailLocationMap({ trail }: { trail: TrailResponse }) {
           <div className="flex min-h-[260px] flex-col items-center justify-center p-8 text-center">
             <MapPin aria-hidden="true" className="size-10 text-[#86EFAC]" />
             <h3 className="mt-4 text-base font-bold">No mapped coordinates</h3>
-            <p className="mt-2 max-w-md text-sm leading-6 text-[#94A3B8]">
+            <p className="mt-2 max-w-md text-sm leading-6 text-[#56655D] dark:text-[#94A3B8]">
               This trail has a DOC location label, but no latitude and longitude
               are available yet.
             </p>
@@ -251,11 +251,11 @@ function TrailDetailPage() {
   }, [trailId]);
 
   return (
-    <main className="min-h-screen bg-[#0F172A] px-4 py-8 text-white sm:px-6 lg:px-8">
+    <main className="theme-page min-h-screen bg-[#F7F8F3] px-4 py-8 text-[#0B1511] dark:bg-[#0F172A] dark:text-white sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl space-y-6">
         <Button
           asChild
-          className="border-white/15 bg-white/5 text-white hover:bg-white/10"
+          className="border-black/10 bg-white text-[#0B1511] hover:bg-[#EEF4E8] dark:border-white/15 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
           variant="outline"
         >
           <Link to="/trails">
@@ -265,17 +265,17 @@ function TrailDetailPage() {
         </Button>
 
         {loadState.status === "loading" ? (
-          <div className="flex min-h-[420px] items-center justify-center rounded-lg border border-white/10 bg-[#071511] text-[#94A3B8]">
+          <div className="flex min-h-[420px] items-center justify-center rounded-lg border border-black/10 bg-white text-[#56655D] dark:border-white/10 dark:bg-[#071511] dark:text-[#94A3B8]">
             <Loader2 aria-hidden="true" className="mr-2 size-5 animate-spin" />
             Loading trail details
           </div>
         ) : null}
 
         {loadState.status === "not-found" ? (
-          <div className="flex min-h-[420px] flex-col items-center justify-center rounded-lg border border-white/10 bg-[#071511] p-8 text-center">
+          <div className="flex min-h-[420px] flex-col items-center justify-center rounded-lg border border-black/10 bg-white p-8 text-center dark:border-white/10 dark:bg-[#071511]">
             <MapPin aria-hidden="true" className="size-10 text-[#86EFAC]" />
             <h1 className="mt-4 text-2xl font-black">Trail not found</h1>
-            <p className="mt-2 max-w-md text-sm text-[#94A3B8]">
+            <p className="mt-2 max-w-md text-sm text-[#56655D] dark:text-[#94A3B8]">
               This trail may be unavailable or no longer active.
             </p>
           </div>
@@ -285,7 +285,7 @@ function TrailDetailPage() {
           <div className="flex min-h-[420px] flex-col items-center justify-center rounded-lg border border-red-400/25 bg-red-500/10 p-8 text-center">
             <AlertCircle aria-hidden="true" className="size-10 text-red-300" />
             <h1 className="mt-4 text-2xl font-black">Trail unavailable</h1>
-            <p className="mt-2 max-w-md text-sm text-red-100/75">
+            <p className="mt-2 max-w-md text-sm text-[#991B1B] dark:text-red-100/75">
               {loadState.message}
             </p>
           </div>
@@ -293,14 +293,14 @@ function TrailDetailPage() {
 
         {loadState.status === "success" ? (
           <article className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
-            <section className="overflow-hidden rounded-lg border border-white/10 bg-[#071511] shadow-2xl shadow-black/25">
+            <section className="overflow-hidden rounded-lg border border-black/10 bg-white shadow-2xl shadow-black/10 dark:border-white/10 dark:bg-[#071511] dark:shadow-black/25">
               <div
                 aria-label={`${loadState.trail.name} hero image`}
-                className="relative min-h-72 bg-[linear-gradient(135deg,rgba(16,185,129,0.2)_0_1px,transparent_1px_58px),linear-gradient(45deg,rgba(14,165,233,0.14)_0_1px,transparent_1px_46px)] bg-cover bg-center"
+                className="trail-detail-hero relative min-h-72 bg-[linear-gradient(135deg,rgba(16,185,129,0.2)_0_1px,transparent_1px_58px),linear-gradient(45deg,rgba(14,165,233,0.14)_0_1px,transparent_1px_46px)] bg-cover bg-center text-white"
                 role="img"
                 style={createHeroBackgroundStyle(loadState.trail)}
               >
-                <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/55 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/75 via-[#020617]/25 to-[#020617]/10" />
                 <div className="absolute bottom-6 left-6 right-6">
                   <span
                     className={`inline-flex rounded-lg border px-3 py-1 text-xs font-bold ${difficultyClassName(
@@ -312,7 +312,7 @@ function TrailDetailPage() {
                   <h1 className="mt-4 text-3xl font-black sm:text-5xl">
                     {loadState.trail.name}
                   </h1>
-                  <p className="mt-3 flex items-center gap-2 text-sm text-white/72">
+                  <p className="mt-3 flex items-center gap-2 text-sm text-white/82">
                     <MapPin aria-hidden="true" className="size-4" />
                     {loadState.trail.city}, {loadState.trail.region}
                   </p>
@@ -321,7 +321,7 @@ function TrailDetailPage() {
 
               <div className="p-6 sm:p-8">
                 <h2 className="text-lg font-bold">Trail description</h2>
-                <p className="mt-4 whitespace-pre-line text-sm leading-7 text-[#CBD5E1]">
+                <p className="mt-4 whitespace-pre-line text-sm leading-7 text-[#34463C] dark:text-[#CBD5E1]">
                   {loadState.trail.description ||
                     "No trail description available yet."}
                 </p>
@@ -333,14 +333,14 @@ function TrailDetailPage() {
             <aside className="space-y-4">
               <CheckInForm trailId={loadState.trail.id} />
 
-              <Card className="border-white/10 bg-[#071511] text-white shadow-xl shadow-black/20">
+              <Card className="border-black/10 bg-white text-[#0B1511] shadow-xl shadow-black/10 dark:border-white/10 dark:bg-[#071511] dark:text-white dark:shadow-black/20">
                 <CardContent className="p-5">
                   <h2 className="text-base font-bold">Trail stats</h2>
                   <div className="mt-5 grid gap-4">
                     <div className="flex items-center gap-3">
                       <RouteIcon className="size-5 text-[#86EFAC]" />
                       <div>
-                        <p className="text-xs text-white/55">Distance</p>
+                        <p className="text-xs text-[#56655D] dark:text-white/55">Distance</p>
                         <p className="font-bold">
                           {loadState.trail.distanceKm} km
                         </p>
@@ -349,7 +349,7 @@ function TrailDetailPage() {
                     <div className="flex items-center gap-3">
                       <Mountain className="size-5 text-[#86EFAC]" />
                       <div>
-                        <p className="text-xs text-white/55">Difficulty</p>
+                        <p className="text-xs text-[#56655D] dark:text-white/55">Difficulty</p>
                         <p className="font-bold">
                           {loadState.trail.difficulty}
                         </p>
@@ -358,7 +358,7 @@ function TrailDetailPage() {
                     <div className="flex items-center gap-3">
                       <CalendarDays className="size-5 text-[#86EFAC]" />
                       <div>
-                        <p className="text-xs text-white/55">Last updated</p>
+                        <p className="text-xs text-[#56655D] dark:text-white/55">Last updated</p>
                         <p className="font-bold">
                           {formatDate(loadState.trail.updatedAt)}
                         </p>

@@ -9,6 +9,7 @@ import { ThemeToggle } from "./ThemeToggle";
 
 describe("ThemeToggle", () => {
   beforeEach(() => {
+    localStorage.clear();
     useThemeStore.getState().setTheme("dark");
   });
 
@@ -33,5 +34,14 @@ describe("ThemeToggle", () => {
 
     expect(useThemeStore.getState().theme).toBe("dark");
     expect(document.documentElement).toHaveClass("dark");
+  });
+
+  it("keeps the document class in sync with a stored light theme", async () => {
+    useThemeStore.getState().setTheme("light");
+
+    renderWithRouter(<ThemeToggle />);
+
+    expect(screen.getByRole("button", { name: "Switch to dark mode" })).toBeInTheDocument();
+    expect(document.documentElement).not.toHaveClass("dark");
   });
 });

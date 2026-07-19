@@ -22,14 +22,14 @@ function Logo() {
       className="flex items-center gap-3 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-[#22C55E]/60"
       to="/"
     >
-      <span className="flex size-10 items-center justify-center rounded-xl border border-[#86EFAC]/40 bg-[#14532D]/70 text-[#BBF7D0] shadow-lg shadow-black/20">
+      <span className="flex size-10 items-center justify-center rounded-xl border border-[#2E7D32]/20 bg-[#E4F5E5] text-[#1F7A3A] shadow-lg shadow-black/10 dark:border-[#86EFAC]/40 dark:bg-[#14532D]/70 dark:text-[#BBF7D0] dark:shadow-black/20">
         <Mountain aria-hidden="true" className="size-6" />
       </span>
       <span className="leading-none">
-        <span className="block text-sm font-black uppercase tracking-wide text-white">
+        <span className="block text-sm font-black uppercase tracking-wide text-[#0B1511] dark:text-white">
           Trail
         </span>
-        <span className="block text-sm font-black uppercase tracking-wide text-[#65D46E]">
+        <span className="block text-sm font-black uppercase tracking-wide text-[#1F7A3A] dark:text-[#65D46E]">
           Explorer
         </span>
       </span>
@@ -77,7 +77,7 @@ function AccountMenu({ session }: { session: AuthSession }) {
         aria-expanded={isOpen}
         aria-haspopup="menu"
         aria-label={`${displayName} account menu`}
-        className="h-10 max-w-64 border-white/15 bg-white/5 px-3 text-white hover:bg-white/10"
+        className="h-10 max-w-64 border-black/10 bg-white/70 px-3 text-[#0B1511] hover:bg-white dark:border-white/15 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
         type="button"
         variant="outline"
         onClick={() => setIsOpen((current) => !current)}
@@ -92,12 +92,12 @@ function AccountMenu({ session }: { session: AuthSession }) {
 
       {isOpen ? (
         <div
-          className="absolute right-0 mt-3 w-72 rounded-xl border border-white/10 bg-[#071511] p-3 text-white shadow-2xl shadow-black/35"
+          className="absolute right-0 mt-3 w-72 rounded-xl border border-black/10 bg-white p-3 text-[#0B1511] shadow-2xl shadow-black/15 dark:border-white/10 dark:bg-[#071511] dark:text-white dark:shadow-black/35"
           role="menu"
         >
-          <div className="mb-3 border-b border-white/10 px-2 pb-3">
+          <div className="mb-3 border-b border-black/10 px-2 pb-3 dark:border-white/10">
             <p className="truncate text-sm font-bold">{displayName}</p>
-            <p className="mt-1 truncate text-xs text-white/60">
+            <p className="mt-1 truncate text-xs text-[#56655D] dark:text-white/60">
               {session.user.email}
             </p>
           </div>
@@ -130,7 +130,7 @@ function SiteHeader() {
   const visibleNavigationItems = sessionNavigationItems;
 
   return (
-    <header className="sticky top-0 z-40 border-b border-white/10 bg-[#061813]/85 text-white shadow-lg shadow-black/10 backdrop-blur-xl">
+    <header className="sticky top-0 z-40 border-b border-black/10 bg-[#F7F8F3]/88 text-[#0B1511] shadow-lg shadow-black/5 backdrop-blur-xl dark:border-white/10 dark:bg-[#061813]/85 dark:text-white dark:shadow-black/10">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
         <Logo />
 
@@ -140,8 +140,8 @@ function SiteHeader() {
               className={({ isActive }) =>
                 `rounded-lg text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#22C55E]/60 ${
                   isActive
-                    ? "text-[#86EFAC]"
-                    : "text-white/85 hover:text-white"
+                    ? "text-[#1F7A3A] dark:text-[#86EFAC]"
+                    : "text-[#34463C] hover:text-[#0B1511] dark:text-white/85 dark:hover:text-white"
                 }`
               }
               key={item.label}
@@ -160,7 +160,7 @@ function SiteHeader() {
             <>
               <Button
                 asChild
-                className="h-10 border-white/30 bg-white/5 px-5 text-white hover:bg-white/10"
+                className="h-10 border-[#2E7D32]/30 bg-white/70 px-5 text-[#1F7A3A] hover:bg-white dark:border-white/30 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
                 variant="outline"
               >
                 <Link to="/login">Log In</Link>
@@ -181,7 +181,7 @@ function SiteHeader() {
             <SheetTrigger asChild>
               <Button
                 aria-label="Open navigation menu"
-                className="border-white/15 bg-white/5 text-white hover:bg-white/10"
+                className="border-black/10 bg-white/70 text-[#0B1511] hover:bg-white dark:border-white/15 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
                 size="icon"
                 type="button"
                 variant="outline"
@@ -201,7 +201,7 @@ function SiteHeader() {
                 {visibleNavigationItems.map((item) => (
                   <SheetClose asChild key={item.label}>
                     <Link
-                      className="rounded-lg px-3 py-3 text-base font-semibold text-white/85 transition hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-[#22C55E]/60"
+                      className="rounded-lg px-3 py-3 text-base font-semibold text-[#34463C] transition hover:bg-black/5 hover:text-[#0B1511] focus:outline-none focus:ring-2 focus:ring-[#22C55E]/60 dark:text-white/85 dark:hover:bg-white/10 dark:hover:text-white"
                       to={item.to}
                     >
                       {item.label}
@@ -213,17 +213,17 @@ function SiteHeader() {
               <div className="mt-8 grid gap-3">
                 {session ? (
                   <>
-                    <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                    <div className="rounded-xl border border-black/10 bg-black/5 p-4 dark:border-white/10 dark:bg-white/5">
                       <div className="flex items-center gap-3">
                         <UserCircle
                           aria-hidden="true"
-                          className="size-6 shrink-0 text-[#86EFAC]"
+                          className="size-6 shrink-0 text-[#1F7A3A] dark:text-[#86EFAC]"
                         />
                         <div className="min-w-0">
-                          <p className="truncate text-sm font-bold text-white">
+                          <p className="truncate text-sm font-bold text-[#0B1511] dark:text-white">
                             {session.user.displayName || session.user.email}
                           </p>
-                          <p className="mt-1 truncate text-xs text-white/60">
+                          <p className="mt-1 truncate text-xs text-[#56655D] dark:text-white/60">
                             {session.user.email}
                           </p>
                         </div>
@@ -236,7 +236,7 @@ function SiteHeader() {
                     <SheetClose asChild>
                       <Button
                         asChild
-                        className="h-11 border-white/30 bg-white/5 text-white hover:bg-white/10"
+                        className="h-11 border-[#2E7D32]/30 bg-white text-[#1F7A3A] hover:bg-[#F7F8F3] dark:border-white/30 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
                         variant="outline"
                       >
                         <Link to="/login">Log In</Link>
