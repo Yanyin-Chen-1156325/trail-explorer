@@ -1,6 +1,7 @@
 import type {
   DashboardResponse,
   RawDashboardResponse,
+  TrailSyncResult,
 } from "../types/dashboard";
 import type { BadgeType, RawBadgeType } from "@/features/badges";
 
@@ -16,6 +17,7 @@ export class DashboardApiError extends Error {
 
 export interface DashboardApi {
   getMyDashboard(accessToken: string): Promise<DashboardResponse>;
+  syncDocTrails(accessToken: string): Promise<TrailSyncResult>;
 }
 
 const trimTrailingSlash = (value: string) => value.replace(/\/+$/, "");
@@ -63,9 +65,10 @@ async function readErrorMessage(response: Response): Promise<string> {
 async function requestJson<TResponse>(
   url: string,
   accessToken: string,
+  method = "GET",
 ): Promise<TResponse> {
   const response = await fetch(url, {
-    method: "GET",
+    method,
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${accessToken}`,
@@ -84,8 +87,10 @@ async function requestJson<TResponse>(
 
 export function createDashboardApi(
   baseUrl: string = "/api/dashboard",
+  adminBaseUrl: string = "/api/admin",
 ): DashboardApi {
   const normalizedBaseUrl = trimTrailingSlash(baseUrl);
+  const normalizedAdminBaseUrl = trimTrailingSlash(adminBaseUrl);
 
   return {
     async getMyDashboard(accessToken) {
@@ -95,6 +100,13 @@ export function createDashboardApi(
       );
 
       return normalizeDashboard(dashboard);
+    },
+    async syncDocTrails(accessToken) {
+      return await requestJson<TrailSyncResult>(
+        `${normalizedAdminBaseUrl}/trails/sync`,
+        accessToken,
+        "POST",
+      );
     },
   };
 }

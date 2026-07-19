@@ -24,6 +24,10 @@ import { BadgeWallPage } from "./features/badges";
 import { DashboardPage } from "./features/dashboard";
 import { LeaderboardPage } from "./features/leaderboard";
 import { ToastProvider } from "./shared/components/ToastProvider";
+import {
+  NotificationListPage,
+  NotificationRealtimeProvider,
+} from "./features/notifications";
 
 export function ScrollToTop() {
   const { pathname } = useLocation();
@@ -204,6 +208,7 @@ function App() {
     <BrowserRouter>
       <ScrollToTop />
       <ToastProvider />
+      <NotificationRealtimeProvider />
       <Routes>
         <Route element={<PublicLayout />}>
           <Route element={<HomePage />} path="/" />
@@ -219,6 +224,10 @@ function App() {
             <Route element={<CheckInHistoryPage />} path="/checkins" />
             <Route element={<BadgeWallPage />} path="/badges" />
             <Route element={<LeaderboardPage />} path="/leaderboard" />
+            <Route
+              element={<NotificationListPage />}
+              path="/notifications"
+            />
             <Route
               element={<CheckInModerationRoute />}
               path="/moderation/checkins"

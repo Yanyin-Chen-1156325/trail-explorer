@@ -102,4 +102,29 @@ describe("createDashboardApi", () => {
       new DashboardApiError("Invalid user token", 401),
     );
   });
+
+  it("triggers DOC trail sync with admin bearer token authorization", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      mockJsonResponse({
+        succeeded: true,
+        candidatesFound: 4,
+        created: 2,
+        updated: 1,
+        skipped: 1,
+      }),
+    );
+    const api = createDashboardApi("/api/dashboard", "/api/admin/");
+
+    const result = await api.syncDocTrails("admin-token");
+
+    expect(fetchMock).toHaveBeenCalledWith("/api/admin/trails/sync", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer admin-token",
+      },
+    });
+    expect(result.created).toBe(2);
+    expect(result.updated).toBe(1);
+  });
 });

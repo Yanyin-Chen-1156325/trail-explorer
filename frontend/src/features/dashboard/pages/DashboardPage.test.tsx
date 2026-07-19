@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { createTestSession, resetAuthStore } from "@/features/auth/testUtils";
+import { ToastProvider } from "@/shared/components/ToastProvider";
 import { renderWithRouter } from "@/test/renderWithRouter";
 
 import { DashboardPage } from "./DashboardPage";
@@ -97,6 +98,121 @@ describe("DashboardPage", () => {
     expect(screen.getByText("3 badges unlocked")).toBeInTheDocument();
     expect(screen.getByText("First Trail")).toBeInTheDocument();
     expect(screen.getByText("Port Hills Loop")).toBeInTheDocument();
+  });
+
+  it("renders admin workspace summary and sync action for admin users", async () => {
+    const user = userEvent.setup();
+    resetAuthStore({ session: createTestSession({ role: "Admin" }) });
+    const fetchMock = vi.spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(mockJsonResponse(dashboardPayload))
+      .mockResolvedValueOnce(
+        mockJsonResponse([
+          {
+            id: "user-1",
+            email: "admin@example.com",
+            displayName: "Admin",
+            role: "Admin",
+            status: "Active",
+            authProvider: "Local",
+            createdAt: "2026-07-19T00:00:00.000Z",
+          },
+          {
+            id: "user-2",
+            email: "moderator@example.com",
+            displayName: "Moderator",
+            role: "Moderator",
+            status: "Suspended",
+            authProvider: "Local",
+            createdAt: "2026-07-19T00:00:00.000Z",
+          },
+        ]),
+      )
+      .mockResolvedValueOnce(
+        mockJsonResponse([
+          {
+            id: "checkin-1",
+            userId: "user-1",
+            trailId: "trail-1",
+            completedDate: "2026-07-19T00:00:00.000Z",
+            notes: null,
+            photoUrl: null,
+            isHidden: false,
+          },
+          {
+            id: "checkin-2",
+            userId: "user-2",
+            trailId: "trail-2",
+            completedDate: "2026-07-19T00:00:00.000Z",
+            notes: null,
+            photoUrl: null,
+            isHidden: true,
+          },
+        ]),
+      )
+      .mockResolvedValueOnce(
+        mockJsonResponse({
+          succeeded: true,
+          candidatesFound: 4,
+          created: 2,
+          updated: 1,
+          skipped: 1,
+        }),
+      );
+
+    renderWithRouter(
+      <>
+        <ToastProvider />
+        <DashboardPage />
+      </>,
+      { initialEntries: ["/dashboard"] },
+    );
+
+    expect(await screen.findByText("Admin workspace")).toBeInTheDocument();
+    expect(screen.getByText("System overview")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Moderation" })).toHaveAttribute(
+      "href",
+      "/moderation/checkins",
+    );
+    expect(screen.getByRole("link", { name: "Manage Users" })).toHaveAttribute(
+      "href",
+      "/admin/users",
+    );
+    expect(screen.getByText("1 active accounts")).toBeInTheDocument();
+    expect(screen.getByText("1 moderators")).toBeInTheDocument();
+    expect(screen.getByText("1 visible")).toBeInTheDocument();
+    expect(screen.getByText("1 suspended users")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Sync DOC trails" }));
+
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledWith(
+        expect.stringContaining("/api/admin/trails/sync"),
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer access-token",
+          },
+        },
+      );
+    });
+    expect(await screen.findByText("DOC sync completed")).toBeInTheDocument();
+    expect(screen.getByText("2 created, 1 updated, 1 skipped.")).toBeInTheDocument();
+  });
+
+  it("does not render the DOC sync action for moderators", async () => {
+    resetAuthStore({ session: createTestSession({ role: "Moderator" }) });
+    vi.spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(mockJsonResponse(dashboardPayload))
+      .mockResolvedValueOnce(mockJsonResponse([]))
+      .mockResolvedValueOnce(mockJsonResponse([]));
+
+    renderWithRouter(<DashboardPage />, { initialEntries: ["/dashboard"] });
+
+    expect(await screen.findByText("Moderator workspace")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Sync DOC trails" }),
+    ).not.toBeInTheDocument();
   });
 
   it("renders empty dashboard widgets when no activity exists", async () => {

@@ -29,4 +29,6 @@ public class User
     public ICollection<CheckIn> CheckIns { get; set; } = [];
 
     public ICollection<UserBadge> UserBadges { get; set; } = [];
+
+    public ICollection<Notification> Notifications { get; set; } = [];
 }

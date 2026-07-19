@@ -134,6 +134,8 @@
 
 * [ ] Level progress displayed
 
+* [ ] Level-up toast notifications implemented
+
 ---
 
 ## Weekly Streak
@@ -141,6 +143,8 @@
 * [ ] Weekly streak calculation working
 
 * [ ] Weekly streak displayed
+
+* [ ] Weekly streak milestone toast notifications implemented
 
 ---
 
@@ -150,7 +154,19 @@
 
 * [ ] Badge wall implemented
 
-* [ ] Badge notifications implemented
+* [ ] Top-right toast notifications shown when badges are unlocked
+
+* [ ] Achievement notifications verified after milestone completion
+
+* [ ] Achievement notifications saved to a notification list
+
+* [ ] Unread and read notification states implemented
+
+* [ ] Users can mark individual notifications as read
+
+* [ ] Users can mark all notifications as read
+
+* [ ] Unread notification count displayed in the top-right notification indicator
 
 ---
 
@@ -196,9 +212,13 @@
 
 * [ ] Real-time leaderboard updates
 
-* [ ] Real-time badge notifications
+* [ ] Real-time badge unlock notifications
 
-* [ ] Real-time XP updates
+* [ ] Real-time XP gain notifications
+
+* [ ] Real-time level-up notifications
+
+* [ ] Real-time unread notification count updates
 
 ---
 

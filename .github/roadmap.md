@@ -273,6 +273,7 @@
 - [x] Calculate Distance Statistics
 - [x] Calculate Weekly Streak
 - [x] Calculate Leaderboard Rank
+- [x] Create Admin Trigger DOC Sync API
 
 ### Frontend
 
@@ -281,16 +282,22 @@
 - [x] Create Statistics Cards
 - [x] Create Achievement Summary
 - [x] Create Progress Widgets
+- [x] Add Admin DOC Sync action to Dashboard
+- [x] Display DOC Sync result feedback
+- [x] Protect DOC Sync action with Admin role
 
 ### Unit Testing
 
 - [x] Backend
 - [x] Frontend
+- [x] Admin DOC Sync service tests
+- [x] Admin Dashboard DOC Sync UI tests
 
 ### Integration Testing
 
 - [x] Dashboard API tests
 - [x] Dashboard UI tests
+- [x] Admin DOC Sync API tests
 
 ---
 
@@ -363,7 +370,60 @@
 
 ---
 
-## Epic 10 - Deployment and Documentation
+## Epic 10 - Achievement Notification Center
+
+### Database
+
+- [x] Create Notification entity
+- [x] Configure Notification table
+- [x] Add User to Notifications relationship
+- [x] Store notification type, title, message, read state, and created time
+
+### Backend
+
+- [x] Create Get My Notifications API
+- [x] Create Get Unread Notification Count API
+- [x] Create Mark Notification As Read API
+- [x] Create Mark All Notifications As Read API
+- [x] Create Notification Service
+- [x] Create notifications when badges are unlocked
+- [x] Create notifications when XP is gained
+- [x] Create notifications when users level up
+- [x] Create notifications when weekly streak milestones are reached
+
+### Real-Time Updates
+
+- [x] Broadcast new notification events with SignalR
+- [x] Broadcast unread notification count updates with SignalR
+
+### Frontend
+
+- [x] Create Notification API client
+- [x] Create Notification Store
+- [x] Create top-right notification indicator
+- [x] Display unread notification count
+- [x] Create Notification List UI
+- [x] Display unread and read notification states
+- [x] Show top-right toast when a new achievement notification is received
+- [x] Allow users to mark an individual notification as read
+- [x] Allow users to mark all notifications as read
+
+### Unit Testing
+
+- [x] Backend
+- [x] Frontend
+
+### Integration Testing
+
+- [x] Notification API tests
+- [x] Notification read state tests
+- [x] Unread notification count tests
+- [x] SignalR notification tests
+- [x] Notification UI tests
+
+---
+
+## Epic 11 - Deployment and Documentation
 
 ### Deployment
 

@@ -23,6 +23,8 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<UserBadge> UserBadges { get; set; } = null!;
 
+    public DbSet<Notification> Notifications { get; set; } = null!;
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasDefaultSchema("trail_explorer");
@@ -34,5 +36,6 @@ public class ApplicationDbContext : DbContext
         modelBuilder.ApplyConfiguration(new TrailConfiguration());
         modelBuilder.ApplyConfiguration(new CheckInConfiguration());
         modelBuilder.ApplyConfiguration(new UserBadgeConfiguration());
+        modelBuilder.ApplyConfiguration(new NotificationConfiguration());
     }
 }

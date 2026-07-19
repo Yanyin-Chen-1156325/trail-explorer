@@ -69,6 +69,18 @@ public enum BadgeType
 }
 ```
 
+## NotificationType
+
+```csharp
+public enum NotificationType
+{
+    BadgeUnlocked = 0,
+    XpGained = 1,
+    LevelUp = 2,
+    WeeklyStreak = 3
+}
+```
+
 ---
 
 # User
@@ -101,6 +113,8 @@ public class User
     public ICollection<UserBadge> UserBadges { get; set; } = [];
 
     public ICollection<RefreshToken> RefreshTokens { get; set; } = [];
+
+    public ICollection<Notification> Notifications { get; set; } = [];
 }
 ```
 
@@ -237,6 +251,31 @@ public class RefreshToken
 
 ---
 
+# Notification
+
+```csharp
+public class Notification
+{
+    public Guid Id { get; set; }
+
+    public Guid UserId { get; set; }
+
+    public NotificationType Type { get; set; }
+
+    public string Title { get; set; } = string.Empty;
+
+    public string Message { get; set; } = string.Empty;
+
+    public bool IsRead { get; set; }
+
+    public DateTime CreatedAt { get; set; }
+
+    public User User { get; set; } = null!;
+}
+```
+
+---
+
 # Relationships
 
 User
@@ -244,6 +283,7 @@ User
 * 1 → Many CheckIns
 * 1 → Many RefreshTokens
 * 1 → Many UserBadges
+* 1 → Many Notifications
 
 Trail
 
@@ -263,6 +303,10 @@ CheckIn
 * Many → 1 Trail
 
 RefreshToken
+
+* Many → 1 User
+
+Notification
 
 * Many → 1 User
 

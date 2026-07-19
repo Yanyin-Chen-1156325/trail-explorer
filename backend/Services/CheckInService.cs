@@ -10,17 +10,20 @@ public class CheckInService : ICheckInService
     private readonly ApplicationDbContext _context;
     private readonly IBadgeUnlockService _badgeUnlockService;
     private readonly ILeaderboardNotificationService _leaderboardNotificationService;
+    private readonly INotificationService _notificationService;
     private readonly ILogger<CheckInService> _logger;
 
     public CheckInService(
         ApplicationDbContext context,
         IBadgeUnlockService badgeUnlockService,
         ILeaderboardNotificationService leaderboardNotificationService,
+        INotificationService notificationService,
         ILogger<CheckInService> logger)
     {
         _context = context;
         _badgeUnlockService = badgeUnlockService;
         _leaderboardNotificationService = leaderboardNotificationService;
+        _notificationService = notificationService;
         _logger = logger;
     }
 
@@ -47,14 +50,21 @@ public class CheckInService : ICheckInService
 
         _context.CheckIns.Add(checkIn);
         await _context.SaveChangesAsync();
+        var notificationCreatedAt = DateTime.UtcNow;
         var unlockedBadges = await _badgeUnlockService.UnlockEligibleBadgesAsync(userId);
+
+        await _notificationService.CreateAchievementNotificationsAsync(
+            userId,
+            checkIn.Id,
+            unlockedBadges,
+            notificationCreatedAt);
 
         if (unlockedBadges.Count > 0)
         {
             await _leaderboardNotificationService.BroadcastBadgeUnlocksAsync(
                 userId,
                 unlockedBadges,
-                DateTime.UtcNow);
+                notificationCreatedAt);
         }
         else
         {

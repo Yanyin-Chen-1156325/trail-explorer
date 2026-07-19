@@ -252,6 +252,7 @@ public class CheckInServiceTests
             context,
             badgeUnlockService.Object,
             Mock.Of<ILeaderboardNotificationService>(),
+            Mock.Of<INotificationService>(),
             Mock.Of<ILogger<CheckInService>>());
     }
 

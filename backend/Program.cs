@@ -20,20 +20,23 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 builder.Services.AddSignalR();
 
-// // Add DbContext - SQLite
-// builder.Services.AddDbContext<ApplicationDbContext>(options =>
-//     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-// Add DbContext - PostgreSQL
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(
-        builder.Configuration.GetConnectionString("Postgres"),
-        npgsqlOptions =>
-        {
-            npgsqlOptions.MigrationsHistoryTable(
-                "__EFMigrationsHistory",
-                "trail_explorer");
-        }));
+if (builder.Environment.IsEnvironment("Testing"))
+{
+    builder.Services.AddDbContext<ApplicationDbContext>(options =>
+        options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+}
+else
+{
+    builder.Services.AddDbContext<ApplicationDbContext>(options =>
+        options.UseNpgsql(
+            builder.Configuration.GetConnectionString("Postgres"),
+            npgsqlOptions =>
+            {
+                npgsqlOptions.MigrationsHistoryTable(
+                    "__EFMigrationsHistory",
+                    "trail_explorer");
+            }));
+}
 
 // Add Authentication Services
 var jwtOptions = builder.Configuration.GetSection("Jwt").Get<JwtOptions>()
@@ -64,6 +67,8 @@ builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IBadgeEvaluationService, BadgeEvaluationService>();
 builder.Services.AddScoped<IBadgeUnlockService, BadgeUnlockService>();
 builder.Services.AddScoped<IBadgeService, BadgeService>();
+builder.Services.AddScoped<INotificationBroadcastService, NotificationBroadcastService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<ITrailSyncService, TrailSyncService>();
 builder.Services.AddScoped<IDocTrailIntegrationService, DocTrailIntegrationService>();
 builder.Services.AddHttpClient<IDocApiClient, DocApiClient>((serviceProvider, client) =>
@@ -103,7 +108,8 @@ builder.Services.AddAuthentication(options =>
             var path = context.HttpContext.Request.Path;
 
             if (!string.IsNullOrEmpty(accessToken) &&
-                path.StartsWithSegments("/hubs/leaderboard"))
+                (path.StartsWithSegments("/hubs/leaderboard") ||
+                path.StartsWithSegments("/hubs/notifications")))
             {
                 context.Token = accessToken;
             }
@@ -144,7 +150,14 @@ using (var scope = app.Services.CreateScope())
     var dbContext =
         scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-    dbContext.Database.Migrate();
+    if (app.Environment.IsEnvironment("Testing"))
+    {
+        dbContext.Database.EnsureCreated();
+    }
+    else
+    {
+        dbContext.Database.Migrate();
+    }
 
     if (app.Environment.IsDevelopment())
     {
@@ -169,6 +182,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapHub<LeaderboardHub>("/hubs/leaderboard");
+app.MapHub<NotificationHub>("/hubs/notifications");
 
 app.Run();
 

@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
 import {
   AlertTriangle,
-  ArrowLeft,
   Calendar,
   CheckCircle2,
   LoaderCircle,
@@ -49,22 +47,22 @@ function formatDate(value: string) {
 
 function roleClassName(role: UserResponse["role"]) {
   if (role === "Admin") {
-    return "border-[#F59E0B]/35 bg-[#F59E0B]/10 text-[#FCD34D]";
+    return "border-[#F59E0B]/35 bg-[#FEF3C7] text-[#92400E] dark:bg-[#F59E0B]/10 dark:text-[#FCD34D]";
   }
 
   if (role === "Moderator") {
-    return "border-[#8B5CF6]/35 bg-[#8B5CF6]/10 text-[#C4B5FD]";
+    return "border-[#8B5CF6]/35 bg-[#F3E8FF] text-[#6D28D9] dark:bg-[#8B5CF6]/10 dark:text-[#C4B5FD]";
   }
 
-  return "border-[#10B981]/35 bg-[#10B981]/10 text-[#A7F3D0]";
+  return "border-[#10B981]/35 bg-[#ECFDF5] text-[#047857] dark:bg-[#10B981]/10 dark:text-[#A7F3D0]";
 }
 
 function statusClassName(status: UserResponse["status"]) {
   if (status === "Suspended" || status === "Deleted") {
-    return "border-[#EF4444]/35 bg-[#EF4444]/10 text-red-200";
+    return "border-[#EF4444]/35 bg-[#FEE2E2] text-[#991B1B] dark:bg-[#EF4444]/10 dark:text-red-200";
   }
 
-  return "border-[#10B981]/35 bg-[#10B981]/10 text-[#A7F3D0]";
+  return "border-[#10B981]/35 bg-[#ECFDF5] text-[#047857] dark:bg-[#10B981]/10 dark:text-[#A7F3D0]";
 }
 
 function UserManagementPage() {
@@ -280,26 +278,9 @@ function UserManagementPage() {
   }, [accessToken, loadUsers]);
 
   return (
-    <main className="min-h-screen bg-[#0F172A] px-4 py-6 text-[#F8FAFC] sm:px-6 lg:px-8">
+    <main className="theme-page min-h-screen bg-[#0F172A] px-4 py-6 text-[#F8FAFC] sm:px-6 lg:px-8">
       <div className="mx-auto flex min-h-[calc(100vh-3rem)] w-full max-w-7xl items-center">
         <section className="w-full space-y-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <Button
-              asChild
-              className="w-fit border-white/15 bg-white/5 text-[#F8FAFC] hover:bg-white/10"
-              variant="outline"
-            >
-              <Link to="/dashboard">
-                <ArrowLeft aria-hidden="true" className="size-4" />
-                Dashboard
-              </Link>
-            </Button>
-
-            <div className="rounded-lg border border-[#10B981]/25 bg-[#10B981]/10 px-4 py-2 text-sm font-medium text-[#A7F3D0]">
-              Admin workspace
-            </div>
-          </div>
-
           <Card className="border-white/10 bg-[#1E293B] text-[#F8FAFC] shadow-2xl shadow-black/25">
             <CardContent className="p-6 sm:p-8 lg:p-10">
               <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
@@ -443,7 +424,7 @@ function UserManagementPage() {
                 <>
                   <div className="hidden overflow-x-auto md:block">
                     <table className="w-full min-w-[760px] text-left text-sm">
-                      <thead className="border-b border-white/10 bg-[#0F172A]/70 text-xs uppercase tracking-wide text-[#94A3B8]">
+                      <thead className="border-b border-black/10 bg-[#F7F8F3] text-xs uppercase tracking-wide text-[#56655D] dark:border-white/10 dark:bg-[#0F172A]/70 dark:text-[#94A3B8]">
                         <tr>
                           <th className="px-5 py-4 font-semibold">User</th>
                           <th className="px-5 py-4 font-semibold">Role</th>

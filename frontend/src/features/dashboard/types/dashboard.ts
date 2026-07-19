@@ -63,3 +63,12 @@ export interface RawDashboardResponse
   extends Omit<DashboardResponse, "recentBadges"> {
   recentBadges: RawDashboardBadge[];
 }
+
+export interface TrailSyncResult {
+  succeeded: boolean;
+  candidatesFound: number;
+  created: number;
+  updated: number;
+  skipped: number;
+  errorMessage?: string | null;
+}

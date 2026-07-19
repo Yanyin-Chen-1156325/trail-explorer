@@ -172,6 +172,26 @@ Example milestones:
 * 4 Week Streak
 * 8 Week Streak
 
+### Achievement Notifications
+
+When a user unlocks a badge, gains XP, levels up, or reaches a weekly streak milestone, the frontend displays a top-right toast notification and records the event in the user's notification list.
+
+Each notification has a read state so users can distinguish unread notifications from read notifications.
+
+Users can:
+
+* View unread and read achievement notifications
+* Mark a notification as read
+* Mark all notifications as read
+* See an unread notification count in the top-right notification indicator
+
+Notification examples:
+
+* Badge unlocked
+* XP gained
+* Level up
+* Weekly streak achieved
+
 ---
 
 ## Weekly Streak System
@@ -239,8 +259,15 @@ Leaderboards are calculated dynamically and are not stored in the database.
 
 * SignalR
 * Real-Time Leaderboards
-* Badge Notifications
-* XP Notifications
+* Top-right toast notifications
+* Notification read and unread states
+* Unread notification count
+* Mark notification as read
+* Mark all notifications as read
+* Badge unlock notifications
+* XP gain notifications
+* Level-up notifications
+* Weekly streak milestone notifications
 
 ---
 
@@ -303,7 +330,7 @@ External Services
 
 # AI-Assisted Development
 
-The project uses GitHub Copilot and structured AI-assisted development.
+The project uses GitHub Copilot / Codex and structured AI-assisted development.
 
 AI collaboration artifacts are maintained within:
 
@@ -313,6 +340,7 @@ AI collaboration artifacts are maintained within:
 
 instructions/
 
+* database.md
 * backend.md
 * frontend.md
 * gamification.md
@@ -333,4 +361,5 @@ These files define development standards, architecture rules, testing requiremen
 7. Dashboard & Statistics
 8. Real-Time Leaderboard
 9. User Experience Enhancements
-10. Deployment & Documentation
+10. Achievement Notification Center
+11. Deployment & Documentation

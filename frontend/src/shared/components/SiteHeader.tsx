@@ -1,6 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
-import { ChevronDown, Menu, Mountain, UserCircle } from "lucide-react";
+import {
+  Bell,
+  ChevronDown,
+  CheckCheck,
+  CheckCircle2,
+  Menu,
+  Mountain,
+  UserCircle,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { LogoutButton, useAuthStore } from "@/features/auth";
@@ -15,6 +23,8 @@ import {
 } from "@/components/ui/sheet";
 import { ThemeToggle } from "@/shared/components/ThemeToggle";
 import type { AuthSession } from "@/features/auth/store/authStore";
+import { useNotificationStore } from "@/features/notifications";
+import type { Notification } from "@/features/notifications";
 
 function Logo() {
   return (
@@ -108,24 +118,221 @@ function AccountMenu({ session }: { session: AuthSession }) {
   );
 }
 
+function NotificationIndicator() {
+  const [isOpen, setIsOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const notifications = useNotificationStore((state) => state.notifications);
+  const unreadCount = useNotificationStore((state) => state.unreadCount);
+  const markAsRead = useNotificationStore((state) => state.markAsRead);
+  const markAllAsRead = useNotificationStore((state) => state.markAllAsRead);
+  const label =
+    unreadCount > 0
+      ? `${unreadCount} unread notifications`
+      : "Notifications";
+  const recentNotifications = notifications.slice(0, 5);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen]);
+
+  const handleMarkAsRead = (notificationId: string) => {
+    void markAsRead(notificationId);
+  };
+
+  const handleMarkAllAsRead = () => {
+    void markAllAsRead();
+  };
+
+  return (
+    <div className="relative" ref={menuRef}>
+      <Button
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
+        aria-label={label}
+        className="relative size-10 border-black/10 bg-white/70 p-0 text-[#0B1511] hover:bg-white dark:border-white/15 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
+        size="icon"
+        type="button"
+        variant="outline"
+        onClick={() => setIsOpen((current) => !current)}
+      >
+        <Bell aria-hidden="true" className="size-5" />
+        {unreadCount > 0 ? (
+          <span className="absolute -right-1 -top-1 flex min-w-5 items-center justify-center rounded-full bg-[#EF4444] px-1.5 text-[11px] font-black leading-5 text-white">
+            {unreadCount > 99 ? "99+" : unreadCount}
+          </span>
+        ) : null}
+      </Button>
+
+      {isOpen ? (
+        <NotificationMenu
+          notifications={recentNotifications}
+          unreadCount={unreadCount}
+          onMarkAllAsRead={handleMarkAllAsRead}
+          onMarkAsRead={handleMarkAsRead}
+          onViewAll={() => setIsOpen(false)}
+        />
+      ) : null}
+    </div>
+  );
+}
+
+function formatNotificationDate(value: string) {
+  return new Intl.DateTimeFormat(undefined, {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(new Date(value));
+}
+
+function NotificationMenu({
+  notifications,
+  unreadCount,
+  onMarkAllAsRead,
+  onMarkAsRead,
+  onViewAll,
+}: {
+  notifications: Notification[];
+  unreadCount: number;
+  onMarkAllAsRead: () => void;
+  onMarkAsRead: (notificationId: string) => void;
+  onViewAll: () => void;
+}) {
+  return (
+    <div
+      className="absolute right-0 mt-3 w-[min(calc(100vw-2rem),24rem)] rounded-xl border border-black/10 bg-white p-3 text-[#0B1511] shadow-2xl shadow-black/15 dark:border-white/10 dark:bg-[#071511] dark:text-white dark:shadow-black/35"
+      role="menu"
+    >
+      <div className="flex items-start justify-between gap-3 border-b border-black/10 px-2 pb-3 dark:border-white/10">
+        <div>
+          <p className="text-sm font-black">Notifications</p>
+          <p className="mt-1 text-xs text-[#56655D] dark:text-white/60">
+            {unreadCount} unread
+          </p>
+        </div>
+        <Button
+          className="h-8 border-black/10 bg-black/5 px-2 text-xs text-[#0B1511] hover:bg-black/10 dark:border-white/15 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
+          disabled={unreadCount === 0}
+          type="button"
+          variant="outline"
+          onClick={onMarkAllAsRead}
+        >
+          <CheckCheck aria-hidden="true" className="size-3.5" />
+          Mark all
+        </Button>
+      </div>
+
+      {notifications.length === 0 ? (
+        <div className="px-2 py-6 text-center text-sm text-[#56655D] dark:text-white/60">
+          No notifications yet.
+        </div>
+      ) : (
+        <ol className="max-h-80 overflow-y-auto py-2" aria-label="Recent notifications">
+          {notifications.map((notification) => (
+            <li
+              className={`rounded-lg px-2 py-3 ${
+                notification.isRead
+                  ? "text-[#34463C] dark:text-white/75"
+                  : "bg-[#10B981]/10 text-[#0B1511] dark:text-white"
+              }`}
+              key={notification.id}
+            >
+              <div className="flex items-start gap-3">
+                <span
+                  className={`mt-1 size-2 rounded-full ${
+                    notification.isRead ? "bg-transparent" : "bg-[#10B981]"
+                  }`}
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-bold">
+                    {notification.title}
+                  </p>
+                  <p className="mt-1 line-clamp-2 text-xs leading-5 text-[#56655D] dark:text-white/60">
+                    {notification.message}
+                  </p>
+                  <p className="mt-2 text-[11px] font-semibold uppercase text-[#6B7A72] dark:text-white/45">
+                    {formatNotificationDate(notification.createdAt)}
+                  </p>
+                </div>
+                {!notification.isRead ? (
+                  <Button
+                    aria-label={`Mark ${notification.title} as read`}
+                    className="size-8 border-black/10 bg-white/60 text-[#0B1511] hover:bg-white dark:border-white/15 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
+                    size="icon"
+                    type="button"
+                    variant="outline"
+                    onClick={() => onMarkAsRead(notification.id)}
+                  >
+                    <CheckCircle2 aria-hidden="true" className="size-4" />
+                  </Button>
+                ) : null}
+              </div>
+            </li>
+          ))}
+        </ol>
+      )}
+
+      <Button
+        asChild
+        className="mt-2 h-10 w-full bg-[#43A047] font-bold text-white hover:bg-[#2E7D32]"
+      >
+        <Link to="/notifications" onClick={onViewAll}>
+          View all notifications
+        </Link>
+      </Button>
+    </div>
+  );
+}
+
 function SiteHeader() {
   const session = useAuthStore((state) => state.session);
   const canManageUsers =
     session?.user.role === "Admin" || session?.user.role === "Moderator";
   const sessionNavigationItems = session
-    ? [
-        { label: "Dashboard", to: "/dashboard" },
-        { label: "Trails", to: "/trails" },
-        { label: "Check-ins", to: "/checkins" },
-        { label: "Badges", to: "/badges" },
-        { label: "Leaderboard", to: "/leaderboard" },
-        ...(canManageUsers
-          ? [
-              { label: "Moderation", to: "/moderation/checkins" },
-              { label: "Manage Users", to: "/admin/users" },
-            ]
-          : []),
-      ]
+    ? canManageUsers
+      ? [
+          { label: "Dashboard", to: "/dashboard" },
+          { label: "Trails", to: "/trails" },
+          { label: "Check-ins", to: "/checkins" },
+          { label: "Badges", to: "/badges" },
+          { label: "Leaderboard", to: "/leaderboard" },
+          { label: "Notifications", to: "/notifications" },
+          { label: "Moderation", to: "/moderation/checkins" },
+          { label: "Manage Users", to: "/admin/users" },
+        ]
+      : [
+          { label: "Dashboard", to: "/dashboard" },
+          { label: "Trails", to: "/trails" },
+          { label: "Check-ins", to: "/checkins" },
+          { label: "Badges", to: "/badges" },
+          { label: "Leaderboard", to: "/leaderboard" },
+          { label: "Notifications", to: "/notifications" },
+        ]
     : [];
   const visibleNavigationItems = sessionNavigationItems;
 
@@ -155,7 +362,10 @@ function SiteHeader() {
         <div className="hidden items-center gap-3 lg:flex">
           <ThemeToggle />
           {session ? (
-            <AccountMenu session={session} />
+            <>
+              <NotificationIndicator />
+              <AccountMenu session={session} />
+            </>
           ) : (
             <>
               <Button
@@ -176,6 +386,7 @@ function SiteHeader() {
         </div>
 
         <div className="flex items-center gap-2 lg:hidden">
+          {session ? <NotificationIndicator /> : null}
           <ThemeToggle />
           <Sheet>
             <SheetTrigger asChild>

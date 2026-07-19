@@ -136,6 +136,7 @@
   }
 
   html:not(.dark) .theme-page .bg-\[\#0F172A\],
+  html:not(.dark) .theme-page .bg-\[\#1E293B\],
   html:not(.dark) .theme-page .bg-\[\#071511\],
   html:not(.dark) .theme-page .bg-\[\#0B1F1A\] {
     background-color: #ffffff !important;
@@ -156,7 +157,9 @@
   }
 
   html:not(.dark) .theme-page .text-white,
+  html:not(.dark) .theme-page .text-\[\#F8FAFC\],
   html:not(.dark) .theme-page .text-\[\#CBD5E1\],
+  html:not(.dark) .theme-page .text-\[\#D7DEE8\],
   html:not(.dark) .theme-page .text-red-50,
   html:not(.dark) .theme-page .text-red-100 {
     color: #0b1511 !important;
