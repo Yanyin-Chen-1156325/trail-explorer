@@ -1,8 +1,160 @@
 # Trail Explorer
 
-Trail Explorer is a gamified hiking web application designed to encourage users to explore and complete hiking trails around Christchurch, New Zealand.
+Trail Explorer is a gamified hiking trail platform focused on trails around Christchurch, New Zealand. Users can explore trails, record completed hikes, gain XP, level up, unlock badges, keep a weekly streak, and compare progress through a leaderboard.
 
-Users can discover trails, record completed hikes, earn experience points (XP), unlock achievements, maintain activity streaks, and compete with other hikers through a leaderboard system.
+---
 
-The application combines outdoor exploration with gamification elements to create a more engaging and rewarding hiking experience.
+## Deployment Links
 
+- Frontend: https://trail-explorer-drab.vercel.app
+- Backend API: https://trail-explorer-ana8cshcfbbrc0ff.australiasoutheast-01.azurewebsites.net
+- Scalar API Documentation: https://trail-explorer-ana8cshcfbbrc0ff.australiasoutheast-01.azurewebsites.net/scalar/v1
+
+---
+
+## Project Introduction
+
+This project is a full-stack web application. The frontend uses React and TypeScript. The backend uses ASP.NET Core Web API, Entity Framework Core, and PostgreSQL. The production frontend is deployed to Vercel. The production backend is deployed to Azure App Service for Linux container. Supabase PostgreSQL is used as the production database.
+
+Trail Explorer is not only a trail list. It uses gamification to encourage users to keep completing trails. Each check-in can affect XP, level, weekly streak, badge progress, and leaderboard ranking.
+
+---
+
+## Theme Relation: Gamification
+
+This project follows the MSA 2026 Phase 2 theme: Gamification. It turns hiking activity into a progress-based experience with rewards and competition.
+
+Main gamification features:
+
+- XP: Users gain XP after completing trails. XP is based on trail distance and difficulty.
+- Level: XP increases the user's level progress.
+- Badges: Users unlock achievements after meeting distance, region, difficulty, or streak goals.
+- Weekly Streak: Users are encouraged to complete trails every week.
+- Leaderboard: Users are ranked by XP and progress.
+- Notifications: Badge unlocks, level-ups, and XP gains can create real-time notifications.
+
+---
+
+## Unique Features
+
+- Uses official New Zealand DOC trail data. The current focus is Christchurch, but the design can be extended to all New Zealand trails.
+- Supports both email/password login and Google OAuth login.
+- Users can record completed trails and track how many trails they have finished.
+- The leaderboard shows user ranking and progress.
+- XP, levels, weekly streaks, badges, and notifications give users clear feedback and motivation.
+- The system has User, Moderator, and Admin roles. In the future, it could be extended into a community platform where users can comment, share hiking stories, or upload photos.
+
+---
+
+## Advanced Features
+
+The following three advanced features are submitted for marking.
+
+### 1. Security Measures
+
+- RBAC: The backend implements User, Moderator, and Admin roles.
+- Role-based policies: `AdminOnly` and `ModeratorOrAdmin` protect privileged API endpoints.
+- Password hashing: Local account passwords are hashed with BCrypt before being stored.
+- Data validation and sanitisation: FluentValidation validates request DTOs before service logic runs.
+
+Related code:
+
+- `backend/Authentication/AuthorizationPolicies.cs`
+- `backend/Enums/UserRole.cs`
+- `backend/Services/AuthenticationService.cs`
+- `backend/Validators/`
+- `backend/Controllers/`
+
+### 2. State Management: Zustand
+
+The frontend uses Zustand for client-side state management. It manages auth state, theme preference, toast notifications, and notification state.
+
+Main stores:
+
+- `frontend/src/features/auth/store/authStore.ts`
+- `frontend/src/shared/store/themeStore.ts`
+- `frontend/src/shared/store/toastStore.ts`
+- `frontend/src/features/notifications/store/notificationStore.ts`
+
+Zustand persistence is used for auth session and theme preference. This means the user can refresh the page and keep the login state and theme setting.
+
+### 3. Docker
+
+Docker is used in two ways: local/testing and production. Docker Compose is used for local smoke testing. In production, only the backend uses Docker. The frontend is deployed through Vercel as a Vite/React static frontend.
+
+Docker files:
+
+- `backend/Dockerfile`
+- `frontend/Dockerfile`
+- `docker-compose.yml`
+- `.dockerignore`
+
+Local/testing Docker flow:
+
+- `docker-compose.yml` can start the frontend and backend containers with one command.
+- This helps verify Dockerfiles, container ports, environment variables, and basic service connections.
+- This flow is for smoke testing. It is not the current production deployment method.
+
+```powershell
+docker compose up --build
+```
+
+Production Docker flow:
+
+1. Build the backend Docker image locally.
+2. Push the image to Azure Container Registry.
+3. Deploy the image to Azure App Service for Linux container.
+4. Configure Azure App Settings for database, JWT, OAuth, CORS, OpenAPI, and container port.
+
+The production frontend does not use Docker by design. Vercel is suitable for hosting the static files generated by Vite/React. Docker is more useful for the ASP.NET Core backend runtime and Azure App Service container deployment.
+
+---
+
+## Other Advanced Features Implemented
+
+### Theme Switching
+
+The app supports light mode and dark mode. The user's theme preference is saved.
+
+### WebSockets
+
+SignalR is used for real-time leaderboard and notification updates.
+
+### Caching Strategy
+
+`IMemoryCache` is used to cache trail list, trail detail, and leaderboard data.
+
+### System Logging
+
+Backend services and controllers use `ILogger` for authentication, check-in, badge, synchronisation, and error logs.
+
+---
+
+## Testing Strategy
+
+This project includes frontend unit/component tests and backend unit/integration tests.
+
+Frontend:
+
+- Test runner: Vitest
+- UI testing: Testing Library
+- Current result: 35 test files passed, 126 tests passed
+
+Backend:
+
+- Test framework: xUnit
+- Integration testing: `WebApplicationFactory<Program>`
+- Test database: SQLite in the testing environment
+- Current result: 205 tests passed
+
+Backend tests cover authentication, refresh tokens, Google OAuth flow, check-ins, dashboard, DOC integration, leaderboard, progress, trails, users, validators, badge evaluation, XP, level, streak, and health endpoints.
+
+---
+
+## Self Reflection
+
+The biggest lesson from this project was not simply that AI helped me write code faster. The bigger change was how I planned and managed software development. I first planned the system architecture, roadmap, and AI skills for different modules. This allowed AI to follow a more consistent process instead of generating a large amount of code all at once. It made the development process more structured and reduced the cost of later changes.
+
+I also found that AI-assisted development creates new challenges. In the past, most code was written by myself, so I understood every part of it more directly and debugging was easier. With AI, a large amount of code can be generated quickly. This made me think about whether I should still read every line of AI-generated code, and how I can keep code quality high. I believe that reading code is still important, but it is also important to build strong tests, code review habits, and verification processes. AI can also help check duplicate code, inconsistent architecture, and whether the code follows existing project standards.
+
+If I did this project again, I would set up automated testing and continuous verification earlier. I would test each feature as soon as it was completed instead of leaving too much testing until the end. I would also keep improving the AI skills and coding standards so AI can produce more consistent and maintainable code from the beginning. I believe AI can improve development speed, but the software engineer is still responsible for architecture design, requirement analysis, and final system quality.
