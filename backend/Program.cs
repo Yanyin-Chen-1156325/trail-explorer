@@ -185,6 +185,13 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+app.UseHttpsRedirection();
+
+app.UseCors("Frontend");
+
+app.UseAuthentication();
+app.UseAuthorization();
+
 // Configure the HTTP request pipeline
 var enableApiDocs = app.Environment.IsDevelopment()
     || app.Configuration.GetValue<bool>("OpenApi:Enabled");
@@ -195,13 +202,6 @@ if (enableApiDocs)
 
     app.MapScalarApiReference();
 }
-
-app.UseHttpsRedirection();
-
-app.UseCors("Frontend");
-
-app.UseAuthentication();
-app.UseAuthorization();
 
 app.MapGet("/", () => Results.Ok(new { status = "ok" }));
 app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
