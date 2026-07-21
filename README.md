@@ -158,3 +158,6 @@ The biggest lesson from this project was not simply that AI helped me write code
 I also found that AI-assisted development creates new challenges. In the past, most code was written by myself, so I understood every part of it more directly and debugging was easier. With AI, a large amount of code can be generated quickly. This made me think about whether I should still read every line of AI-generated code, and how I can keep code quality high. I believe that reading code is still important, but it is also important to build strong tests, code review habits, and verification processes. AI can also help check duplicate code, inconsistent architecture, and whether the code follows existing project standards.
 
 If I did this project again, I would set up automated testing and continuous verification earlier. I would test each feature as soon as it was completed instead of leaving too much testing until the end. I would also keep improving the AI skills and coding standards so AI can produce more consistent and maintainable code from the beginning. I believe AI can improve development speed, but the software engineer is still responsible for architecture design, requirement analysis, and final system quality.
+
+改測試, 優化程式內容與架構
+完善打卡機至, 例如track user路徑 需要start, finish時確認距離與地點才可以check in

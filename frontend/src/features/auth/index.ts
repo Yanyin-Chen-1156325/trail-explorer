@@ -13,6 +13,7 @@ export { LoginPage } from "./pages/LoginPage";
 export { LogoutButton } from "./components/LogoutButton";
 export { ProtectedRoute } from "./components/ProtectedRoute";
 export { PublicOnlyRoute } from "./components/PublicOnlyRoute";
+export { RoleProtectedRoute } from "./components/RoleProtectedRoute";
 export { RegisterPage } from "./pages/RegisterPage";
 export { useAuthStore } from "./store/authStore";
 export {

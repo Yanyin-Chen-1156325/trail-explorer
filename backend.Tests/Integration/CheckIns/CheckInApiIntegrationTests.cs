@@ -394,7 +394,7 @@ public class CheckInApiIntegrationTests : IClassFixture<CustomWebApplicationFact
             Name = name,
             City = "Christchurch",
             Region = "Canterbury",
-            Difficulty = TrailDifficulty.Moderate,
+            Difficulty = TrailDifficulty.Intermediate,
             DistanceKm = 7.5m,
             Description = $"{name} integration test trail",
             IsActive = true,

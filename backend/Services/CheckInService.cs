@@ -11,6 +11,7 @@ public class CheckInService : ICheckInService
     private readonly IBadgeUnlockService _badgeUnlockService;
     private readonly ILeaderboardNotificationService _leaderboardNotificationService;
     private readonly INotificationService _notificationService;
+    private readonly IXpCalculatorService _xpCalculatorService;
     private readonly ILogger<CheckInService> _logger;
 
     public CheckInService(
@@ -18,17 +19,20 @@ public class CheckInService : ICheckInService
         IBadgeUnlockService badgeUnlockService,
         ILeaderboardNotificationService leaderboardNotificationService,
         INotificationService notificationService,
+        IXpCalculatorService xpCalculatorService,
         ILogger<CheckInService> logger)
     {
         _context = context;
         _badgeUnlockService = badgeUnlockService;
         _leaderboardNotificationService = leaderboardNotificationService;
         _notificationService = notificationService;
+        _xpCalculatorService = xpCalculatorService;
         _logger = logger;
     }
 
     public async Task<CheckInResponse> CreateCheckInAsync(Guid userId, CreateCheckInRequest request)
     {
+        await using var transaction = await _context.Database.BeginTransactionAsync();
         var trailExists = await _context.Trails
             .AsNoTracking()
             .AnyAsync(trail => trail.Id == request.TrailId && trail.IsActive);
@@ -53,11 +57,16 @@ public class CheckInService : ICheckInService
         var notificationCreatedAt = DateTime.UtcNow;
         var unlockedBadges = await _badgeUnlockService.UnlockEligibleBadgesAsync(userId);
 
-        await _notificationService.CreateAchievementNotificationsAsync(
+        var createdNotifications = await _notificationService.CreateAchievementNotificationsAsync(
             userId,
             checkIn.Id,
             unlockedBadges,
-            notificationCreatedAt);
+            notificationCreatedAt) ?? [];
+
+        await transaction.CommitAsync();
+        await _notificationService.BroadcastCreatedNotificationsAsync(
+            userId,
+            createdNotifications);
 
         if (unlockedBadges.Count > 0)
         {
@@ -111,7 +120,9 @@ public class CheckInService : ICheckInService
 
     public async Task DeleteCheckInAsync(Guid checkInId, Guid userId)
     {
+        await using var transaction = await _context.Database.BeginTransactionAsync();
         var checkIn = await _context.CheckIns
+            .Include(x => x.Trail)
             .FirstOrDefaultAsync(x => x.Id == checkInId);
 
         if (checkIn is null)
@@ -125,8 +136,31 @@ public class CheckInService : ICheckInService
         }
 
         var removedUserId = checkIn.UserId;
+        var deductedXp = checkIn.IsHidden
+            ? 0
+            : _xpCalculatorService.CalculateXp(
+                checkIn.Trail.DistanceKm,
+                checkIn.Trail.Difficulty);
         _context.CheckIns.Remove(checkIn);
         await _context.SaveChangesAsync();
+
+        backend.DTOs.Notification.NotificationResponse? createdNotification = null;
+        if (deductedXp > 0)
+        {
+            createdNotification = await _notificationService.CreateXpDeductedNotificationAsync(
+                removedUserId,
+                deductedXp,
+                "a check-in was deleted",
+                DateTime.UtcNow);
+        }
+
+        await transaction.CommitAsync();
+        if (createdNotification is not null)
+        {
+            await _notificationService.BroadcastCreatedNotificationsAsync(
+                removedUserId,
+                [createdNotification]);
+        }
         await _leaderboardNotificationService.BroadcastLeaderboardChangedAsync(removedUserId);
     }
 
@@ -153,7 +187,9 @@ public class CheckInService : ICheckInService
 
     public async Task<CheckInResponse> HideCheckInAsync(Guid checkInId)
     {
+        await using var transaction = await _context.Database.BeginTransactionAsync();
         var checkIn = await _context.CheckIns
+            .Include(x => x.Trail)
             .FirstOrDefaultAsync(x => x.Id == checkInId);
 
         if (checkIn is null)
@@ -161,9 +197,33 @@ public class CheckInService : ICheckInService
             throw new KeyNotFoundException("Check-in not found");
         }
 
+        if (checkIn.IsHidden)
+        {
+            return ToCheckInResponse(checkIn);
+        }
+
         checkIn.IsHidden = true;
+        var deductedXp = _xpCalculatorService.CalculateXp(
+            checkIn.Trail.DistanceKm,
+            checkIn.Trail.Difficulty);
 
         await _context.SaveChangesAsync();
+        backend.DTOs.Notification.NotificationResponse? createdNotification = null;
+        if (deductedXp > 0)
+        {
+            createdNotification = await _notificationService.CreateXpDeductedNotificationAsync(
+                checkIn.UserId,
+                deductedXp,
+                "a check-in was hidden",
+                DateTime.UtcNow);
+        }
+        await transaction.CommitAsync();
+        if (createdNotification is not null)
+        {
+            await _notificationService.BroadcastCreatedNotificationsAsync(
+                checkIn.UserId,
+                [createdNotification]);
+        }
         await _leaderboardNotificationService.BroadcastLeaderboardChangedAsync(checkIn.UserId);
 
         return ToCheckInResponse(checkIn);
@@ -171,7 +231,9 @@ public class CheckInService : ICheckInService
 
     public async Task<CheckInResponse> RestoreCheckInAsync(Guid checkInId)
     {
+        await using var transaction = await _context.Database.BeginTransactionAsync();
         var checkIn = await _context.CheckIns
+            .Include(x => x.Trail)
             .FirstOrDefaultAsync(x => x.Id == checkInId);
 
         if (checkIn is null)
@@ -179,9 +241,32 @@ public class CheckInService : ICheckInService
             throw new KeyNotFoundException("Check-in not found");
         }
 
+        if (!checkIn.IsHidden)
+        {
+            return ToCheckInResponse(checkIn);
+        }
+
         checkIn.IsHidden = false;
+        var regainedXp = _xpCalculatorService.CalculateXp(
+            checkIn.Trail.DistanceKm,
+            checkIn.Trail.Difficulty);
 
         await _context.SaveChangesAsync();
+        backend.DTOs.Notification.NotificationResponse? createdNotification = null;
+        if (regainedXp > 0)
+        {
+            createdNotification = await _notificationService.CreateXpRegainedNotificationAsync(
+                checkIn.UserId,
+                regainedXp,
+                DateTime.UtcNow);
+        }
+        await transaction.CommitAsync();
+        if (createdNotification is not null)
+        {
+            await _notificationService.BroadcastCreatedNotificationsAsync(
+                checkIn.UserId,
+                [createdNotification]);
+        }
         await _leaderboardNotificationService.BroadcastLeaderboardChangedAsync(checkIn.UserId);
 
         return ToCheckInResponse(checkIn);

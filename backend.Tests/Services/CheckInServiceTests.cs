@@ -81,7 +81,8 @@ public class CheckInServiceTests
         database.Context.Trails.Add(trail);
         database.Context.CheckIns.Add(checkIn);
         await database.Context.SaveChangesAsync();
-        var service = CreateService(database.Context);
+        var notificationService = new Mock<INotificationService>();
+        var service = CreateService(database.Context, notificationService);
         var completedDate = new DateTime(2026, 2, 10, 9, 30, 0, DateTimeKind.Utc);
 
         var response = await service.UpdateCheckInAsync(checkIn.Id, user.Id, new UpdateCheckInRequest
@@ -111,7 +112,8 @@ public class CheckInServiceTests
         database.Context.Trails.Add(trail);
         database.Context.CheckIns.Add(checkIn);
         await database.Context.SaveChangesAsync();
-        var service = CreateService(database.Context);
+        var notificationService = new Mock<INotificationService>();
+        var service = CreateService(database.Context, notificationService);
 
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => service.UpdateCheckInAsync(checkIn.Id, otherUser.Id, new UpdateCheckInRequest
         {
@@ -131,11 +133,17 @@ public class CheckInServiceTests
         database.Context.Trails.Add(trail);
         database.Context.CheckIns.Add(checkIn);
         await database.Context.SaveChangesAsync();
-        var service = CreateService(database.Context);
+        var notificationService = new Mock<INotificationService>();
+        var service = CreateService(database.Context, notificationService);
 
         await service.DeleteCheckInAsync(checkIn.Id, user.Id);
 
         Assert.Empty(database.Context.CheckIns);
+        notificationService.Verify(service => service.CreateXpDeductedNotificationAsync(
+            user.Id,
+            60,
+            "a check-in was deleted",
+            It.IsAny<DateTime>()), Times.Once);
     }
 
     [Fact]
@@ -150,7 +158,8 @@ public class CheckInServiceTests
         database.Context.Trails.Add(trail);
         database.Context.CheckIns.Add(checkIn);
         await database.Context.SaveChangesAsync();
-        var service = CreateService(database.Context);
+        var notificationService = new Mock<INotificationService>();
+        var service = CreateService(database.Context, notificationService);
 
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => service.DeleteCheckInAsync(checkIn.Id, otherUser.Id));
 
@@ -210,7 +219,8 @@ public class CheckInServiceTests
         database.Context.Trails.Add(trail);
         database.Context.CheckIns.Add(checkIn);
         await database.Context.SaveChangesAsync();
-        var service = CreateService(database.Context);
+        var notificationService = new Mock<INotificationService>();
+        var service = CreateService(database.Context, notificationService);
 
         var response = await service.HideCheckInAsync(checkIn.Id);
 
@@ -218,6 +228,11 @@ public class CheckInServiceTests
         Assert.NotNull(savedCheckIn);
         Assert.True(savedCheckIn.IsHidden);
         Assert.True(response.IsHidden);
+        notificationService.Verify(service => service.CreateXpDeductedNotificationAsync(
+            user.Id,
+            60,
+            "a check-in was hidden",
+            It.IsAny<DateTime>()), Times.Once);
     }
 
     [Fact]
@@ -231,7 +246,8 @@ public class CheckInServiceTests
         database.Context.Trails.Add(trail);
         database.Context.CheckIns.Add(checkIn);
         await database.Context.SaveChangesAsync();
-        var service = CreateService(database.Context);
+        var notificationService = new Mock<INotificationService>();
+        var service = CreateService(database.Context, notificationService);
 
         var response = await service.RestoreCheckInAsync(checkIn.Id);
 
@@ -239,9 +255,90 @@ public class CheckInServiceTests
         Assert.NotNull(savedCheckIn);
         Assert.False(savedCheckIn.IsHidden);
         Assert.False(response.IsHidden);
+        notificationService.Verify(service => service.CreateXpRegainedNotificationAsync(
+            user.Id,
+            60,
+            It.IsAny<DateTime>()), Times.Once);
     }
 
-    private static CheckInService CreateService(ApplicationDbContext context)
+    [Fact]
+    public async Task DeleteCheckInAsync_WhenAlreadyHidden_DoesNotDeductXpAgain()
+    {
+        using var database = CreateDatabase();
+        var user = CreateUser();
+        var trail = CreateTrail();
+        var checkIn = CreateCheckIn(user.Id, trail.Id, isHidden: true);
+        database.Context.Users.Add(user);
+        database.Context.Trails.Add(trail);
+        database.Context.CheckIns.Add(checkIn);
+        await database.Context.SaveChangesAsync();
+        var notificationService = new Mock<INotificationService>();
+        var service = CreateService(database.Context, notificationService);
+
+        await service.DeleteCheckInAsync(checkIn.Id, user.Id);
+
+        notificationService.Verify(
+            service => service.CreateXpDeductedNotificationAsync(
+                It.IsAny<Guid>(),
+                It.IsAny<int>(),
+                It.IsAny<string>(),
+                It.IsAny<DateTime>()),
+            Times.Never);
+    }
+
+    [Fact]
+    public async Task HideAndRestoreCheckInAsync_WhenStateIsUnchanged_DoNotNotifyAgain()
+    {
+        using var database = CreateDatabase();
+        var user = CreateUser();
+        var trail = CreateTrail();
+        var hiddenCheckIn = CreateCheckIn(user.Id, trail.Id, isHidden: true);
+        var visibleCheckIn = CreateCheckIn(user.Id, trail.Id);
+        database.Context.Users.Add(user);
+        database.Context.Trails.Add(trail);
+        database.Context.CheckIns.AddRange(hiddenCheckIn, visibleCheckIn);
+        await database.Context.SaveChangesAsync();
+        var notificationService = new Mock<INotificationService>();
+        var service = CreateService(database.Context, notificationService);
+
+        await service.HideCheckInAsync(hiddenCheckIn.Id);
+        await service.RestoreCheckInAsync(visibleCheckIn.Id);
+
+        notificationService.VerifyNoOtherCalls();
+    }
+
+    [Fact]
+    public async Task HideCheckInAsync_WhenNotificationPersistenceFails_RollsBackStateChange()
+    {
+        using var database = CreateDatabase();
+        var user = CreateUser();
+        var trail = CreateTrail();
+        var checkIn = CreateCheckIn(user.Id, trail.Id);
+        database.Context.Users.Add(user);
+        database.Context.Trails.Add(trail);
+        database.Context.CheckIns.Add(checkIn);
+        await database.Context.SaveChangesAsync();
+        var notificationService = new Mock<INotificationService>();
+        notificationService
+            .Setup(service => service.CreateXpDeductedNotificationAsync(
+                user.Id,
+                60,
+                "a check-in was hidden",
+                It.IsAny<DateTime>()))
+            .ThrowsAsync(new InvalidOperationException("Notification persistence failed."));
+        var service = CreateService(database.Context, notificationService);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            service.HideCheckInAsync(checkIn.Id));
+
+        database.Context.ChangeTracker.Clear();
+        var savedCheckIn = await database.Context.CheckIns.SingleAsync();
+        Assert.False(savedCheckIn.IsHidden);
+    }
+
+    private static CheckInService CreateService(
+        ApplicationDbContext context,
+        Mock<INotificationService>? notificationService = null)
     {
         var badgeUnlockService = new Mock<IBadgeUnlockService>();
         badgeUnlockService
@@ -252,7 +349,8 @@ public class CheckInServiceTests
             context,
             badgeUnlockService.Object,
             Mock.Of<ILeaderboardNotificationService>(),
-            Mock.Of<INotificationService>(),
+            (notificationService ?? new Mock<INotificationService>()).Object,
+            new XpCalculatorService(),
             Mock.Of<ILogger<CheckInService>>());
     }
 
@@ -285,7 +383,7 @@ public class CheckInServiceTests
             Name = "Summit Track",
             City = "Christchurch",
             Region = "Canterbury",
-            Difficulty = TrailDifficulty.Moderate,
+            Difficulty = TrailDifficulty.Intermediate,
             DistanceKm = 5,
             Description = "Summit Track description",
             CoordinateX = 1572954.6221,

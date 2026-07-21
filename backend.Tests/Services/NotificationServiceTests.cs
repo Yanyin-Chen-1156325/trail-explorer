@@ -116,7 +116,7 @@ public class NotificationServiceTests
         using var database = CreateDatabase();
         var user = CreateUser();
         var olderTrail = CreateTrail(distanceKm: 1, difficulty: TrailDifficulty.Easy);
-        var currentTrail = CreateTrail(distanceKm: 50, difficulty: TrailDifficulty.Moderate);
+        var currentTrail = CreateTrail(distanceKm: 50, difficulty: TrailDifficulty.Intermediate);
         var previousCheckIn = CreateCheckIn(
             user.Id,
             olderTrail.Id,
@@ -133,7 +133,7 @@ public class NotificationServiceTests
         var broadcast = new Mock<INotificationBroadcastService>();
         var service = CreateService(database.Context, broadcast);
 
-        await service.CreateAchievementNotificationsAsync(
+        var createdNotifications = await service.CreateAchievementNotificationsAsync(
             user.Id,
             currentCheckIn.Id,
             [badge],
@@ -149,11 +149,103 @@ public class NotificationServiceTests
         Assert.Contains(notifications, x => x.Type == NotificationType.WeeklyStreak);
         broadcast.Verify(
             service => service.BroadcastNotificationCreatedAsync(
+                It.IsAny<Guid>(),
+                It.IsAny<backend.DTOs.Notification.NotificationResponse>()),
+            Times.Never);
+
+        await service.BroadcastCreatedNotificationsAsync(user.Id, createdNotifications);
+
+        broadcast.Verify(
+            service => service.BroadcastNotificationCreatedAsync(
                 user.Id,
                 It.IsAny<backend.DTOs.Notification.NotificationResponse>()),
             Times.Exactly(4));
         broadcast.Verify(
             service => service.BroadcastUnreadCountChangedAsync(user.Id, 4),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task CreateXpDeductedNotificationAsync_PersistsAndBroadcastsNotification()
+    {
+        using var database = CreateDatabase();
+        var user = CreateUser();
+        database.Context.Users.Add(user);
+        await database.Context.SaveChangesAsync();
+        var broadcast = new Mock<INotificationBroadcastService>();
+        var service = CreateService(database.Context, broadcast);
+        var createdAt = new DateTime(2026, 7, 14, 12, 0, 0, DateTimeKind.Utc);
+
+        var createdNotification = await service.CreateXpDeductedNotificationAsync(
+            user.Id,
+            60,
+            "a check-in was hidden",
+            createdAt);
+
+        var notification = await database.Context.Notifications.SingleAsync();
+        Assert.Equal(NotificationType.XpDeducted, notification.Type);
+        Assert.Equal("XP deducted", notification.Title);
+        Assert.Equal(
+            "60 XP was deducted because a check-in was hidden.",
+            notification.Message);
+        Assert.Equal(createdAt, notification.CreatedAt);
+        broadcast.Verify(
+            service => service.BroadcastNotificationCreatedAsync(
+                It.IsAny<Guid>(),
+                It.IsAny<backend.DTOs.Notification.NotificationResponse>()),
+            Times.Never);
+
+        await service.BroadcastCreatedNotificationsAsync(
+            user.Id,
+            [Assert.IsType<backend.DTOs.Notification.NotificationResponse>(createdNotification)]);
+
+        broadcast.Verify(
+            service => service.BroadcastNotificationCreatedAsync(
+                user.Id,
+                It.Is<backend.DTOs.Notification.NotificationResponse>(response =>
+                    response.Type == NotificationType.XpDeducted)),
+            Times.Once);
+        broadcast.Verify(
+            service => service.BroadcastUnreadCountChangedAsync(user.Id, 1),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task CreateXpRegainedNotificationAsync_PersistsAndBroadcastsNotification()
+    {
+        using var database = CreateDatabase();
+        var user = CreateUser();
+        database.Context.Users.Add(user);
+        await database.Context.SaveChangesAsync();
+        var broadcast = new Mock<INotificationBroadcastService>();
+        var service = CreateService(database.Context, broadcast);
+
+        var createdNotification = await service.CreateXpRegainedNotificationAsync(
+            user.Id,
+            60,
+            new DateTime(2026, 7, 14, 12, 0, 0, DateTimeKind.Utc));
+
+        var notification = await database.Context.Notifications.SingleAsync();
+        Assert.Equal(NotificationType.XpRegained, notification.Type);
+        Assert.Equal("XP regained", notification.Title);
+        Assert.Equal(
+            "You regained 60 XP because a check-in was restored.",
+            notification.Message);
+        broadcast.Verify(
+            service => service.BroadcastNotificationCreatedAsync(
+                It.IsAny<Guid>(),
+                It.IsAny<backend.DTOs.Notification.NotificationResponse>()),
+            Times.Never);
+
+        await service.BroadcastCreatedNotificationsAsync(
+            user.Id,
+            [Assert.IsType<backend.DTOs.Notification.NotificationResponse>(createdNotification)]);
+
+        broadcast.Verify(
+            service => service.BroadcastNotificationCreatedAsync(
+                user.Id,
+                It.Is<backend.DTOs.Notification.NotificationResponse>(response =>
+                    response.Type == NotificationType.XpRegained)),
             Times.Once);
     }
 

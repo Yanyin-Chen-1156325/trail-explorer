@@ -32,13 +32,13 @@ public class DashboardApiIntegrationTests : IClassFixture<CustomWebApplicationFa
             "Dashboard API Trail",
             "Canterbury",
             10m,
-            TrailDifficulty.Moderate);
+            TrailDifficulty.Intermediate);
         var otherTrail = await SeedTrailAsync(
             "dashboard-api-other-trail",
             "Dashboard API Other Trail",
             "Port Hills",
             20m,
-            TrailDifficulty.Hard);
+            TrailDifficulty.Advanced);
         var badge = await SeedBadgeAsync("Dashboard Badge");
         await SeedCheckInAsync(user.Id, trail.Id);
         await SeedCheckInAsync(otherUser.Id, otherTrail.Id);

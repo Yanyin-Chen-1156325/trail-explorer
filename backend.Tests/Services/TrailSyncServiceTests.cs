@@ -70,7 +70,7 @@ public class TrailSyncServiceTests
             City = "Old city",
             Region = "Old region",
             Description = "Old description",
-            Difficulty = TrailDifficulty.Hard,
+            Difficulty = TrailDifficulty.Advanced,
             DistanceKm = 1,
             IsActive = false,
             CreatedAt = DateTime.UtcNow.AddDays(-1),
@@ -113,7 +113,7 @@ public class TrailSyncServiceTests
         Assert.Equal("Updated description", trail.Description);
         Assert.Equal("https://www.doc.govt.nz/thumbs/large/link/updated.jpg", trail.ImageUrl);
         Assert.Equal(12.5m, trail.DistanceKm);
-        Assert.Equal(TrailDifficulty.Moderate, trail.Difficulty);
+        Assert.Equal(TrailDifficulty.Intermediate, trail.Difficulty);
         Assert.Equal(1480769.1942, trail.CoordinateX);
         Assert.Equal(5244426.8577, trail.CoordinateY);
         Assert.InRange(trail.Latitude.GetValueOrDefault(), -43.5, -42.5);
@@ -163,7 +163,7 @@ public class TrailSyncServiceTests
             City = "Old city",
             Region = "Old region",
             Description = "Old description",
-            Difficulty = TrailDifficulty.Hard,
+            Difficulty = TrailDifficulty.Advanced,
             DistanceKm = 1,
             IsActive = true,
             CreatedAt = DateTime.UtcNow.AddDays(-1),
@@ -205,8 +205,16 @@ public class TrailSyncServiceTests
         Assert.Equal(2, await context.Trails.CountAsync());
     }
 
-    [Fact]
-    public async Task SyncFromDocAsync_MapsEasiestDifficultyToEasy()
+    [Theory]
+    [InlineData("Easy Access", TrailDifficulty.Easy)]
+    [InlineData("Easiest", TrailDifficulty.Easy)]
+    [InlineData("Easy", TrailDifficulty.Easy)]
+    [InlineData("Intermediate", TrailDifficulty.Intermediate)]
+    [InlineData("Advanced", TrailDifficulty.Advanced)]
+    [InlineData("Expert", TrailDifficulty.Expert)]
+    public async Task SyncFromDocAsync_MapsOfficialDocDifficultyValues(
+        string difficultyText,
+        TrailDifficulty expectedDifficulty)
     {
         await using var context = CreateContext();
         var integrationService = new FakeDocTrailIntegrationService(
@@ -215,7 +223,7 @@ public class TrailSyncServiceTests
                 {
                     DocId = "doc-1",
                     Name = "Trail 1",
-                    DifficultyText = "Easiest"
+                    DifficultyText = difficultyText
                 }
             ]);
         var service = CreateService(context, integrationService);
@@ -223,7 +231,7 @@ public class TrailSyncServiceTests
         await service.SyncFromDocAsync();
 
         var trail = await context.Trails.SingleAsync();
-        Assert.Equal(TrailDifficulty.Easy, trail.Difficulty);
+        Assert.Equal(expectedDifficulty, trail.Difficulty);
         Assert.Equal(0, trail.DistanceKm);
         Assert.Equal("Unknown", trail.City);
         Assert.Equal("Unknown", trail.Region);

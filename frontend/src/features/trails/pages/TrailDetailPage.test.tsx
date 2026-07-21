@@ -36,7 +36,7 @@ describe("TrailDetailPage", () => {
       await mockJsonResponse(
         createTrailResponse({
           name: "Summit Route",
-          difficulty: "Hard",
+          difficulty: "Expert",
           distanceKm: 12.4,
           city: "Akaroa",
           region: "Canterbury",
@@ -51,7 +51,7 @@ describe("TrailDetailPage", () => {
 
     expect(screen.getByText("Loading trail details")).toBeInTheDocument();
     expect(await screen.findByRole("heading", { name: "Summit Route" })).toBeInTheDocument();
-    expect(screen.getAllByText("Hard").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Expert").length).toBeGreaterThan(0);
     expect(screen.getByText("12.4 km")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Trail location" })).toBeInTheDocument();
     expect(screen.getAllByText("Akaroa, Canterbury").length).toBeGreaterThan(0);

@@ -48,7 +48,7 @@ describe("TrailCard", () => {
     ).toBeInTheDocument();
   });
 
-  it.each<TrailDifficulty>(["Easy", "Moderate", "Hard"])(
+  it.each<TrailDifficulty>(["Easy", "Intermediate", "Advanced", "Expert"])(
     "renders the %s difficulty label",
     (difficulty) => {
       renderWithRouter(<TrailCard trail={createTrailWithDifficulty(difficulty)} />);

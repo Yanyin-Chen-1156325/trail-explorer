@@ -11,7 +11,8 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { LogoutButton, useAuthStore } from "@/features/auth";
+import { LogoutButton } from "@/features/auth/components/LogoutButton";
+import { useAuthStore } from "@/features/auth/store/authStore";
 import {
   Sheet,
   SheetClose,
@@ -23,8 +24,8 @@ import {
 } from "@/components/ui/sheet";
 import { ThemeToggle } from "@/shared/components/ThemeToggle";
 import type { AuthSession } from "@/features/auth/store/authStore";
-import { useNotificationStore } from "@/features/notifications";
-import type { Notification } from "@/features/notifications";
+import { useNotificationStore } from "@/features/notifications/store/notificationStore";
+import type { Notification } from "@/features/notifications/types/notification";
 
 function Logo() {
   return (

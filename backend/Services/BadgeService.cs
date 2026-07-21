@@ -80,7 +80,10 @@ public class BadgeService : IBadgeService
             .Where(region => !string.IsNullOrWhiteSpace(region))
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .Count();
-        var hardTrailCount = completedTrails.Count(trail => trail.Difficulty == TrailDifficulty.Hard);
+        var advancedTrailCount = completedTrails.Count(
+            trail => trail.Difficulty == TrailDifficulty.Advanced);
+        var expertTrailCount = completedTrails.Count(
+            trail => trail.Difficulty == TrailDifficulty.Expert);
         var weeklyStreak = CalculateWeeklyStreak(completedTrails);
         var hasPortHillsTrail = completedTrails.Any(trail =>
             ContainsRegion(trail.Region, "Port Hills"));
@@ -91,7 +94,8 @@ public class BadgeService : IBadgeService
             completedTrailCount,
             totalDistanceKm,
             completedRegionCount,
-            hardTrailCount,
+            advancedTrailCount,
+            expertTrailCount,
             weeklyStreak,
             hasPortHillsTrail,
             hasBanksPeninsulaTrail);
@@ -151,7 +155,8 @@ public class BadgeService : IBadgeService
         int CompletedTrailCount,
         decimal TotalDistanceKm,
         int CompletedRegionCount,
-        int HardTrailCount,
+        int AdvancedTrailCount,
+        int ExpertTrailCount,
         int WeeklyStreak,
         bool HasPortHillsTrail,
         bool HasBanksPeninsulaTrail)
@@ -163,7 +168,7 @@ public class BadgeService : IBadgeService
                 BadgeType.Completion => CompletedTrailCount,
                 BadgeType.Distance => TotalDistanceKm,
                 BadgeType.Region => GetRegionCurrentValue(badge.Name),
-                BadgeType.Difficulty => HardTrailCount,
+                BadgeType.Difficulty => GetDifficultyCurrentValue(badge.Name),
                 BadgeType.Streak => WeeklyStreak,
                 _ => 0
             };
@@ -181,7 +186,16 @@ public class BadgeService : IBadgeService
                 return distanceTarget;
             }
 
-            if (BadgeRuleCatalog.ExpertTrailThresholds.TryGetValue(badge.Name, out var expertTrailTarget))
+            if (BadgeRuleCatalog.AdvancedTrailThresholds.TryGetValue(
+                badge.Name,
+                out var advancedTrailTarget))
+            {
+                return advancedTrailTarget;
+            }
+
+            if (BadgeRuleCatalog.ExpertTrailThresholds.TryGetValue(
+                badge.Name,
+                out var expertTrailTarget))
             {
                 return expertTrailTarget;
             }
@@ -210,7 +224,7 @@ public class BadgeService : IBadgeService
                 BadgeType.Completion => $"{FormatNumber(currentValue)}/{FormatNumber(targetValue)} trails",
                 BadgeType.Distance => $"{FormatNumber(currentValue)}/{FormatNumber(targetValue)} km",
                 BadgeType.Region => $"{FormatNumber(currentValue)}/{FormatNumber(targetValue)} regions",
-                BadgeType.Difficulty => $"{FormatNumber(currentValue)}/{FormatNumber(targetValue)} hard trails",
+                BadgeType.Difficulty => $"{FormatNumber(currentValue)}/{FormatNumber(targetValue)} {GetDifficultyLabel(badge.Name)} trails",
                 BadgeType.Streak => $"{FormatNumber(currentValue)}/{FormatNumber(targetValue)} weeks",
                 _ => $"{FormatNumber(currentValue)}/{FormatNumber(targetValue)}"
             };
@@ -225,6 +239,28 @@ public class BadgeService : IBadgeService
                 "Canterbury Explorer" => CompletedRegionCount,
                 _ => 0
             };
+        }
+
+        private decimal GetDifficultyCurrentValue(string badgeName)
+        {
+            if (BadgeRuleCatalog.AdvancedTrailThresholds.ContainsKey(badgeName))
+            {
+                return AdvancedTrailCount;
+            }
+
+            if (BadgeRuleCatalog.ExpertTrailThresholds.ContainsKey(badgeName))
+            {
+                return ExpertTrailCount;
+            }
+
+            return 0;
+        }
+
+        private static string GetDifficultyLabel(string badgeName)
+        {
+            return BadgeRuleCatalog.ExpertTrailThresholds.ContainsKey(badgeName)
+                ? "expert"
+                : "advanced";
         }
 
         private static string FormatNumber(decimal value)

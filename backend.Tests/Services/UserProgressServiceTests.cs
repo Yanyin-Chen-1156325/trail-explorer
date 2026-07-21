@@ -15,7 +15,7 @@ public class UserProgressServiceTests
         using var database = CreateDatabase();
         var user = CreateUser();
         var easyTrail = CreateTrail("Easy Trail", 5m, TrailDifficulty.Easy);
-        var hardTrail = CreateTrail("Hard Trail", 10m, TrailDifficulty.Hard);
+        var hardTrail = CreateTrail("Hard Trail", 10m, TrailDifficulty.Advanced);
         database.Context.Users.Add(user);
         database.Context.Trails.AddRange(easyTrail, hardTrail);
         database.Context.CheckIns.AddRange(
@@ -42,7 +42,7 @@ public class UserProgressServiceTests
         using var database = CreateDatabase();
         var user = CreateUser("user@example.com");
         var otherUser = CreateUser("other@example.com");
-        var trail = CreateTrail("Shared Trail", 10m, TrailDifficulty.Moderate);
+        var trail = CreateTrail("Shared Trail", 10m, TrailDifficulty.Intermediate);
         database.Context.Users.AddRange(user, otherUser);
         database.Context.Trails.Add(trail);
         database.Context.CheckIns.AddRange(

@@ -13,9 +13,24 @@ public interface INotificationService
 
     Task<int> MarkAllNotificationsAsReadAsync(Guid userId);
 
-    Task CreateAchievementNotificationsAsync(
+    Task<IReadOnlyList<NotificationResponse>> CreateAchievementNotificationsAsync(
         Guid userId,
         Guid checkInId,
         IReadOnlyCollection<Badge> unlockedBadges,
         DateTime createdAtUtc);
+
+    Task<NotificationResponse?> CreateXpDeductedNotificationAsync(
+        Guid userId,
+        int deductedXp,
+        string reason,
+        DateTime createdAtUtc);
+
+    Task<NotificationResponse?> CreateXpRegainedNotificationAsync(
+        Guid userId,
+        int regainedXp,
+        DateTime createdAtUtc);
+
+    Task BroadcastCreatedNotificationsAsync(
+        Guid userId,
+        IReadOnlyCollection<NotificationResponse> notifications);
 }

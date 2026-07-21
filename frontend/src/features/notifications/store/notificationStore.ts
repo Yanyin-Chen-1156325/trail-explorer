@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
 import { notificationsApiBaseUrl } from "@/config/api";
-import { runAuthenticatedRequest } from "@/features/auth";
+import { runAuthenticatedRequest } from "@/features/auth/utils/authenticatedRequest";
 
 import {
   createNotificationApi,

@@ -203,9 +203,10 @@ public class TrailSyncService : ITrailSyncService
 
         return difficultyText.Trim().ToLowerInvariant() switch
         {
-            "easiest" or "easy" => TrailDifficulty.Easy,
-            "intermediate" or "moderate" => TrailDifficulty.Moderate,
-            "advanced" or "expert" or "hard" => TrailDifficulty.Hard,
+            "easy access" or "easiest" or "easy" => TrailDifficulty.Easy,
+            "intermediate" or "moderate" => TrailDifficulty.Intermediate,
+            "advanced" or "hard" => TrailDifficulty.Advanced,
+            "expert" => TrailDifficulty.Expert,
             _ => TrailDifficulty.Easy
         };
     }

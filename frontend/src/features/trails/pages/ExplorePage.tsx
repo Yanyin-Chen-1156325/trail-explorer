@@ -39,8 +39,9 @@ const trailApi = createTrailApi(trailsApiBaseUrl);
 const difficultyOptions: Array<TrailDifficulty | "All"> = [
   "All",
   "Easy",
-  "Moderate",
-  "Hard",
+  "Intermediate",
+  "Advanced",
+  "Expert",
 ];
 const TrailMapContainer = MapContainer as unknown as ComponentType<
   PropsWithChildren<{

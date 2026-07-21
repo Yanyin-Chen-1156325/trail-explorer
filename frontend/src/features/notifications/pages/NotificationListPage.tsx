@@ -7,8 +7,10 @@ import {
   CheckCircle2,
   Flame,
   Loader2,
+  RefreshCcw,
   Sparkles,
   Star,
+  TrendingDown,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -23,6 +25,8 @@ const notificationIcons = {
   XpGained: Sparkles,
   LevelUp: Star,
   WeeklyStreak: Flame,
+  XpDeducted: TrendingDown,
+  XpRegained: RefreshCcw,
 } satisfies Record<NotificationType, typeof Award>;
 
 function formatDate(value: string) {

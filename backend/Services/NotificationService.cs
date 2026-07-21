@@ -102,7 +102,7 @@ public class NotificationService : INotificationService
         return unreadNotifications.Count;
     }
 
-    public async Task CreateAchievementNotificationsAsync(
+    public async Task<IReadOnlyList<NotificationResponse>> CreateAchievementNotificationsAsync(
         Guid userId,
         Guid checkInId,
         IReadOnlyCollection<Badge> unlockedBadges,
@@ -182,17 +182,64 @@ public class NotificationService : INotificationService
 
         if (notifications.Count == 0)
         {
-            return;
+            return [];
         }
 
         _context.Notifications.AddRange(notifications);
         await _context.SaveChangesAsync();
 
+        return notifications.Select(ToResponse).ToList();
+    }
+
+    public Task<NotificationResponse?> CreateXpDeductedNotificationAsync(
+        Guid userId,
+        int deductedXp,
+        string reason,
+        DateTime createdAtUtc)
+    {
+        return CreateNotificationAsync(new Notification
+        {
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            Type = NotificationType.XpDeducted,
+            Title = "XP deducted",
+            Message = $"{deductedXp} XP was deducted because {reason}.",
+            IsRead = false,
+            CreatedAt = createdAtUtc
+        });
+    }
+
+    public Task<NotificationResponse?> CreateXpRegainedNotificationAsync(
+        Guid userId,
+        int regainedXp,
+        DateTime createdAtUtc)
+    {
+        return CreateNotificationAsync(new Notification
+        {
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            Type = NotificationType.XpRegained,
+            Title = "XP regained",
+            Message = $"You regained {regainedXp} XP because a check-in was restored.",
+            IsRead = false,
+            CreatedAt = createdAtUtc
+        });
+    }
+
+    public async Task BroadcastCreatedNotificationsAsync(
+        Guid userId,
+        IReadOnlyCollection<NotificationResponse> notifications)
+    {
+        if (notifications.Count == 0)
+        {
+            return;
+        }
+
         foreach (var notification in notifications)
         {
             await _notificationBroadcastService.BroadcastNotificationCreatedAsync(
                 userId,
-                ToResponse(notification));
+                notification);
         }
 
         await BroadcastUnreadCountAsync(userId);
@@ -202,8 +249,8 @@ public class NotificationService : INotificationService
         IReadOnlyCollection<NotificationProgressCheckIn> checkIns,
         DateTime currentDateUtc)
     {
-        var totalXp = checkIns.Sum(checkIn =>
-            _xpCalculatorService.CalculateXp(checkIn.DistanceKm, checkIn.Difficulty));
+        var totalXp = _xpCalculatorService.CalculateTotalXp(checkIns.Select(checkIn =>
+            new TrailXpInput(checkIn.DistanceKm, checkIn.Difficulty)));
         var level = _levelCalculatorService.CalculateLevel(totalXp);
         var weeklyStreak = _streakCalculatorService.CalculateWeeklyStreak(
             checkIns.Select(checkIn => checkIn.CompletedDate),
@@ -218,6 +265,13 @@ public class NotificationService : INotificationService
         await _notificationBroadcastService.BroadcastUnreadCountChangedAsync(
             userId,
             unreadCount);
+    }
+
+    private async Task<NotificationResponse?> CreateNotificationAsync(Notification notification)
+    {
+        _context.Notifications.Add(notification);
+        await _context.SaveChangesAsync();
+        return ToResponse(notification);
     }
 
     private static NotificationResponse ToResponse(Notification notification)

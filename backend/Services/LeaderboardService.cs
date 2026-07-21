@@ -109,10 +109,10 @@ public class LeaderboardService : ILeaderboardService
                 (user, userCheckIns) =>
                 {
                     var completions = userCheckIns.ToList();
-                    var totalXp = completions.Sum(completion =>
-                        _xpCalculatorService.CalculateXp(
+                    var totalXp = _xpCalculatorService.CalculateTotalXp(
+                        completions.Select(completion => new TrailXpInput(
                             completion.DistanceKm,
-                            completion.Difficulty));
+                            completion.Difficulty)));
 
                     return new LeaderboardUserSummary(
                         user.UserId,

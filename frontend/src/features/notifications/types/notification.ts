@@ -2,7 +2,9 @@ export type NotificationType =
   | "BadgeUnlocked"
   | "XpGained"
   | "LevelUp"
-  | "WeeklyStreak";
+  | "WeeklyStreak"
+  | "XpDeducted"
+  | "XpRegained";
 
 export type RawNotificationType = NotificationType | number;
 

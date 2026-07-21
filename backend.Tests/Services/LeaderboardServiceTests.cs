@@ -18,8 +18,8 @@ public class LeaderboardServiceTests
         var tieMoreCompletionsUser = CreateUser("Tie More Completions");
         var tieMoreDistanceUser = CreateUser("Tie More Distance");
         var hiddenOnlyUser = CreateUser("Hidden Only");
-        var hardTrail = CreateTrail("Hard Trail", 10m, TrailDifficulty.Hard);
-        var moderateTrail = CreateTrail("Moderate Trail", 10m, TrailDifficulty.Moderate);
+        var hardTrail = CreateTrail("Hard Trail", 10m, TrailDifficulty.Advanced);
+        var moderateTrail = CreateTrail("Moderate Trail", 10m, TrailDifficulty.Intermediate);
         var shortEasyTrail = CreateTrail("Short Easy Trail", 5m, TrailDifficulty.Easy);
         var longEasyTrail = CreateTrail("Long Easy Trail", 10m, TrailDifficulty.Easy);
         database.Context.Users.AddRange(
@@ -96,7 +96,7 @@ public class LeaderboardServiceTests
         var user = CreateUser("Regular User");
         var admin = CreateUser("Admin User", UserRole.Admin);
         var moderator = CreateUser("Moderator User", UserRole.Moderator);
-        var trail = CreateTrail("High XP Trail", 20m, TrailDifficulty.Hard);
+        var trail = CreateTrail("High XP Trail", 20m, TrailDifficulty.Advanced);
         database.Context.Users.AddRange(user, admin, moderator);
         database.Context.Trails.Add(trail);
         database.Context.CheckIns.AddRange(

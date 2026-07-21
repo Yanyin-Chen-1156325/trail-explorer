@@ -17,8 +17,8 @@ public class DashboardServiceTests
         var user = CreateUser("dashboard.user@example.com");
         var otherUser = CreateUser("other.dashboard.user@example.com");
         var firstTrail = CreateTrail("First Trail", "Canterbury", 5m, TrailDifficulty.Easy);
-        var secondTrail = CreateTrail("Second Trail", "Port Hills", 10m, TrailDifficulty.Hard);
-        var hiddenTrail = CreateTrail("Hidden Trail", "Canterbury", 20m, TrailDifficulty.Hard);
+        var secondTrail = CreateTrail("Second Trail", "Port Hills", 10m, TrailDifficulty.Advanced);
+        var hiddenTrail = CreateTrail("Hidden Trail", "Canterbury", 20m, TrailDifficulty.Advanced);
         var badge = CreateBadge("First Trail Badge");
         database.Context.Users.AddRange(user, otherUser);
         database.Context.Trails.AddRange(firstTrail, secondTrail, hiddenTrail);

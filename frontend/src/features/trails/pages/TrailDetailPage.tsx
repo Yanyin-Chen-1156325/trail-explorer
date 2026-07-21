@@ -59,11 +59,15 @@ const TrailCircleMarker = CircleMarker as unknown as ComponentType<
 >;
 
 function difficultyClassName(difficulty: TrailResponse["difficulty"]) {
-  if (difficulty === "Hard") {
+  if (difficulty === "Expert") {
+    return "border-red-400/40 bg-red-500/18 text-red-100";
+  }
+
+  if (difficulty === "Advanced") {
     return "border-orange-400/40 bg-orange-500/18 text-orange-100";
   }
 
-  if (difficulty === "Moderate") {
+  if (difficulty === "Intermediate") {
     return "border-amber-300/40 bg-amber-400/16 text-amber-100";
   }
 

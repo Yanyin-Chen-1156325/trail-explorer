@@ -1,4 +1,4 @@
-export type TrailDifficulty = "Easy" | "Moderate" | "Hard";
+export type TrailDifficulty = "Easy" | "Intermediate" | "Advanced" | "Expert";
 
 export type RawTrailDifficulty = TrailDifficulty | number;
 

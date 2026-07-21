@@ -103,8 +103,8 @@ public class DashboardService : IDashboardService
     private UserProgressResponse CalculateProgress(
         IReadOnlyCollection<CompletedTrailDashboardData> completedTrails)
     {
-        var totalXp = completedTrails.Sum(trail =>
-            _xpCalculatorService.CalculateXp(trail.DistanceKm, trail.Difficulty));
+        var totalXp = _xpCalculatorService.CalculateTotalXp(completedTrails.Select(trail =>
+            new TrailXpInput(trail.DistanceKm, trail.Difficulty)));
         var levelProgress = _levelCalculatorService.CalculateProgress(totalXp);
 
         return new UserProgressResponse(

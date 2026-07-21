@@ -86,7 +86,18 @@ public class BadgeEvaluationService : IBadgeEvaluationService
             eligibleBadgeNames.Add("Canterbury Explorer");
         }
 
-        var expertTrailCount = completedTrails.Count(IsExpertLevelTrail);
+        var advancedTrailCount = completedTrails.Count(
+            trail => trail.Difficulty == TrailDifficulty.Advanced);
+        foreach (var threshold in BadgeRuleCatalog.AdvancedTrailThresholds)
+        {
+            if (advancedTrailCount >= threshold.Value)
+            {
+                eligibleBadgeNames.Add(threshold.Key);
+            }
+        }
+
+        var expertTrailCount = completedTrails.Count(
+            trail => trail.Difficulty == TrailDifficulty.Expert);
         foreach (var threshold in BadgeRuleCatalog.ExpertTrailThresholds)
         {
             if (expertTrailCount >= threshold.Value)
@@ -110,11 +121,6 @@ public class BadgeEvaluationService : IBadgeEvaluationService
     private static bool ContainsRegion(string region, string targetRegion)
     {
         return region.Contains(targetRegion, StringComparison.OrdinalIgnoreCase);
-    }
-
-    private static bool IsExpertLevelTrail(CompletedTrailBadgeProgress trail)
-    {
-        return trail.Difficulty == TrailDifficulty.Hard;
     }
 
     private static int CalculateWeeklyStreak(

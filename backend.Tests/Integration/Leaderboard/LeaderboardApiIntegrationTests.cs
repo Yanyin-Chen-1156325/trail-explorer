@@ -28,7 +28,7 @@ public class LeaderboardApiIntegrationTests : IClassFixture<CustomWebApplication
         await ResetLeaderboardDataAsync();
         var topUser = await SeedUserAsync("leaderboard.top@example.com", "Top Hiker");
         var currentUser = await SeedUserAsync("leaderboard.current@example.com", "Current Hiker");
-        var trail = await SeedTrailAsync("leaderboard-trail", "Leaderboard Trail", 10m, TrailDifficulty.Hard);
+        var trail = await SeedTrailAsync("leaderboard-trail", "Leaderboard Trail", 10m, TrailDifficulty.Advanced);
         await SeedCheckInAsync(topUser.Id, trail.Id);
         await SeedCheckInAsync(currentUser.Id, trail.Id, isHidden: true);
         client.DefaultRequestHeaders.Authorization = CreateAuthorizationHeader(currentUser);
@@ -54,7 +54,7 @@ public class LeaderboardApiIntegrationTests : IClassFixture<CustomWebApplication
         var currentUser = await SeedUserAsync("leaderboard.user@example.com", "User Hiker");
         var admin = await SeedUserAsync("leaderboard.admin@example.com", "Admin Hiker", UserRole.Admin);
         var moderator = await SeedUserAsync("leaderboard.moderator@example.com", "Moderator Hiker", UserRole.Moderator);
-        var trail = await SeedTrailAsync("leaderboard-role-trail", "Leaderboard Role Trail", 10m, TrailDifficulty.Hard);
+        var trail = await SeedTrailAsync("leaderboard-role-trail", "Leaderboard Role Trail", 10m, TrailDifficulty.Advanced);
         await SeedCheckInAsync(currentUser.Id, trail.Id);
         await SeedCheckInAsync(admin.Id, trail.Id);
         await SeedCheckInAsync(moderator.Id, trail.Id);

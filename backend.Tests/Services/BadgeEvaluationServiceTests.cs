@@ -17,8 +17,8 @@ public class BadgeEvaluationServiceTests
         database.Context.Users.Add(user);
         database.Context.Badges.AddRange(CreateBadges());
 
-        var portHillsTrail = CreateTrail("Port Hills Trail", "Port Hills", 25m, TrailDifficulty.Hard);
-        var banksTrail = CreateTrail("Banks Trail", "Banks Peninsula", 25m, TrailDifficulty.Moderate);
+        var portHillsTrail = CreateTrail("Port Hills Trail", "Port Hills", 25m, TrailDifficulty.Advanced);
+        var banksTrail = CreateTrail("Banks Trail", "Banks Peninsula", 25m, TrailDifficulty.Intermediate);
         var canterburyTrail = CreateTrail("Canterbury Trail", "Canterbury Foothills", 10m, TrailDifficulty.Easy);
         database.Context.Trails.AddRange(portHillsTrail, banksTrail, canterburyTrail);
         database.Context.CheckIns.AddRange(
@@ -36,8 +36,84 @@ public class BadgeEvaluationServiceTests
         Assert.Contains(badges, badge => badge.Name == "Banks Peninsula Explorer");
         Assert.Contains(badges, badge => badge.Name == "Canterbury Explorer");
         Assert.Contains(badges, badge => badge.Name == "Advanced Explorer");
-        Assert.Contains(badges, badge => badge.Name == "Expert Explorer");
+        Assert.DoesNotContain(badges, badge => badge.Name == "Expert Explorer");
         Assert.Contains(badges, badge => badge.Name == "2 Week Streak");
+    }
+
+    [Fact]
+    public async Task GetEligibleBadgesAsync_UsesOnlyExpertTrailsForExpertThresholds()
+    {
+        using var database = CreateDatabase();
+        var user = CreateUser();
+        var expertTrail = CreateTrail(
+            "Expert Trail",
+            "Canterbury",
+            10m,
+            TrailDifficulty.Expert);
+        database.Context.Users.Add(user);
+        database.Context.Trails.Add(expertTrail);
+        database.Context.Badges.AddRange(CreateBadges());
+        database.Context.CheckIns.AddRange(Enumerable.Range(0, 10).Select(index =>
+            CreateCheckIn(
+                user.Id,
+                expertTrail.Id,
+                new DateTime(2026, 1, 1, 8, 0, 0, DateTimeKind.Utc).AddDays(index))));
+        await database.Context.SaveChangesAsync();
+        var service = new BadgeEvaluationService(database.Context);
+
+        var badges = await service.GetEligibleBadgesAsync(user.Id);
+
+        Assert.Contains(badges, badge => badge.Name == "Expert Explorer");
+        Assert.Contains(badges, badge => badge.Name == "Expert Specialist");
+        Assert.Contains(badges, badge => badge.Name == "Expert Master");
+        Assert.DoesNotContain(badges, badge => badge.Name == "Advanced Explorer");
+    }
+
+    [Fact]
+    public async Task GetUserBadgesAsync_ReportsSeparateAdvancedAndExpertProgress()
+    {
+        using var database = CreateDatabase();
+        var user = CreateUser();
+        var advancedTrail = CreateTrail(
+            "Advanced Trail",
+            "Canterbury",
+            10m,
+            TrailDifficulty.Advanced);
+        var expertTrail = CreateTrail(
+            "Expert Trail",
+            "Canterbury",
+            10m,
+            TrailDifficulty.Expert);
+        database.Context.Users.Add(user);
+        database.Context.Trails.AddRange(advancedTrail, expertTrail);
+        database.Context.Badges.AddRange(CreateBadges());
+        var advancedCheckIns = Enumerable.Range(0, 2).Select(index => CreateCheckIn(
+                user.Id,
+                advancedTrail.Id,
+                new DateTime(2026, 1, 1, 8, 0, 0, DateTimeKind.Utc).AddDays(index)));
+        var expertCheckIns = Enumerable.Range(0, 5).Select(index => CreateCheckIn(
+                user.Id,
+                expertTrail.Id,
+                new DateTime(2026, 2, 1, 8, 0, 0, DateTimeKind.Utc).AddDays(index)));
+        database.Context.CheckIns.AddRange(advancedCheckIns.Concat(expertCheckIns));
+        await database.Context.SaveChangesAsync();
+        var service = new BadgeService(database.Context);
+
+        var badges = await service.GetUserBadgesAsync(user.Id);
+
+        var advancedBadge = Assert.Single(
+            badges,
+            badge => badge.Name == "Advanced Explorer");
+        Assert.Equal(2m, advancedBadge.CurrentValue);
+        Assert.Equal(1m, advancedBadge.TargetValue);
+        Assert.Equal("2/1 advanced trails", advancedBadge.ProgressLabel);
+
+        var expertBadge = Assert.Single(
+            badges,
+            badge => badge.Name == "Expert Specialist");
+        Assert.Equal(5m, expertBadge.CurrentValue);
+        Assert.Equal(5m, expertBadge.TargetValue);
+        Assert.Equal("5/5 expert trails", expertBadge.ProgressLabel);
     }
 
     [Fact]
@@ -45,7 +121,7 @@ public class BadgeEvaluationServiceTests
     {
         using var database = CreateDatabase();
         var user = CreateUser();
-        var trail = CreateTrail("Hidden Trail", "Port Hills", 100m, TrailDifficulty.Hard);
+        var trail = CreateTrail("Hidden Trail", "Port Hills", 100m, TrailDifficulty.Advanced);
         database.Context.Users.Add(user);
         database.Context.Trails.Add(trail);
         database.Context.Badges.AddRange(CreateBadges());

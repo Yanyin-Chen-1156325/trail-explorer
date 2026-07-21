@@ -25,7 +25,7 @@ public static class BadgeRuleCatalog
         new("Port Hills Explorer", "Complete a trail in Port Hills.", "/badges/port-hills-explorer.svg", BadgeType.Region),
         new("Banks Peninsula Explorer", "Complete a trail in Banks Peninsula.", "/badges/banks-peninsula-explorer.svg", BadgeType.Region),
         new("Canterbury Explorer", "Complete trails across three Canterbury regions.", "/badges/canterbury-explorer.svg", BadgeType.Region),
-        new("Advanced Explorer", "Complete your first hard trail.", "/badges/advanced-explorer.svg", BadgeType.Difficulty),
+        new("Advanced Explorer", "Complete your first advanced trail.", "/badges/advanced-explorer.svg", BadgeType.Difficulty),
         new("Expert Explorer", "Complete your first expert-level trail.", "/badges/expert-explorer.svg", BadgeType.Difficulty),
         new("Expert Specialist", "Complete 5 expert-level trails.", "/badges/expert-specialist.svg", BadgeType.Difficulty),
         new("Expert Master", "Complete 10 expert-level trails.", "/badges/expert-master.svg", BadgeType.Difficulty),
@@ -56,10 +56,15 @@ public static class BadgeRuleCatalog
             ["1000km Explorer"] = 1000m
         };
 
+    public static readonly IReadOnlyDictionary<string, int> AdvancedTrailThresholds =
+        new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["Advanced Explorer"] = 1
+        };
+
     public static readonly IReadOnlyDictionary<string, int> ExpertTrailThresholds =
         new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
         {
-            ["Advanced Explorer"] = 1,
             ["Expert Explorer"] = 1,
             ["Expert Specialist"] = 5,
             ["Expert Master"] = 10

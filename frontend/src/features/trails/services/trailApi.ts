@@ -25,7 +25,12 @@ export interface TrailApi {
 
 const trimTrailingSlash = (value: string) => value.replace(/\/+$/, "");
 
-const trailDifficultyLabels: TrailDifficulty[] = ["Easy", "Moderate", "Hard"];
+const trailDifficultyLabels: TrailDifficulty[] = [
+  "Easy",
+  "Intermediate",
+  "Advanced",
+  "Expert",
+];
 
 function normalizeDifficulty(value: RawTrailDifficulty): TrailDifficulty {
   if (typeof value === "string") {

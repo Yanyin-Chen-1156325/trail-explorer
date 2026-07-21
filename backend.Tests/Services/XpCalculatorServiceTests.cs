@@ -10,9 +10,10 @@ public class XpCalculatorServiceTests
     public static TheoryData<decimal, TrailDifficulty, int> XpCases => new()
     {
         { 5m, TrailDifficulty.Easy, 50 },
-        { 10m, TrailDifficulty.Moderate, 120 },
-        { 12m, TrailDifficulty.Hard, 180 },
-        { 8.5m, TrailDifficulty.Hard, 128 }
+        { 10m, TrailDifficulty.Intermediate, 120 },
+        { 12m, TrailDifficulty.Advanced, 180 },
+        { 8.5m, TrailDifficulty.Advanced, 128 },
+        { 20m, TrailDifficulty.Expert, 400 }
     };
 
     [Theory]
@@ -47,5 +48,26 @@ public class XpCalculatorServiceTests
     {
         Assert.Throws<ArgumentOutOfRangeException>(() =>
             _service.CalculateXp(5m, (TrailDifficulty)999));
+    }
+
+    [Fact]
+    public void CalculateTotalXp_SumsIndividuallyRoundedTrailRewards()
+    {
+        TrailXpInput[] trails =
+        [
+            new(8.5m, TrailDifficulty.Advanced),
+            new(10m, TrailDifficulty.Intermediate),
+            new(20m, TrailDifficulty.Expert)
+        ];
+
+        var totalXp = _service.CalculateTotalXp(trails);
+
+        Assert.Equal(648, totalXp);
+    }
+
+    [Fact]
+    public void CalculateTotalXp_WithNoTrails_ReturnsZero()
+    {
+        Assert.Equal(0, _service.CalculateTotalXp([]));
     }
 }

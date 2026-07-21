@@ -10,8 +10,9 @@ public class XpCalculatorService : IXpCalculatorService
         new Dictionary<TrailDifficulty, decimal>
         {
             [TrailDifficulty.Easy] = 1.0m,
-            [TrailDifficulty.Moderate] = 1.2m,
-            [TrailDifficulty.Hard] = 1.5m
+            [TrailDifficulty.Intermediate] = 1.2m,
+            [TrailDifficulty.Advanced] = 1.5m,
+            [TrailDifficulty.Expert] = 2.0m
         };
 
     public int CalculateXp(decimal distanceKm, TrailDifficulty difficulty)
@@ -35,5 +36,12 @@ public class XpCalculatorService : IXpCalculatorService
         var xp = distanceKm * BaseXpPerKilometre * multiplier;
 
         return (int)Math.Round(xp, MidpointRounding.AwayFromZero);
+    }
+
+    public int CalculateTotalXp(IEnumerable<TrailXpInput> trails)
+    {
+        ArgumentNullException.ThrowIfNull(trails);
+
+        return trails.Sum(trail => CalculateXp(trail.DistanceKm, trail.Difficulty));
     }
 }

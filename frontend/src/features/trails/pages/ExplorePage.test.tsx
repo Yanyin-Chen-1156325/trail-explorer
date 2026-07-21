@@ -27,7 +27,7 @@ describe("ExplorePage", () => {
             docId: "doc-trail-2",
             name: "Harbour Track",
             city: "Nelson",
-            difficulty: "Moderate",
+            difficulty: "Intermediate",
           }),
         ]),
       ),
@@ -77,18 +77,18 @@ describe("ExplorePage", () => {
       .spyOn(globalThis, "fetch")
       .mockResolvedValue(
         await mockJsonResponse(
-          createTrailsResponse([createTrailWithDifficulty("Hard")]),
+          createTrailsResponse([createTrailWithDifficulty("Advanced")]),
         ),
       );
 
     renderWithRouter(<ExplorePage />);
 
-    expect((await screen.findAllByText("Hard Trail")).length).toBeGreaterThan(0);
-    await user.click(screen.getByRole("button", { name: "Hard" }));
+    expect((await screen.findAllByText("Advanced Trail")).length).toBeGreaterThan(0);
+    await user.click(screen.getByRole("button", { name: "Advanced" }));
 
     await waitFor(() => {
       expect(fetchMock).toHaveBeenLastCalledWith(
-        "http://localhost:5146/api/trails?difficulty=Hard&pageNumber=1&pageSize=12",
+        "http://localhost:5146/api/trails?difficulty=Advanced&pageNumber=1&pageSize=12",
         expect.any(Object),
       );
     });

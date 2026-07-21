@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 
 import { notificationHubUrl } from "@/config/api";
-import { useAuthStore } from "@/features/auth";
+import { useAuthStore } from "@/features/auth/store/authStore";
 import { useToastStore } from "@/shared/store/toastStore";
 
 import { createNotificationSignalRClient } from "../services/notificationSignalRClient";

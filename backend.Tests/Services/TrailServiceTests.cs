@@ -17,8 +17,8 @@ public class TrailServiceTests
         using var database = CreateDatabase();
         database.Context.Trails.AddRange(
             CreateTrail("doc-1", "Zeta Walk", "Canterbury", TrailDifficulty.Easy),
-            CreateTrail("doc-2", "Alpha Walk", "Auckland", TrailDifficulty.Moderate),
-            CreateTrail("doc-3", "Inactive Walk", "Auckland", TrailDifficulty.Hard, isActive: false),
+            CreateTrail("doc-2", "Alpha Walk", "Auckland", TrailDifficulty.Intermediate),
+            CreateTrail("doc-3", "Inactive Walk", "Auckland", TrailDifficulty.Advanced, isActive: false),
             CreateTrail("doc-4", "Beta Walk", "Auckland", TrailDifficulty.Easy));
         await database.Context.SaveChangesAsync();
         using var serviceFixture = CreateService(database.Context);
@@ -35,8 +35,8 @@ public class TrailServiceTests
         using var database = CreateDatabase();
         database.Context.Trails.AddRange(
             CreateTrail("doc-1", "Forest Loop", "Wellington", TrailDifficulty.Easy, description: "Native bush"),
-            CreateTrail("doc-2", "Harbour Track", "Christchurch", TrailDifficulty.Moderate),
-            CreateTrail("doc-3", "Summit Route", "Dunedin", TrailDifficulty.Hard, region: "Canterbury"),
+            CreateTrail("doc-2", "Harbour Track", "Christchurch", TrailDifficulty.Intermediate),
+            CreateTrail("doc-3", "Summit Route", "Dunedin", TrailDifficulty.Advanced, region: "Canterbury"),
             CreateTrail("doc-4", "River Walk", "Nelson", TrailDifficulty.Easy, description: "Canterbury views"));
         await database.Context.SaveChangesAsync();
         using var serviceFixture = CreateService(database.Context);
@@ -56,19 +56,19 @@ public class TrailServiceTests
         using var database = CreateDatabase();
         database.Context.Trails.AddRange(
             CreateTrail("doc-1", "Easy Walk", "Canterbury", TrailDifficulty.Easy),
-            CreateTrail("doc-2", "Moderate Walk", "Canterbury", TrailDifficulty.Moderate),
-            CreateTrail("doc-3", "Hard Walk", "Canterbury", TrailDifficulty.Hard));
+            CreateTrail("doc-2", "Moderate Walk", "Canterbury", TrailDifficulty.Intermediate),
+            CreateTrail("doc-3", "Hard Walk", "Canterbury", TrailDifficulty.Advanced));
         await database.Context.SaveChangesAsync();
         using var serviceFixture = CreateService(database.Context);
 
         var response = await serviceFixture.Service.GetTrailsAsync(new TrailQueryRequest
         {
-            Difficulty = TrailDifficulty.Hard
+            Difficulty = TrailDifficulty.Advanced
         });
 
         Assert.Single(response.Items);
         Assert.Equal("Hard Walk", response.Items[0].Name);
-        Assert.Equal(TrailDifficulty.Hard, response.Items[0].Difficulty);
+        Assert.Equal(TrailDifficulty.Advanced, response.Items[0].Difficulty);
     }
 
     [Fact]

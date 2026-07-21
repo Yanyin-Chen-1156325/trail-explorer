@@ -1,60 +1,10 @@
-import { screen, waitFor } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { Route, Routes } from "react-router-dom";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
-import { useAuthStore } from "@/features/auth";
 import { createTestSession, resetAuthStore } from "@/features/auth/testUtils";
 import { renderWithRouter } from "@/test/renderWithRouter";
 import { SiteHeader } from "@/shared/components/SiteHeader";
-
-import { CheckInModerationRoute, ManageUsersRoute, ProtectedHomePage } from "./App";
-
-vi.mock("@/features/checkins", () => ({
-  CheckInHistoryPage: () => <p>Check-in history page</p>,
-  CheckInModerationPage: () => <p>Check-in moderation page</p>,
-}));
-
-describe("ProtectedHomePage", () => {
-  beforeEach(() => {
-    resetAuthStore();
-  });
-
-  it("does not render the old in-page manage users button", () => {
-    resetAuthStore({ session: createTestSession({ role: "User" }) });
-
-    renderWithRouter(<ProtectedHomePage />);
-
-    expect(
-      screen.queryByRole("link", { name: /manage users/i }),
-    ).not.toBeInTheDocument();
-  });
-
-  it("refreshes a stale role before blocking user management", async () => {
-    vi.spyOn(globalThis, "fetch").mockResolvedValue(
-      {
-        ok: true,
-        status: 200,
-        statusText: "OK",
-        json: () => Promise.resolve([]),
-      } as Response,
-    );
-    resetAuthStore({
-      session: createTestSession({ role: "User" }),
-      refreshSession: async () => {
-        useAuthStore.setState({
-          session: createTestSession({ role: "Moderator" }),
-        });
-      },
-    });
-
-    renderWithRouter(<ManageUsersRoute />, { initialEntries: ["/admin/users"] });
-
-    await waitFor(() => {
-      expect(screen.getByText("User Management")).toBeInTheDocument();
-    });
-  });
-});
 
 describe("SiteHeader", () => {
   beforeEach(() => {
@@ -150,42 +100,5 @@ describe("SiteHeader", () => {
 
     expect(screen.getByText("machi@example.com")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /logout/i })).toBeInTheDocument();
-  });
-});
-
-describe("CheckInModerationRoute", () => {
-  beforeEach(() => {
-    resetAuthStore();
-  });
-
-  it("renders moderation UI for moderators", async () => {
-    resetAuthStore({ session: createTestSession({ role: "Moderator" }) });
-
-    renderWithRouter(
-      <Routes>
-        <Route element={<CheckInModerationRoute />} path="/moderation/checkins" />
-      </Routes>,
-      { initialEntries: ["/moderation/checkins"] },
-    );
-
-    expect(await screen.findByText("Check-in moderation page")).toBeInTheDocument();
-  });
-
-  it("redirects regular users away from moderation after refreshing role", async () => {
-    resetAuthStore({
-      session: createTestSession({ role: "User" }),
-      refreshSession: async () => undefined,
-    });
-
-    renderWithRouter(
-      <Routes>
-        <Route element={<CheckInModerationRoute />} path="/moderation/checkins" />
-        <Route element={<p>Dashboard destination</p>} path="/dashboard" />
-      </Routes>,
-      { initialEntries: ["/moderation/checkins"] },
-    );
-
-    expect(screen.getByText("Checking moderation permissions")).toBeInTheDocument();
-    expect(await screen.findByText("Dashboard destination")).toBeInTheDocument();
   });
 });

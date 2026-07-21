@@ -28,7 +28,7 @@ public class ProgressApiIntegrationTests : IClassFixture<CustomWebApplicationFac
         var user = await SeedUserAsync("progress.user@example.com", UserRole.User);
         var otherUser = await SeedUserAsync("other.progress.user@example.com", UserRole.User);
         var easyTrail = await SeedTrailAsync("progress-easy-trail", "Progress Easy Trail", 5m, TrailDifficulty.Easy);
-        var hardTrail = await SeedTrailAsync("progress-hard-trail", "Progress Hard Trail", 10m, TrailDifficulty.Hard);
+        var hardTrail = await SeedTrailAsync("progress-hard-trail", "Progress Hard Trail", 10m, TrailDifficulty.Advanced);
         await SeedCheckInAsync(user.Id, easyTrail.Id);
         await SeedCheckInAsync(user.Id, hardTrail.Id);
         await SeedCheckInAsync(user.Id, hardTrail.Id, isHidden: true);
@@ -69,8 +69,8 @@ public class ProgressApiIntegrationTests : IClassFixture<CustomWebApplicationFac
         await ResetProgressDataAsync();
         var user = await SeedUserAsync("xp.integration.user@example.com", UserRole.User);
         var easyTrail = await SeedTrailAsync("xp-easy-trail", "XP Easy Trail", 5m, TrailDifficulty.Easy);
-        var moderateTrail = await SeedTrailAsync("xp-moderate-trail", "XP Moderate Trail", 10m, TrailDifficulty.Moderate);
-        var hardTrail = await SeedTrailAsync("xp-hard-trail", "XP Hard Trail", 12m, TrailDifficulty.Hard);
+        var moderateTrail = await SeedTrailAsync("xp-moderate-trail", "XP Moderate Trail", 10m, TrailDifficulty.Intermediate);
+        var hardTrail = await SeedTrailAsync("xp-hard-trail", "XP Hard Trail", 12m, TrailDifficulty.Advanced);
         await SeedCheckInAsync(user.Id, easyTrail.Id);
         await SeedCheckInAsync(user.Id, moderateTrail.Id);
         await SeedCheckInAsync(user.Id, hardTrail.Id);
@@ -91,7 +91,7 @@ public class ProgressApiIntegrationTests : IClassFixture<CustomWebApplicationFac
         var client = _factory.CreateClient();
         await ResetProgressDataAsync();
         var user = await SeedUserAsync("level.integration.user@example.com", UserRole.User);
-        var hardTrail = await SeedTrailAsync("level-hard-trail", "Level Hard Trail", 50m, TrailDifficulty.Hard);
+        var hardTrail = await SeedTrailAsync("level-hard-trail", "Level Hard Trail", 50m, TrailDifficulty.Advanced);
         await SeedCheckInAsync(user.Id, hardTrail.Id);
         client.DefaultRequestHeaders.Authorization = CreateAuthorizationHeader(user);
 

@@ -25,12 +25,12 @@ public class TrailApiIntegrationTests : IClassFixture<CustomWebApplicationFactor
         var client = _factory.CreateClient();
         await ResetTrailsAsync();
         var activeTrail = CreateTrail("api-list-active", "Alpine Loop", "Auckland", TrailDifficulty.Easy);
-        var secondActiveTrail = CreateTrail("api-list-second", "Bush Track", "Wellington", TrailDifficulty.Moderate);
+        var secondActiveTrail = CreateTrail("api-list-second", "Bush Track", "Wellington", TrailDifficulty.Intermediate);
         var inactiveTrail = CreateTrail(
             "api-list-inactive",
             "Closed Ridge",
             "Canterbury",
-            TrailDifficulty.Hard,
+            TrailDifficulty.Advanced,
             isActive: false);
         await SeedTrailsAsync(activeTrail, secondActiveTrail, inactiveTrail);
 
@@ -54,7 +54,7 @@ public class TrailApiIntegrationTests : IClassFixture<CustomWebApplicationFactor
     {
         var client = _factory.CreateClient();
         await ResetTrailsAsync();
-        var trail = CreateTrail("api-detail-active", "Summit Route", "Nelson", TrailDifficulty.Hard);
+        var trail = CreateTrail("api-detail-active", "Summit Route", "Nelson", TrailDifficulty.Advanced);
         await SeedTrailsAsync(trail);
 
         var response = await client.GetAsync($"/api/trails/{trail.Id}");
@@ -79,7 +79,7 @@ public class TrailApiIntegrationTests : IClassFixture<CustomWebApplicationFactor
             "api-detail-inactive",
             "Closed Summit",
             "Otago",
-            TrailDifficulty.Hard,
+            TrailDifficulty.Advanced,
             isActive: false);
         await SeedTrailsAsync(trail);
 
@@ -127,7 +127,7 @@ public class TrailApiIntegrationTests : IClassFixture<CustomWebApplicationFactor
         var client = _factory.CreateClient();
         await ResetTrailsAsync();
         var nameMatch = CreateTrail("search-name", "Canterbury Ridge", "Auckland", TrailDifficulty.Easy);
-        var cityMatch = CreateTrail("search-city", "Harbour Path", "Canterbury", TrailDifficulty.Moderate);
+        var cityMatch = CreateTrail("search-city", "Harbour Path", "Canterbury", TrailDifficulty.Intermediate);
         var regionMatch = CreateTrail(
             "search-region",
             "Forest Loop",
@@ -138,7 +138,7 @@ public class TrailApiIntegrationTests : IClassFixture<CustomWebApplicationFactor
             "search-description",
             "River Walk",
             "Otago",
-            TrailDifficulty.Hard,
+            TrailDifficulty.Advanced,
             description: "A route with Canterbury foothill views.");
         var nonMatch = CreateTrail("search-non-match", "Coastal Track", "Wellington", TrailDifficulty.Easy);
         await SeedTrailsAsync(nameMatch, cityMatch, regionMatch, descriptionMatch, nonMatch);
@@ -167,7 +167,7 @@ public class TrailApiIntegrationTests : IClassFixture<CustomWebApplicationFactor
             "search-inactive",
             "Summit Route",
             "Auckland",
-            TrailDifficulty.Hard,
+            TrailDifficulty.Advanced,
             isActive: false);
         await SeedTrailsAsync(activeTrail, inactiveTrail);
 
@@ -206,19 +206,19 @@ public class TrailApiIntegrationTests : IClassFixture<CustomWebApplicationFactor
         var client = _factory.CreateClient();
         await ResetTrailsAsync();
         var easyTrail = CreateTrail("filter-easy", "Forest Loop", "Auckland", TrailDifficulty.Easy);
-        var firstHardTrail = CreateTrail("filter-hard-1", "Summit Route", "Canterbury", TrailDifficulty.Hard);
-        var secondHardTrail = CreateTrail("filter-hard-2", "Ridge Track", "Otago", TrailDifficulty.Hard);
-        var moderateTrail = CreateTrail("filter-moderate", "Harbour Path", "Wellington", TrailDifficulty.Moderate);
+        var firstHardTrail = CreateTrail("filter-hard-1", "Summit Route", "Canterbury", TrailDifficulty.Advanced);
+        var secondHardTrail = CreateTrail("filter-hard-2", "Ridge Track", "Otago", TrailDifficulty.Advanced);
+        var moderateTrail = CreateTrail("filter-moderate", "Harbour Path", "Wellington", TrailDifficulty.Intermediate);
         await SeedTrailsAsync(easyTrail, firstHardTrail, secondHardTrail, moderateTrail);
 
-        var response = await client.GetAsync("/api/trails?difficulty=Hard&pageNumber=1&pageSize=10");
+        var response = await client.GetAsync("/api/trails?difficulty=Advanced&pageNumber=1&pageSize=10");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         var trails = await response.Content.ReadFromJsonAsync<PagedTrailResponse>();
         Assert.NotNull(trails);
         Assert.Equal(2, trails.TotalCount);
-        Assert.All(trails.Items, trail => Assert.Equal(TrailDifficulty.Hard, trail.Difficulty));
+        Assert.All(trails.Items, trail => Assert.Equal(TrailDifficulty.Advanced, trail.Difficulty));
         Assert.Contains(trails.Items, trail => trail.Id == firstHardTrail.Id);
         Assert.Contains(trails.Items, trail => trail.Id == secondHardTrail.Id);
         Assert.DoesNotContain(trails.Items, trail => trail.Id == easyTrail.Id);
@@ -259,7 +259,7 @@ public class TrailApiIntegrationTests : IClassFixture<CustomWebApplicationFactor
             CreateTrail("filter-page-1", "Easy Trail 1", "Auckland", TrailDifficulty.Easy),
             CreateTrail("filter-page-2", "Easy Trail 2", "Auckland", TrailDifficulty.Easy),
             CreateTrail("filter-page-3", "Easy Trail 3", "Auckland", TrailDifficulty.Easy),
-            CreateTrail("filter-page-hard", "Hard Trail", "Auckland", TrailDifficulty.Hard));
+            CreateTrail("filter-page-hard", "Hard Trail", "Auckland", TrailDifficulty.Advanced));
 
         var response = await client.GetAsync("/api/trails?difficulty=Easy&pageNumber=2&pageSize=2");
 

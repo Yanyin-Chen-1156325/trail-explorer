@@ -10,6 +10,8 @@ const notificationTypeLabels: NotificationType[] = [
   "XpGained",
   "LevelUp",
   "WeeklyStreak",
+  "XpDeducted",
+  "XpRegained",
 ];
 
 export function normalizeNotificationType(

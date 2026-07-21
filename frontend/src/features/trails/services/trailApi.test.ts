@@ -28,13 +28,13 @@ describe("createTrailApi", () => {
 
     const response = await api.getTrails({
       search: "  forest loop  ",
-      difficulty: "Hard",
+      difficulty: "Advanced",
       pageNumber: 2,
       pageSize: 6,
     });
 
     expect(fetchMock).toHaveBeenCalledWith(
-      "/api/trails?search=forest+loop&difficulty=Hard&pageNumber=2&pageSize=6",
+      "/api/trails?search=forest+loop&difficulty=Advanced&pageNumber=2&pageSize=6",
       {
         method: "GET",
         headers: {
@@ -42,7 +42,7 @@ describe("createTrailApi", () => {
         },
       },
     );
-    expect(response.items[0].difficulty).toBe("Hard");
+    expect(response.items[0].difficulty).toBe("Advanced");
   });
 
   it("encodes trail detail ids", async () => {
