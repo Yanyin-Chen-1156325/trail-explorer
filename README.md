@@ -12,6 +12,29 @@ Trail Explorer is a gamified hiking trail platform focused on trails around Chri
 
 ---
 
+## Local Setup
+
+### Prerequisites
+
+- Docker Desktop
+- `.env` file (included in the submission)
+
+### Run the Project
+
+1. Copy the provided `.env` file into the project root directory (`TrailExplorer/`).
+2. Run:
+
+```bash
+docker compose up --build
+```
+
+After the containers have started:
+
+- Frontend: http://localhost:5173
+- Backend API: http://localhost:8080
+
+---
+
 ## Project Introduction
 
 This project is a full-stack web application. The frontend uses React and TypeScript. The backend uses ASP.NET Core Web API, Entity Framework Core, and PostgreSQL. The production frontend is deployed to Vercel. The production backend is deployed to Azure App Service for Linux container. Supabase PostgreSQL is used as the production database.
