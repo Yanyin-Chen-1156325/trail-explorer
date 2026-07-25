@@ -334,10 +334,10 @@
 
 * [x] Specs complete
 
-* [ ] Video complete
+* [x] Video complete
 
 * [x] Repository public
 
 * [x] Deployment links verified
 
-* [ ] Ready for submission
+* [x] Ready for submission
